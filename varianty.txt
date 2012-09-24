@@ -1,0 +1,13 @@
+Varianty:
+
+(a) Knuth-Moris-Prattův algoritmus (jednodušší?)
+b Boyer-Mooreův algoritmus (libovolný typ heuristiky)
+---
+1 Quick sort
+2 Heap sort
+3 Shell sort
+(4) Merge sort
+---
+(I) Binární strom
+II Hashovací tabulka
+
