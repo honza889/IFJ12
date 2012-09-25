@@ -10,5 +10,3 @@ b Boyer-Mooreův algoritmus (libovolný typ heuristiky)
 ---
 (I) Binární strom
 II Hashovací tabulka
-
-zkouska 1 2 3
