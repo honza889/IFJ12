@@ -107,12 +107,12 @@ char* getGTstring(GenType *object){
   break;
   
   case typeString:
-   // Pozdeji mozna pujde optimalizovat - zalezi jak se bude vraceny retezec vyuzivat
+   // Pozdeji muze stacit toto - zalezi jak se bude vraceny retezec vyuzivat
+   //output=object->value;
    outputSize=((strlen(object->value)+1)*sizeof(char));
    output=malloc(outputSize);
    MALLCHECK(output);
    memcpy(output,object->value,outputSize);
-   return object->value;
   break;
   
  }
