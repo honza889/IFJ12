@@ -1,5 +1,4 @@
 #include "global.h"
-#include "gentype.h"
 
 int main(int argc, char**argv)
 {
@@ -19,6 +18,8 @@ int main(int argc, char**argv)
  printf("(%s)",getGTstring(&test));
  setGTstring(&test,"abcd");
  printf("(%s)",getGTstring(&test));
+ setSymbol("promenna1",&test);
+ printf("(%s)",getGTstring(getSymbol("promenna1")));
  freeGTvalue(&test);
  
  printf("\n");
