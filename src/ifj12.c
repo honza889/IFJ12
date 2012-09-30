@@ -2,26 +2,27 @@
 
 int main(int argc, char**argv)
 {
- printf("Hello world!\n");
  
- GenType test;
- test.value=NULL; // dulezite inicializovat!
- setGTnil(&test);
- printf("(%s)",getGTstring(&test));
- setGTbool(&test,true);
- printf("(%s)",getGTstring(&test));
- setGTbool(&test,false);
- printf("(%s)",getGTstring(&test));
- setGTint(&test,8);
- printf("(%s)",getGTstring(&test));
- setGTnumeric(&test,0.00034567891234567899);
- printf("(%s)",getGTstring(&test));
- setGTstring(&test,"abcd");
- printf("(%s)",getGTstring(&test));
- setSymbol("promenna1",&test);
- printf("(%s)",getGTstring(getSymbol("promenna1")));
- freeGTvalue(&test);
+ // Vytvoreni promennych:
+ setGTstring(setSymbol("jablko"),"Jabloň");
+ setGTstring(setSymbol("hruska"),"Hrušeň");
+ setGTstring(setSymbol("tresne"),"Třešeň");
  
+ // Trivialni ziskani obsahu promennych: (vysledek getGTstring neni uvolnovan free()!)
+ printf("(%s)\n",getGTstring(getSymbol("jablko")));
+ printf("(%s)\n",getGTstring(getSymbol("hruska")));
+ printf("(%s)\n",getGTstring(getSymbol("tresne")));
+ 
+ // Prepis promenne ala PHP:
+ setGTstring(setSymbol("hruska"),"Jiná Hrušeň");
+ setGTint(setSymbol("merunka"),125);
+ 
+ // Opet vypis pro srovnani:
  printf("\n");
+ printf("(%s)\n",getGTstring(getSymbol("jablko")));
+ printf("(%s)\n",getGTstring(getSymbol("hruska")));
+ printf("(%s)\n",getGTstring(getSymbol("tresne")));
+ printf("(%s)\n",getGTstring(getSymbol("merunka")));
+ 
 }
 

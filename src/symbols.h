@@ -17,6 +17,8 @@ struct Symbol {
 
 extern Symbol *symbolTable;
 
-void setSymbol(char *name, GenType *value);
+/** Vrati adresu GT symbolu daneho jmena, pokud neexistuje, vytvori */
+GenType* setSymbol(char *name);
+/** Vrati adresu GT symbolu daneho jmena, pokud neexistuje, vrati NULL */
 GenType* getSymbol(char *name);
 
