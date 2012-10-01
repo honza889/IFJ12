@@ -5,7 +5,9 @@
  * Tabulka symbolu (vyuzivajici vyhledavaci strom)
  */
 
-#include "global.h"
+#include <stdlib.h>
+#include "symbols.h"
+#include "gentype.h"
 
 /**
  * Symbol (prvek tabulky/stromu symbolu)

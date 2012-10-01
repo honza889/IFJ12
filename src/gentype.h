@@ -1,10 +1,11 @@
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#ifndef GENTYPE_H
+#define GENTYPE_H
 
 /**
  * Genericky datovy typ pro promenne jazyka
  */
 
+#include <stdbool.h>
 #include "global.h"
 
 /**

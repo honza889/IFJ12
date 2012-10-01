@@ -1,3 +1,6 @@
+#include "gentype.h"
+
+#include <stdlib.h>
 #include "global.h"
 
 #define BUFFERSIZE 64

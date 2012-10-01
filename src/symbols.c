@@ -1,4 +1,6 @@
-#include "global.h"
+#include "symbols.h"
+
+#include <string.h>
 
 /** Tabulka symbolu (ukazatel na vrchol vyhledavaciho stromu) */
 Symbol *symbolTable = NULL;

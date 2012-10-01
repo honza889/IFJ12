@@ -1,4 +1,6 @@
-#include "global.h"
+#include <stdio.h>
+#include "gentype.h"
+#include "symbols.h"
 
 int main(int argc, char**argv)
 {
@@ -23,6 +25,8 @@ int main(int argc, char**argv)
  printf("(%s)\n",getGTstring(getSymbol("hruska")));
  printf("(%s)\n",getGTstring(getSymbol("tresne")));
  printf("(%s)\n",getGTstring(getSymbol("merunka")));
+ 
+ return 0;
  
 }
 
