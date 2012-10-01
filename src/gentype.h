@@ -1,3 +1,6 @@
+#ifndef GLOBAL_H
+#define GLOBAL_H
+
 /**
  * Genericky datovy typ pro promenne jazyka
  */
@@ -37,3 +40,4 @@ void setGTstring(GenType *object, char *value);
 // Ziskat z GT typ... (bez ohledu na to co obsahuje)
 char* getGTstring(GenType *object);
 
+#endif

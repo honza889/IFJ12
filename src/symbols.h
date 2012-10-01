@@ -1,3 +1,6 @@
+#ifndef SYMBOLS_H
+#define SYMBOLS_H
+
 /**
  * Tabulka symbolu (vyuzivajici vyhledavaci strom)
  */
@@ -22,3 +25,4 @@ GenType* setSymbol(char *name);
 /** Vrati adresu GT symbolu daneho jmena, pokud neexistuje, vrati NULL */
 GenType* getSymbol(char *name);
 
+#endif
