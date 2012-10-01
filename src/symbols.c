@@ -2,74 +2,78 @@
 
 #include <string.h>
 
-/** Tabulka symbolu (ukazatel na vrchol vyhledavaciho stromu) */
-Symbol *symbolTable = NULL;
-
-/** Zajisti vytvoreni/nalezeni GT a jeho adresu vrati */
-GenType* setSymbol(char *name){
- 
- // Vyhledani uzlu (uzel=symbolTable/greater/lesser)
- Symbol **destination = &symbolTable;
+/**
+ * Vyhledani uzlu (uzel=root/greater/lesser)
+ * Vstupem ukazatel na ukazatel na vrchol stromu (Symbol**)
+ * Vystupem ukazatel na uzel pro symbol (Symbol**)
+ */
+Symbol** searchSymbol(Symbol **destination, char *name, bool *exist){
  while(*destination!=NULL){
   int cmp=strcmp((*destination)->name,name);
-  
   if(cmp==0){ // destination name == name
-   break; // prepis hodnoty existujiciho symbolu
+   *exist=true; // symbol nalezen
+   break;
   }else if(cmp<0){ // destination name < name
    destination = &((*destination)->greater);
   }else{ // destination name > name
    destination = &((*destination)->lesser);
   }
-  
+ }
+ return destination;
+}
+
+
+/**
+ * Vrati index symbolu daneho jmena, pokud neexistuje, vytvori ho
+ * @return index (zaporny=globalTable, kladny=localTable)
+ */
+int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable){
+ 
+ bool inLocal=false;
+ bool exist=false;
+ int index;
+ Symbol **destination;
+ SymbolTable *table;
+ 
+ // Nejprve bude prohledana globalni tabulka
+ destination = searchSymbol(&(globalTable->root),name,&exist);
+ 
+ // Mame-li lokalni tabulku, a symbol v minule nebyl, prohledame lokalni
+ if(localTable!=NULL && !exist){
+  destination = searchSymbol(&(localTable->root),name,&exist);
+  inLocal=true;
  }
  
  // Vytvoreni symbolu, pokud nejde o prepis exitujiciho
- if(*destination==NULL){
+ if(!exist){
+  
+  // destination nyni ukazuje na NULL ukazatel (volny uzel)
+  
   Symbol *newSymbol = malloc(sizeof(Symbol));
   MALLCHECK(newSymbol);
   
-  // Vytvoreni kopie nazvu promenne
+  // Kopie nazvu promenne
   int nameSize = (strlen(name)+1)*sizeof(char);
   newSymbol->name=malloc(nameSize);
   MALLCHECK(newSymbol->name);
   memcpy(newSymbol->name,name,nameSize);
-
-  newSymbol->value = NULL;
+  
+  // Ziskani a nasledne navyseni indexu
+  index=(inLocal?localTable:globalTable)->count++;
+  
   newSymbol->lesser = NULL;
   newSymbol->greater = NULL;
+  newSymbol->index = index;
   *destination = newSymbol;
- }
- 
- // Vytvoreni/nalezeni GT
- if((*destination)->value!=NULL){
-  return (*destination)->value;
- }else{
-  GenType *newGT = malloc(sizeof(GenType));
-  MALLCHECK(newGT);
-  newGT->type = typeNil;
-  newGT->value = NULL;
-  (*destination)->value=newGT;
-  return newGT;
- }
- 
-}
-
-GenType* getSymbol(char *name){
- 
- Symbol *destination = symbolTable;
- while(destination!=NULL){
-  int cmp=strcmp(destination->name,name);
   
-  if(cmp==0){ // destination name == name
-   return destination->value; // nalezeno - HURA!
-  }else if(cmp<0){ // destination name < name
-   destination = destination->greater;
-  }else{ // destination name > name
-   destination = destination->lesser;
-  }
+ }else{ // Jde o prepis stavajiciho
+  
+  // destination nyni ukazuje na ukazatel na stejnojmeny prvek
+  index = (*destination)->index;
   
  }
  
- return NULL; // nazev nebyl nalezen
+ // prevod fyzicke adresy na logickou
+ return (inLocal?index:-index-1);
 }
 

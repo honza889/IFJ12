@@ -3,34 +3,31 @@
 
 /**
  * Tabulka symbolu (vyuzivajici vyhledavaci strom)
+ * Jmenum promennych prirazuje index v polich symbolu.
  */
 
 #include <stdlib.h>
+#include <stdbool.h>
+#include "global.h"
 #include "symbols.h"
-#include "gentype.h"
 
 /**
- * Symbol (prvek tabulky/stromu symbolu)
+ * Symbol (prvek stromu symbolu)
  */
 typedef struct Symbol Symbol; // Aby mohl obsahovat sam sebe
 struct Symbol {
  char *name; // Nazev promenne
- GenType *value; // Obsah promenne
+ int index; // Index Value v poli symbolu (kladny=lokalni tabulka, zaporny=globalni tabulka)
  Symbol *lesser; // Větev - menší prvek
  Symbol *greater; // Větev - větší prvek
 };
 
-typedef struct 
-{
-	int index;
-	bool isGlobal;
-} Variable;
+typedef struct {
+ Symbol *root;
+ int count;
+} SymbolTable;
 
-extern Symbol *symbolTable;
-
-/** Vrati adresu GT symbolu daneho jmena, pokud neexistuje, vytvori */
-GenType* setSymbol(char *name);
-/** Vrati adresu GT symbolu daneho jmena, pokud neexistuje, vrati NULL */
-GenType* getSymbol(char *name);
+/** Vrati index symbolu daneho jmena, pokud neexistuje, vytvori ho */
+int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable);
 
 #endif

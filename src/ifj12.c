@@ -1,30 +1,22 @@
 #include <stdio.h>
-#include "gentype.h"
+#include "value.h"
 #include "symbols.h"
+
+int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable);
 
 int main(int argc, char**argv)
 {
  
- // Vytvoreni promennych:
- setGTstring(setSymbol("jablko"),"Jabloň");
- setGTstring(setSymbol("hruska"),"Hrušeň");
- setGTstring(setSymbol("tresne"),"Třešeň");
+ SymbolTable global = {NULL,0};
+ SymbolTable local = {NULL,0};
  
- // Trivialni ziskani obsahu promennych: (vysledek getGTstring neni uvolnovan free()!)
- printf("(%s)\n",getGTstring(getSymbol("jablko")));
- printf("(%s)\n",getGTstring(getSymbol("hruska")));
- printf("(%s)\n",getGTstring(getSymbol("tresne")));
- 
- // Prepis promenne ala PHP:
- setGTstring(setSymbol("hruska"),"Jiná Hrušeň");
- setGTint(setSymbol("merunka"),125);
- 
- // Opet vypis pro srovnani:
- printf("\n");
- printf("(%s)\n",getGTstring(getSymbol("jablko")));
- printf("(%s)\n",getGTstring(getSymbol("hruska")));
- printf("(%s)\n",getGTstring(getSymbol("tresne")));
- printf("(%s)\n",getGTstring(getSymbol("merunka")));
+ printf("%d\n", getSymbol("test",&global,&local) );
+ printf("%d\n", getSymbol("test",&global,&local) );
+ printf("%d\n", getSymbol("test2",&global,&local) );
+ printf("%d\n", getSymbol("test3",&global,&local) );
+ printf("%d\n", getSymbol("funkce1",&global,NULL) );
+ printf("%d\n", getSymbol("funkce2",&global,NULL) );
+ printf("%d\n", getSymbol("funkce1",&global,NULL) );
  
  return 0;
  
