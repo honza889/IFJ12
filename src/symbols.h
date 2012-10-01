@@ -20,6 +20,12 @@ struct Symbol {
  Symbol *greater; // Větev - větší prvek
 };
 
+typedef struct 
+{
+	int index;
+	bool isGlobal;
+} Variable;
+
 extern Symbol *symbolTable;
 
 /** Vrati adresu GT symbolu daneho jmena, pokud neexistuje, vytvori */
