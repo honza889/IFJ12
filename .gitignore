@@ -1,2 +1,5 @@
 ifj12
 obj
+unitests/*/test
+unitests/*/test.o
+unitests/*/out
