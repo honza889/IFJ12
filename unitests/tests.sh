@@ -6,7 +6,7 @@ for FILE in $FILES; do
 		echo "*********************************"
 		echo "  Test: $FILE"
 		echo "*********************************"
-		diff "unitests/$FILE/out" "unitests/$FILE/out.correct"
+		unitests/$FILE/test
    	if [ "$?" == "0" ]; then
 			echo "Korektni";
 		fi
