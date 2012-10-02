@@ -11,13 +11,14 @@ obj/%.o: src/%.c
 #  Testy
 #  *****
 
-TESTS=value 
+TESTS=value symbols
 
 .PHONY: test
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 	unitests/tests.sh
 
-unitests/value/test: obj/value.o 
+unitests/value/test: obj/value.o
+unitests/symbols/test: obj/symbols.o obj/value.o
 
 unitests/%/test: unitests/%/test.c
 	gcc -o $@ $^ $(CFLAGS)
