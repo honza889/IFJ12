@@ -2,8 +2,6 @@
 #include "value.h"
 #include "symbols.h"
 
-int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable);
-
 int main(int argc, char**argv)
 {
  
@@ -18,7 +16,18 @@ int main(int argc, char**argv)
  printf("%d\n", getSymbol("funkce2",&global,NULL) );
  printf("%d\n", getSymbol("funkce1",&global,NULL) );
  
- return 0;
+ freeSymbolTable(&global);
+ freeSymbolTable(&local);
  
+ Value *globalTable = initValueTable(&global);
+ Value *localTable = initValueTable(&local);
+ 
+ setValueString(&localTable[1],"zkouska");
+ printf("[%s]\n", getValueString(&localTable[1]) );
+ 
+ freeValueTable(globalTable,&global);
+ freeValueTable(localTable,&local);
+ 
+ return 0;
 }
 

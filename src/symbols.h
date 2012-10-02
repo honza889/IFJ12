@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include "global.h"
 #include "symbols.h"
+#include "value.h"
 
 /**
  * Symbol (prvek stromu symbolu)
@@ -29,5 +30,14 @@ typedef struct {
 
 /** Vrati index symbolu daneho jmena, pokud neexistuje, vytvori ho */
 int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable);
+
+/** Alokuje a inicializuje tabulku symbolu */
+Value* initValueTable(SymbolTable *st);
+
+/** Uvolnuje symboly stromu symbolu (pocet prvku zachova) */
+void freeSymbolTable(SymbolTable *st);
+
+/** Uvolnuje Value tabulky symbolu (potrebuje st->count) */
+void freeValueTable(Value *table,SymbolTable *st);
 
 #endif
