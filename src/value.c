@@ -107,6 +107,10 @@ bool getValueBoolean(Value *object){
    exit(3);
   break;
   
+  case typeBoolean:
+   return object->data.boolean;
+  break;
+  
   case typeNumeric:
    if(object->data.numeric==0.0 || object->data.numeric==NAN){
     return false;

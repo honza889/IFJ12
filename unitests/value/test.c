@@ -21,8 +21,8 @@ BEGIN_TEST
  STRTEST( s=getValueString(&v), "false" );free(s);
  TEST( getValueBoolean(&v) == false );
 
- setValueNumeric(&v,123456.789012);
- STRTEST( s=getValueString(&v), "123456.789012" ); free( s );
+ setValueNumeric(&v,123.456); // %g vypisuje jen na 6 cifer
+ STRTEST( s=getValueString(&v), "123.456" ); free( s );
  TEST( getValueBoolean(&v) );
  
  setValueString(&v,"Toto je řetězec znaků");
