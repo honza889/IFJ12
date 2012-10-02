@@ -19,7 +19,7 @@ obj/symbols.o: src/symbols.c
 #  *****
 .PHONY: test unitests/value/test
 test:   unitests/value/test
-	unitests/tests
+	unitests/tests.sh
 unitests/value/test:
 	gcc -c -o unitests/value/test.o unitests/value/test.c $(CFLAGS)
 	gcc -o $@ unitests/value/test.o obj/value.o $(CFLAGS)

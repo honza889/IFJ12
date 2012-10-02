@@ -67,7 +67,7 @@ char* getValueString(Value *object){
   break;
   
   case typeNil:
-   NEWSTRING(output,"nil");
+   NEWSTRING(output,"Nil");
   break;
   
   case typeBoolean:
