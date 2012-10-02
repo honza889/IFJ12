@@ -1,32 +1,34 @@
-#include <stdio.h>
-#include "value.h"
 
-int main(){
+#include <stdio.h>
+#include <assert.h>
+#include "value.h"
+#include "../test.h"
+
+BEGIN_TEST
  
  char *s;
  Value v = {typeUndefined};
  
  setValueNil(&v);
- printf("%s:%d: %s\n",__FILE__,__LINE__,s=getValueString(&v));free(s);
- printf("%s:%d: %s\n",__FILE__,__LINE__,(getValueBoolean(&v)?"true":"false"));
+ STRTEST( s=getValueString(&v),"Nil" );free(s);
+ TEST( getValueBoolean(&v) == false );
  
  setValueBoolean(&v,true);
- printf("%s:%d: %s\n",__FILE__,__LINE__,s=getValueString(&v));free(s);
- printf("%s:%d: %s\n",__FILE__,__LINE__,(getValueBoolean(&v)?"true":"false"));
+ STRTEST( s=getValueString(&v),"true" );free(s);
+ TEST( getValueBoolean(&v) == true );
 
  setValueBoolean(&v,false);
- printf("%s:%d: %s\n",__FILE__,__LINE__,s=getValueString(&v));free(s);
- printf("%s:%d: %s\n",__FILE__,__LINE__,(getValueBoolean(&v)?"true":"false"));
+ STRTEST( s=getValueString(&v), "false" );free(s);
+ TEST( getValueBoolean(&v) == false );
 
  setValueNumeric(&v,123456.789012);
- printf("%s:%d: %s\n",__FILE__,__LINE__,s=getValueString(&v));free(s);
- printf("%s:%d: %s\n",__FILE__,__LINE__,(getValueBoolean(&v)?"true":"false"));
+ STRTEST( s=getValueString(&v), "123456.789012" ); free( s );
+ TEST( getValueBoolean(&v) );
  
  setValueString(&v,"Toto je řetězec znaků");
- printf("%s:%d: %s\n",__FILE__,__LINE__,s=getValueString(&v));free(s);
- printf("%s:%d: %s\n",__FILE__,__LINE__,(getValueBoolean(&v)?"true":"false"));
+ STRTEST( s=getValueString(&v), "Toto je řetězec znaků" );free(s);
+ TEST( getValueBoolean(&v) == true );
 
  freeValue(&v);
  
- printf("Hotovo\n");
-}
+END_TEST
