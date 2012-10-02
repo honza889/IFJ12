@@ -20,7 +20,6 @@ test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 unitests/value/test: obj/value.o 
 
 unitests/%/test: unitests/%/test.c
-	echo NIC NEJEDE
 	gcc -o $@ $^ $(CFLAGS)
 
 
