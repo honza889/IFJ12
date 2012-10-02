@@ -28,7 +28,7 @@ typedef struct {
   bool boolean;
   double numeric;
   void *function;
-  void *string;
+  char *string;
  } data;
  
 } Value;
@@ -44,5 +44,6 @@ void setValueString(Value *object, char *value);
 
 // Ziskat z Value typ... (bez ohledu na to co obsahuje)
 char* getValueString(Value *object);
+bool getValueBoolean(Value *object);
 
 #endif

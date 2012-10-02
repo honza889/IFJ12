@@ -22,8 +22,12 @@ int main(int argc, char**argv)
  Value *globalTable = initValueTable(&global);
  Value *localTable = initValueTable(&local);
  
+ char *s;
  setValueString(&localTable[1],"zkouska");
- printf("[%s]\n", getValueString(&localTable[1]) );
+ printf("[%s]\n", s = getValueString(&localTable[1]) );
+ free(s);
+ 
+ printf("%s\n", (getValueBoolean(&localTable[1])?"true":"false") );
  
  freeValueTable(globalTable,&global);
  freeValueTable(localTable,&local);

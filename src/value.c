@@ -1,6 +1,7 @@
 #include "value.h"
 
 #include <stdlib.h>
+#include <math.h>
 #include "global.h"
 
 #define BUFFERSIZE 128
@@ -59,6 +60,11 @@ char* getValueString(Value *object){
  char *output=NULL;
  int outputSize=0;
  switch(object->type){
+
+  case typeUndefined:
+   fprintf(stderr,"\nError: Undefined variable!\n");
+   exit(3);
+  break;
   
   case typeNil:
    NEWSTRING(output,"nil");
@@ -83,10 +89,41 @@ char* getValueString(Value *object){
   break;
   
   case typeString:
-   output=object->data.string;
+   outputSize=((strlen(object->data.string)+1)*sizeof(char));
+   output=malloc(outputSize);
+   MALLCHECK(output);
+   memcpy(output,object->data.string,outputSize);
   break;
   
  }
  return output;
+}
+
+bool getValueBoolean(Value *object){
+ switch(object->type){
+  
+  case typeUndefined:
+   fprintf(stderr,"\nError: Undefined variable!\n");
+   exit(3);
+  break;
+  
+  case typeNumeric:
+   if(object->data.numeric==0.0 || object->data.numeric==NAN){
+    return false;
+   }else{
+    return true;
+   }
+  break;
+  
+  case typeString:
+   if(object->data.string[0]=='\0'){
+    return false; // prazdny retezec
+   }else{
+    return true; // neprazdny retezec
+   }
+  break;
+  
+ }
+ return false;
 }
 
