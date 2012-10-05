@@ -1,11 +1,15 @@
-CFLAGS=-std=c99 -I src
+CFLAGS=-std=c99 -I src -Wall
 
-ifj12: obj/ifj12.o obj/value.o obj/symbols.o
+SOURCES=ifj12 value symbols
+
+ifj12: $(addprefix obj/,$(addsuffix .o,$(SOURCES)))
 	gcc -o $@ $^ $(CFLAGS)
 
 obj/%.o: src/%.c
-	mkdir -p obj # Adresar obj neni v gitu
-	gcc -c -o $@ $^ $(CFLAGS)
+	mkdir -p dep obj # Adresare nejsou v gitu
+	gcc -MMD -MP -MF dep/$*.d -c -o $@ $< $(CFLAGS)
+
+-include $(addprefix dep/,$(addsuffix .d,$(SOURCES)))
 
 
 #  Testy
@@ -28,7 +32,7 @@ unitests/%/test: unitests/%/test.c
 
 
 clean:
-	rm -f obj/*.o ./ifj12 unitests/*/test unitests/*/test.o unitests/*/out
+	rm -f obj/*.o dep/*.d ./ifj12 unitests/*/test unitests/*/test.o unitests/*/test
 
 
 
