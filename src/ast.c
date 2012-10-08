@@ -73,6 +73,7 @@ Value evalOperator( Operator* op, Context* context )
 	{
 		case BINARYOP: return evalBinaryOp( &op->value.binary, context );
 		case UNARYOP: return evalUnaryOp( &op->value.unary, context );
+		default: return (Value){typeUndefined};
 	}
 }
 
@@ -94,6 +95,8 @@ Value evalExpression( Expression* expr, Context* context )
 			return evalOperator( &expr->value.operator, context );
 		case FUNCTION_CALL:
 			return evalFunctionCall( &expr->value.functionCall, context );
+		default:
+			return (Value){typeUndefined};
 	}
 }
 
@@ -140,7 +143,10 @@ ReturnData evalStatement( Statement* statement, Context* context )
 			return evalCondition( &statement->value.condition, context );
 		case RETURN: 
 			return evalReturn( &statement->value.ret, context );
+		default:
+			return (ReturnData){false};
 	}
+	
 }
 
 Value evalFunction( Function* func, ExpressionList params, int parameterCount, Context* context )
