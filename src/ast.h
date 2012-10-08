@@ -1,17 +1,63 @@
 #ifndef AST_H
 #define AST_H
 
-#include "value.h"
+#include <stdbool.h>
 
-typedef struct SExpression Expression;
-typedef struct SStatement Statement;
-typedef Statement* StatementList;
+typedef struct SValue Value;
+typedef struct SFunction Function;
+
 typedef int Variable; // index do pole proměnných (podle symbols.h)
+typedef Value Constant;
+typedef struct SBinaryOp BinaryOp;
+typedef struct SUnaryOp UnaryOp;
+typedef struct SOperator Operator;
+typedef struct SFunctionCall FunctionCall;
+typedef struct SExpression Expression;
+
+typedef struct SAssignment Assignment;
+typedef struct SSubstring Substring;
+typedef struct SLoop Loop;
+typedef struct SCondition Condition;
+typedef Expression Return;
+
+typedef struct SStatement Statement;
+
+typedef struct SContext Context;
+
+typedef Statement* StatementList;
 typedef Expression* ExpressionList;
 typedef Value* ValueList;
+
 typedef Value( *BuiltinFunction )( ValueList, int );
 
-typedef struct SFunction
+Value evalFunction( Function* func, ExpressionList params, int parameterCount, Context* context );
+
+/**
+ * Hodnota promenne generickeho datoveho typu
+ */
+struct SValue {
+ 
+ // Aktualni typ
+ enum {
+  typeUndefined=-1,
+  typeNil=0,
+  typeBoolean=1,
+  typeNumeric=3,
+  typeFunction=6,
+  typeString=8
+ } type;
+ 
+ // Hodnota
+ union {
+  bool boolean;
+  double numeric;
+  Function *function;
+  char *string;
+ } data;
+ 
+};
+
+struct SFunction
 {
 	enum{
 		USER_DEFINED,
@@ -28,11 +74,9 @@ typedef struct SFunction
 	} value;
 	
 	int paramCount; // zaporne cislo znamena volitelny pocet argumentu
-} Function;
+};
 
-typedef Value Constant;
-
-typedef struct
+struct SBinaryOp
 {
 	enum
 	{
@@ -51,9 +95,9 @@ typedef struct
 	
 	Expression* left;
 	Expression* right;
-} BinaryOp;
+};
 
-typedef struct
+struct SUnaryOp
 {
 	enum
 	{
@@ -61,10 +105,10 @@ typedef struct
 	} type;
 	
 	Expression* operand;
-} UnaryOp;
+};
 		
 
-typedef struct
+struct SOperator
 {
 	enum
 	{
@@ -77,14 +121,14 @@ typedef struct
 		BinaryOp binary;
 		UnaryOp unary;
 	} value;
-} Operator;
+};
 
-typedef struct
+struct SFunctionCall
 {
 	ExpressionList params;
 	int parameterCount;
 	Variable function;
-} FunctionCall;
+};
 	
 struct SExpression
 {
@@ -105,34 +149,32 @@ struct SExpression
 	} value;
 };
 
-typedef struct
+struct SAssignment
 {
 	Variable destination;
 	Expression source;
-} Assignment;
+};
 
-typedef struct
+struct SSubstring
 {
 	Variable destination;
 	Expression source;
 	int left;
 	int right;
-} Substring;
+};
 
-typedef struct
+struct SLoop
 {
 	Expression condition;
 	StatementList statements;
-} Loop;
+};
 
-typedef struct
+struct SCondition
 {
 	Expression condition;
 	StatementList ifTrue;
 	StatementList ifFalse;
-} Condition;
-
-typedef Expression Return;
+};
 
 struct SStatement
 {
@@ -155,12 +197,10 @@ struct SStatement
 	} value;
 };
 
-typedef struct
+struct SContext
 {
 	Value* globals;
 	Value* locals;
-} Context;
-
-Value evalFunction( Function* func, ExpressionList params, int parameterCount, Context* context );
+};
 
 #endif

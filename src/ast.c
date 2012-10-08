@@ -1,6 +1,7 @@
 #include "ast.h"
 
 #include <stdbool.h>
+#include "global.h"
 
 typedef struct
 {

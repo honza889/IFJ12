@@ -1,5 +1,9 @@
-#include "ast.h"
 #include "../test.h"
+
+#include <stdlib.h>
+#include "ast.h"
+#include "value.h"
+
 
 BEGIN_TEST
 
