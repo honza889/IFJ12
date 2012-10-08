@@ -7,13 +7,73 @@
 #define BUFFERSIZE 128
 
 /**
- * Uvolnit obsah hodnoty
+ * Konstruktor nedefinovane promenne
  */
-void freeValue(Value *object){
- if(object->type==typeString && object->data.string){
-  free(object->data.string);
- }
+Value newValueUndefined(){
+ return (Value){
+  .type=typeUndefined
+ };
 }
+
+/**
+ * Konstruktor Nil
+ */
+Value newValueNil(){
+ return (Value){
+  .type=typeNil
+ };
+}
+
+/**
+ * Konstruktor Booleovske promenne
+ */
+Value newValueBoolean( bool value ){
+ return (Value){
+  .type=typeBoolean,
+  .data.boolean=value
+ };
+}
+
+/**
+ * Konstruktor ciselne promenne
+ */
+Value newValueNumeric( double value ){
+ return (Value){
+  .type=typeNumeric,
+  .data.numeric=value
+ };
+}
+
+/**
+ * Konstruktor ukazatele na funkci
+ */
+Value newValueFunction( Function *value ){
+ return (Value){
+  .type=typeFunction,
+  .data.function=value
+ };
+}
+
+/**
+ * Konstruktor retezce
+ */
+Value newValueString( char *value ){
+ char *string = malloc(sizeof(char));
+ string[0]='\0';
+ return (Value){
+  .type=typeString,
+  .data.string=string
+ };
+}
+
+/**
+ * Ulozit hodnotu Undefined
+ */
+void setValueUndefined(Value *object){
+ freeValue(object);
+ object->type=typeUndefined;
+}
+
 
 /**
  * Ulozit hodnotu Nil
@@ -141,5 +201,14 @@ bool getValueBoolean(Value *object){
   
  }
  return false;
+}
+
+/**
+ * Uvolnit obsah hodnoty
+ */
+void freeValue(Value *object){
+ if(object->type==typeString && object->data.string){
+  free(object->data.string);
+ }
 }
 
