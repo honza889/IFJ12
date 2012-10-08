@@ -1,4 +1,6 @@
-CFLAGS=-std=c99 -I src -Wall
+CFLAGS=-std=c99 -I src -Wall -pedantic
+# Úroveň množství debugovacích informací
+LDB=-g3
 
 SOURCES=ifj12 value symbols ast
 
@@ -9,6 +11,10 @@ obj/%.o: src/%.c
 	mkdir -p dep obj # Adresare nejsou v gitu
 	gcc -MMD -MP -MF dep/$*.d -c -o $@ $< $(CFLAGS)
 
+obj/dbg/%.o: src/%.c
+	mkdir -p dep/dbg obj/dbg # Adresare nejsou v gitu
+	gcc -MMD -MP -MF dep/dbg/$*.d -c -o $@ $< $(CFLAGS) $(LDB)
+
 -include $(addprefix dep/,$(addsuffix .d,$(SOURCES)))
 
 
@@ -17,7 +23,7 @@ obj/%.o: src/%.c
 
 TESTS=value symbols ast
 
-.PHONY: test
+.PHONY: test debug clean
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 	unitests/tests.sh
 
@@ -30,10 +36,12 @@ unitests/%/test: unitests/%/test.c
 
 
 
+debug: $(addprefix obj/dbg/,$(addsuffix .o,$(SOURCES)))
+	gcc -o ifj12-dbg $^ $(CFLAGS) $(LDB)
 
 
 clean:
-	rm -f obj/*.o dep/*.d ./ifj12 unitests/*/test unitests/*/test.o unitests/*/out
+	rm -f obj/*.o obj/dbg/*.o dep/*.d ./ifj12 ./ifj12-dbg unitests/*/test unitests/*/test.o unitests/*/out
 
 
 
