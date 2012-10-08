@@ -6,7 +6,7 @@ for FILE in $FILES; do
 		echo "*********************************"
 		echo "  Test: $FILE"
 		echo "*********************************"
-		valgrind -q unitests/$FILE/test > "unitests/$FILE/out" 2>&1
+		valgrind --leak-check=full -q unitests/$FILE/test > "unitests/$FILE/out" 2>&1
 		FILESIZE=$(stat -c%s "unitests/$FILE/out")
 		if [[ $FILESIZE > 1 ]] ; then # Nekdy soubor obsahoval \n
 			cat unitests/$FILE/out
