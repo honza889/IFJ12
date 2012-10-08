@@ -7,13 +7,13 @@
 #define BUFFERSIZE 128
 
 /**
- * Uvolnit obsah hodnoty
+ * Ulozit hodnotu Undefined
  */
-void freeValue(Value *object){
- if(object->type==typeString && object->data.string){
-  free(object->data.string);
- }
+void setValueUndefined(Value *object){
+ freeValue(object);
+ object->type=typeUndefined;
 }
+
 
 /**
  * Ulozit hodnotu Nil
@@ -33,7 +33,7 @@ void setValueBoolean(Value *object, bool value){
 }
 
 /**
- * Ulozit do GT numeric (desetinne cislo)
+ * Ulozit do Value numeric (desetinne cislo)
  */
 void setValueNumeric(Value *object, double value){
  freeValue(object);
@@ -42,7 +42,16 @@ void setValueNumeric(Value *object, double value){
 }
 
 /**
- * Ulozit do GT retezec
+ * Ulozit do Value (ukazatel na) funkci
+ */
+void setValueFunction(Value *object, Function *value){
+ freeValue(object);
+ object->type=typeFunction;
+ object->data.function=value;
+}
+
+/**
+ * Ulozit do Value retezec
  */
 void setValueString(Value *object, char *value){
  freeValue(object);
@@ -54,7 +63,7 @@ void setValueString(Value *object, char *value){
 }
 
 /**
- * Dostat z GT string (bez ohledu na to co obsahuje)
+ * Dostat z Value string (bez ohledu na to co obsahuje)
  */
 char* getValueString(Value *object){
  char *output=NULL;
@@ -141,5 +150,14 @@ bool getValueBoolean(Value *object){
   
  }
  return false;
+}
+
+/**
+ * Uvolnit obsah hodnoty
+ */
+void freeValue(Value *object){
+ if(object->type==typeString && object->data.string){
+  free(object->data.string);
+ }
 }
 

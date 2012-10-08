@@ -181,9 +181,13 @@ Value evalFunction( Function* func, ExpressionList params, int parameterCount, C
 		{
 			variables[ i ] = evalExpression( &params[ i ], context );
 		}
+		else if( i < func->paramCount )
+		{
+			variables[i] = (Value){typeNil};
+		}
 		else
 		{
-			setValueNil( &variables[ i ] );
+			variables[i] = (Value){typeUndefined};
 		}
 	}
 	
