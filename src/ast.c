@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include "global.h"
+#include "symbols.h"
 
 typedef struct
 {
@@ -11,7 +12,7 @@ typedef struct
 
 void setVariable( Variable* var, Context* context, Value value )
 {
-	*SYMBOL(*var,context->locals,context->globals) = value;
+	*symbol(*var,context) = value;
 }
 
 Value evalConstant( Constant* constant )
@@ -21,7 +22,7 @@ Value evalConstant( Constant* constant )
 
 Value evalVariable( Variable* var, Context* context )
 {
-	return *SYMBOL(*var,context->locals,context->globals);
+	return *symbol(*var,context);
 }
 
 Value evalUnaryOp( UnaryOp* op, Context* context )

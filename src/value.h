@@ -48,7 +48,7 @@ void setValueString(Value *object, char *value);
 char* getValueString(Value *object);
 bool getValueBoolean(Value *object);
 
-inline int typeOfValue(Value *object){
+static inline int typeOfValue(Value *object){
 	return (int)object->type;
 }
 

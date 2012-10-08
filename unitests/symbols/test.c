@@ -35,16 +35,17 @@ BEGIN_TEST
  
  Value *globalTable = initValueTable(&global);
  Value *localTable = initValueTable(&local);
+ Context context = (Context){globalTable,localTable};
  
  // Overeni nedefinovaneho stavu promennych po inicializaci
- TEST( SYMBOL(-4,localTable,globalTable)->type == typeUndefined );
- TEST( SYMBOL(-3,localTable,globalTable)->type == typeUndefined );
- TEST( SYMBOL(-2,localTable,globalTable)->type == typeUndefined );
- TEST( SYMBOL(-1,localTable,globalTable)->type == typeUndefined );
- TEST( SYMBOL(0,localTable,globalTable)->type == typeUndefined );
- TEST( SYMBOL(1,localTable,globalTable)->type == typeUndefined );
- TEST( SYMBOL(2,localTable,globalTable)->type == typeUndefined );
- TEST( SYMBOL(3,localTable,globalTable)->type == typeUndefined );
+ TEST( symbol(-4,&context)->type == typeUndefined );
+ TEST( symbol(-3,&context)->type == typeUndefined );
+ TEST( symbol(-2,&context)->type == typeUndefined );
+ TEST( symbol(-1,&context)->type == typeUndefined );
+ TEST( symbol(0,&context)->type == typeUndefined );
+ TEST( symbol(1,&context)->type == typeUndefined );
+ TEST( symbol(2,&context)->type == typeUndefined );
+ TEST( symbol(3,&context)->type == typeUndefined );
  
  freeValueTable(globalTable,&global);
  freeValueTable(localTable,&local);

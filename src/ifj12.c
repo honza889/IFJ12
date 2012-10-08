@@ -22,15 +22,16 @@ int main(int argc, char**argv)
  
  Value *globalTable = initValueTable(&global);
  Value *localTable = initValueTable(&local);
+ Context context = (Context){globalTable,localTable};
  
  char *s;
  
- setValueString(SYMBOL(1,localTable,globalTable),"zkouska");
- printf("[%s]\n", s = getValueString(SYMBOL(1,localTable,globalTable)) );
+ setValueString(symbol(1,&context),"zkouska");
+ printf("[%s]\n", s = getValueString(symbol(1,&context)) );
  free(s);
  
- setValueString(SYMBOL(-3,localTable,globalTable),"zkouska2");
- printf("[%s]\n", s = getValueString(SYMBOL(-3,localTable,globalTable)) );
+ setValueString(symbol(-3,&context),"zkouska2");
+ printf("[%s]\n", s = getValueString(symbol(-3,&context)) );
  free(s);
  
  freeValueTable(globalTable,&global);
