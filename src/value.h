@@ -43,7 +43,7 @@ void setValueUndefined(Value *object);
 void setValueNil(Value *object);
 void setValueBoolean(Value *object, bool value);
 void setValueNumeric(Value *object, double value);
-//void setValueFunction(Value *object, Function *value);
+void setValueFunction(Value *object, Function *value);
 void setValueString(Value *object, char *value);
 
 Value newValueUndefined();
