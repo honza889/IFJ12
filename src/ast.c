@@ -10,16 +10,7 @@ typedef struct
 
 void setVariable( Variable* var, Context* context, Value value )
 {
-	if( var < 0 )
-	{
-		// TODO: mělo by přiřazení do globální proměnné blokováno až zde, 
-		// nebo během analýzy?
-		context->globals[ -*var - 1 ] = value;
-	}
-	else
-	{
-		context->locals[ *var ] = value;
-	}
+	*SYMBOL(*var,context->locals,context->globals) = value;
 }
 
 Value evalConstant( Constant* constant )
@@ -29,14 +20,7 @@ Value evalConstant( Constant* constant )
 
 Value evalVariable( Variable* var, Context* context )
 {
-	if( *var < 0 )
-	{
-		return context->globals[ -*var - 1 ];
-	}
-	else
-	{
-		return context->locals[ *var ];
-	}
+	return *SYMBOL(*var,context->locals,context->globals);
 }
 
 Value evalUnaryOp( UnaryOp* op, Context* context )
