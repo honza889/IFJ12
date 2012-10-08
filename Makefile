@@ -32,7 +32,7 @@ unitests/%/test: unitests/%/test.c
 
 
 clean:
-	rm -f obj/*.o dep/*.d ./ifj12 unitests/*/test unitests/*/test.o unitests/*/test
+	rm -f obj/*.o dep/*.d ./ifj12 unitests/*/test unitests/*/test.o unitests/*/out
 
 
 

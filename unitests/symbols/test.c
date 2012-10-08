@@ -37,10 +37,14 @@ BEGIN_TEST
  Value *localTable = initValueTable(&local);
  
  // Overeni nedefinovaneho stavu promennych po inicializaci
- TEST( localTable[0].type == typeUndefined );
- TEST( localTable[1].type == typeUndefined );
- TEST( localTable[2].type == typeUndefined );
- TEST( localTable[3].type == typeUndefined );
+ TEST( SYMBOL(-4,localTable,globalTable)->type == typeUndefined );
+ TEST( SYMBOL(-3,localTable,globalTable)->type == typeUndefined );
+ TEST( SYMBOL(-2,localTable,globalTable)->type == typeUndefined );
+ TEST( SYMBOL(-1,localTable,globalTable)->type == typeUndefined );
+ TEST( SYMBOL(0,localTable,globalTable)->type == typeUndefined );
+ TEST( SYMBOL(1,localTable,globalTable)->type == typeUndefined );
+ TEST( SYMBOL(2,localTable,globalTable)->type == typeUndefined );
+ TEST( SYMBOL(3,localTable,globalTable)->type == typeUndefined );
  
  freeValueTable(globalTable,&global);
  freeValueTable(localTable,&local);

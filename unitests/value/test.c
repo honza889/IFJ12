@@ -11,7 +11,7 @@ BEGIN_TEST
  
  setValueNil(&v);
  STRTEST( s=getValueString(&v),"Nil" );free(s);
- TEST( getValueBoolean(&v) == false );
+ //TEST( getValueBoolean(&v) == false ); // nedefinovana nebo jen neimplementovana operace?
  
  setValueBoolean(&v,true);
  STRTEST( s=getValueString(&v),"true" );free(s);

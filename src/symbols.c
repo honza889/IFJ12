@@ -33,7 +33,6 @@ int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable){
  bool exist=false;
  int index;
  Symbol **destination;
- SymbolTable *table;
  
  // Nejprve bude prohledana globalni tabulka
  destination = searchSymbol(&(globalTable->root),name,&exist);

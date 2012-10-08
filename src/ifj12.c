@@ -15,6 +15,7 @@ int main(int argc, char**argv)
  printf("%d\n", getSymbol("funkce1",&global,NULL) );
  printf("%d\n", getSymbol("funkce2",&global,NULL) );
  printf("%d\n", getSymbol("funkce1",&global,NULL) );
+ printf("%d\n", getSymbol("globalVar",&global,NULL) ); // pro test makra SYMBOL
  
  freeSymbolTable(&global);
  freeSymbolTable(&local);
@@ -23,11 +24,14 @@ int main(int argc, char**argv)
  Value *localTable = initValueTable(&local);
  
  char *s;
- setValueString(&localTable[1],"zkouska");
- printf("[%s]\n", s = getValueString(&localTable[1]) );
+ 
+ setValueString(SYMBOL(1,localTable,globalTable),"zkouska");
+ printf("[%s]\n", s = getValueString(SYMBOL(1,localTable,globalTable)) );
  free(s);
  
- printf("%s\n", (getValueBoolean(&localTable[1])?"true":"false") );
+ setValueString(SYMBOL(-3,localTable,globalTable),"zkouska2");
+ printf("[%s]\n", s = getValueString(SYMBOL(-3,localTable,globalTable)) );
+ free(s);
  
  freeValueTable(globalTable,&global);
  freeValueTable(localTable,&local);

@@ -11,5 +11,7 @@
 
 #define NEWSTRING(pointer,string) pointer=(char*)malloc(sizeof(string));MALLCHECK(pointer);memcpy(pointer,string,sizeof(string));
 
+#define SYMBOL(index,localTable,globalTable) ((index)>=0?&(localTable)[index]:&(globalTable)[-(index)-1])
+
 #endif
 

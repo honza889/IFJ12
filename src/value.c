@@ -88,6 +88,10 @@ char* getValueString(Value *object){
    MALLCHECK(output);
   break;
   
+  case typeFunction:
+   ERROR("Neni implementovano: getValueString pro typeFuntion!");
+  break;
+  
   case typeString:
    outputSize=((strlen(object->data.string)+1)*sizeof(char));
    output=malloc(outputSize);
@@ -107,6 +111,10 @@ bool getValueBoolean(Value *object){
    exit(3);
   break;
   
+  case typeNil:
+   ERROR("Neni implementovano: getValueBoolean pro typeNil!");
+  break;
+  
   case typeBoolean:
    return object->data.boolean;
   break;
@@ -117,6 +125,10 @@ bool getValueBoolean(Value *object){
    }else{
     return true;
    }
+  break;
+  
+  case typeFunction:
+   ERROR("Neni implementovano: getValueBoolean pro typeFunction!");
   break;
   
   case typeString:
