@@ -48,8 +48,8 @@ BEGIN_TEST
 		.paramCount = 1
 	};
 	
-	Value glob[1];
-	Value loc[1];
+	Value glob[1] = { {typeUndefined} };
+	Value loc[1] = { {typeUndefined} };
 	
 	Context ctx = { glob, loc };
 	
