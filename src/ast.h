@@ -7,12 +7,27 @@ typedef struct SExpression Expression;
 typedef struct SStatement Statement;
 typedef Statement* StatementList;
 typedef int Variable; // index do pole proměnných (podle symbols.h)
+typedef Expression* ExpressionList;
+typedef Value* ValueList;
+typedef Value( *BuiltinFunction )( ValueList, int );
 
-typedef struct
+typedef struct SFunction
 {
-	StatementList statements;
-	int paramCount;
-	int variableCount;
+	enum{
+		USER_DEFINED,
+		BUILTIN
+	} type;
+	
+	union{
+		struct{
+			StatementList statements;
+			int statementCount;
+			int variableCount;
+		} userDefined;
+		BuiltinFunction builtin;
+	} value;
+	
+	int paramCount; // zaporne cislo znamena volitelny pocet argumentu
 } Function;
 
 typedef Value Constant;
@@ -64,14 +79,11 @@ typedef struct
 	} value;
 } Operator;
 
-typedef Expression* ParameterList;
-
 typedef struct
 {
-	ParameterList params;
+	ExpressionList params;
 	int parameterCount;
-	char* name;
-	Function* function;
+	Variable function;
 } FunctionCall;
 	
 struct SExpression
@@ -142,5 +154,13 @@ struct SStatement
 		Return ret;
 	} value;
 };
+
+typedef struct
+{
+	Value* globals;
+	Value* locals;
+} Context;
+
+Value evalFunction( Function* func, ExpressionList params, int parameterCount, Context* context );
 
 #endif

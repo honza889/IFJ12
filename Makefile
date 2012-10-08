@@ -1,6 +1,6 @@
 CFLAGS=-std=c99 -I src -Wall
 
-SOURCES=ifj12 value symbols
+SOURCES=ifj12 value symbols ast
 
 ifj12: $(addprefix obj/,$(addsuffix .o,$(SOURCES)))
 	gcc -o $@ $^ $(CFLAGS)
@@ -15,7 +15,7 @@ obj/%.o: src/%.c
 #  Testy
 #  *****
 
-TESTS=value symbols
+TESTS=value symbols ast
 
 .PHONY: test
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
@@ -23,6 +23,7 @@ test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 
 unitests/value/test: obj/value.o
 unitests/symbols/test: obj/symbols.o obj/value.o
+unitests/ast/test: obj/value.o obj/ast.o
 
 unitests/%/test: unitests/%/test.c
 	gcc -o $@ $^ $(CFLAGS)

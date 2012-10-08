@@ -8,6 +8,9 @@
 #include <stdbool.h>
 #include "global.h"
 
+// forward deklarace pro vyreseni krizovych zavislosti
+typedef struct SFunction Function; 
+
 /**
  * Genericky datovy typ (GT)
  */
@@ -27,7 +30,7 @@ typedef struct {
  union {
   bool boolean;
   double numeric;
-  void *function;
+  Function *function;
   char *string;
  } data;
  
