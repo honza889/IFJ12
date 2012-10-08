@@ -33,8 +33,8 @@ BEGIN_TEST
  freeSymbolTable(&global);
  freeSymbolTable(&local);
  
- Value *globalTable = initValueTable(&global);
- Value *localTable = initValueTable(&local);
+ Value *globalTable = initValueTable(global.count);
+ Value *localTable = initValueTable(local.count);
  Context context = (Context){globalTable,localTable};
  
  // Overeni nedefinovaneho stavu promennych po inicializaci
@@ -47,7 +47,7 @@ BEGIN_TEST
  TEST( symbol(2,&context)->type == typeUndefined );
  TEST( symbol(3,&context)->type == typeUndefined );
  
- freeValueTable(globalTable,&global);
- freeValueTable(localTable,&local);
+ freeValueTable(globalTable,global.count);
+ freeValueTable(localTable,local.count);
  
 END_TEST

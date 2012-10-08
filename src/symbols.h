@@ -32,13 +32,13 @@ typedef struct {
 int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable);
 
 /** Alokuje a inicializuje tabulku symbolu */
-Value* initValueTable(SymbolTable *st);
+Value* initValueTable(int length);
 
 /** Uvolnuje symboly stromu symbolu (pocet prvku zachova) */
 void freeSymbolTable(SymbolTable *st);
 
 /** Uvolnuje Value tabulky symbolu (potrebuje st->count) */
-void freeValueTable(Value *table,SymbolTable *st);
+void freeValueTable(Value *table,int length);
 
 static inline Value* symbol(int index,Context* context){
  return (index>=0?&(context->locals)[index]:&(context->globals)[-index-1]);

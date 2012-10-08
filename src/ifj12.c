@@ -20,8 +20,8 @@ int main(int argc, char**argv)
  freeSymbolTable(&global);
  freeSymbolTable(&local);
  
- Value *globalTable = initValueTable(&global);
- Value *localTable = initValueTable(&local);
+ Value *globalTable = initValueTable(global.count);
+ Value *localTable = initValueTable(local.count);
  Context context = (Context){globalTable,localTable};
  
  char *s;
@@ -34,8 +34,8 @@ int main(int argc, char**argv)
  printf("[%s]\n", s = getValueString(symbol(-3,&context)) );
  free(s);
  
- freeValueTable(globalTable,&global);
- freeValueTable(localTable,&local);
+ freeValueTable(globalTable,global.count);
+ freeValueTable(localTable,local.count);
  
  return 0;
 }
