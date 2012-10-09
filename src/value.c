@@ -175,9 +175,8 @@ bool equalValue(Value *value1, Value *value2){
  }else
  if(value1->type==typeString && value2->type==typeString){
   return (strcmp(value1->data.string,value2->data.string)==0);
- }else{
-  return false; // operandy nejsou stejneho typu, neni chyba!
  }
+ return false; // operandy nejsou stejneho typu, neni chyba!
 }
 
 /**
@@ -192,9 +191,8 @@ bool greaterValue(Value *value1, Value *value2){
  }else
  if(value1->type==typeString && value2->type==typeString){
   return (strcmp(value1->data.string,value2->data.string)>0);
- }else{
-  throw(IncompatibleComparison,true);
  }
+ throw(IncompatibleComparison,true);
  return false;
 }
 
@@ -210,9 +208,8 @@ bool greaterEqualValue(Value *value1, Value *value2){
  }else
  if(value1->type==typeString && value2->type==typeString){
   return (strcmp(value1->data.string,value2->data.string)>=0);
- }else{
-  throw(IncompatibleComparison,true);
  }
+ throw(IncompatibleComparison,true);
  return false;
 }
 

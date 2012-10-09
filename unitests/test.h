@@ -23,6 +23,7 @@
 		int failed = 0; \
 		int total = 0; \
 		exceptions_init(); \
+		int exc_status = 0; \
 		try {
 		
 #define END_TEST \
@@ -40,10 +41,10 @@
 	}
 
 #define EXCEPT_TEST( exception, expr ) \
-	status = 0; total++; \
+	exc_status = 0; total++; \
 	try{ expr; } \
-	catch{ on( exception, e ){ status = 1; } } \
-	if( status != 1 ) \
+	catch{ on( exception, e ){ exc_status = 1; } } \
+	if( exc_status != 1 ) \
 	{ \
 		failed++; \
 		fprintf( stderr,"%s:%d: %s doesnt throw %s\n",__FILE__,__LINE__,#exception,#expr); \

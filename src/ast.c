@@ -10,17 +10,17 @@ typedef struct
 	Value ret;
 } ReturnData;
 
-void setVariable( Variable* var, Context* context, Value value )
+static inline void setVariable( Variable* var, Context* context, Value value )
 {
 	*symbol(*var,context) = value;
 }
 
-Value evalConstant( Constant* constant )
+static inline Value evalConstant( Constant* constant )
 {
 	return *constant;
 }
 
-Value evalVariable( Variable* var, Context* context )
+static inline Value evalVariable( Variable* var, Context* context )
 {
 	return *symbol(*var,context);
 }

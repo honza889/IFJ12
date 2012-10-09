@@ -6,18 +6,18 @@
 
 BEGIN_TEST
  char *s;
- exceptions_init();
  Value v = {typeUndefined};
  Value w = {typeUndefined};
- int status = 0;
+ 
  
  /************** nedefinovne **************/
 
- EXCEPT_TEST( UndefinedVariable, greaterValue(&v,&w) )
- EXCEPT_TEST( UndefinedVariable, greaterEqualValue(&v,&w) )
- EXCEPT_TEST( UndefinedVariable, equalValue(&v,&w) )
- EXCEPT_TEST( UndefinedVariable, lesserEqualValue(&v,&w) )
- EXCEPT_TEST( UndefinedVariable, lesserValue(&v,&w) )
+ EXCEPT_TEST( UndefinedVariable, greaterValue(&v,&w) );
+ EXCEPT_TEST( UndefinedVariable, greaterEqualValue(&v,&w) );
+ EXCEPT_TEST( UndefinedVariable, equalValue(&v,&w) );
+ EXCEPT_TEST( UndefinedVariable, lesserEqualValue(&v,&w) );
+ EXCEPT_TEST( UndefinedVariable, lesserValue(&v,&w) );
+ 
  
  /************** set/get **************/
  
@@ -45,6 +45,7 @@ BEGIN_TEST
  STRTEST( s=getValueString(&v), "Toto je řetězec znaků" );free(s);
  TEST( getValueBoolean(&v) == true );
  TEST( typeOfValue(&v) == 8 );
+ 
  
  /************** porovnavani - spravne **************/
  
@@ -88,22 +89,18 @@ BEGIN_TEST
  TEST( lesserValue(&v,&w) == false );
  TEST( lesserEqualValue(&v,&w) == false );
  
- /************** porovnavani - chybne **************/
+ 
+ /************** porovnavani ruznych typu **************/
  
  setValueNumeric(&v,5.0);
  setValueString(&w,"a");
- try{
-  greaterValue(&v,&w);
-  TEST( false )
- }
- catch{
-  on( IncompatibleComparison, e ){
-   status = 2;
-  }
- }
- TEST( status == 2 );
+ TEST( equalValue(&v,&w) == false );
+ EXCEPT_TEST( IncompatibleComparison, greaterValue(&v,&w) );
+ EXCEPT_TEST( IncompatibleComparison, greaterEqualValue(&v,&w) );
+ EXCEPT_TEST( IncompatibleComparison, lesserEqualValue(&v,&w) );
+ EXCEPT_TEST( IncompatibleComparison, lesserValue(&v,&w) );
+ 
  
  freeValue(&v);
  freeValue(&w);
- 
 END_TEST

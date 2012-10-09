@@ -76,6 +76,9 @@ int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable){
  return (inLocal?index:-index-1);
 }
 
+/**
+ * Uvolni symbol (vcetne obsahu)
+ */
 void freeSymbol(Symbol *s){
  free(s->name);
  if(s->lesser!=NULL) freeSymbol(s->lesser);
@@ -83,10 +86,16 @@ void freeSymbol(Symbol *s){
  free(s);
 }
 
+/**
+ * Uvolni strom symbolu
+ */
 void freeSymbolTable(SymbolTable *st){
  if(st->root!=NULL) freeSymbol(st->root);
 }
 
+/**
+ * Alokuje tabulku symbolu
+ */
 Value* initValueTable(int length){
  Value *table = malloc(length*sizeof(Value));
  for(int i=0;i<length;i++){
@@ -95,6 +104,9 @@ Value* initValueTable(int length){
  return table;
 }
 
+/**
+ * Uvolni tabulku symbolu
+ */
 void freeValueTable(Value *table,int length){
  for(int i=0;i<length;i++){
   if(table[i].type==typeString){
