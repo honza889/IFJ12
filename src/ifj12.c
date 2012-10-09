@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include "value.h"
 #include "symbols.h"
+#include "exceptions.h"
 
 int main(int argc, char**argv)
 {
- 
+	exceptions_init();
+	
  SymbolTable global = {NULL,0};
  SymbolTable local = {NULL,0};
  

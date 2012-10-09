@@ -1,8 +1,8 @@
-CFLAGS=-std=c99 -I src -Wall -pedantic
+CFLAGS=-std=c99 -I src -Wall -Wno-unused-variable -pedantic
 # Úroveň množství debugovacích informací
 LDB=-g3
 
-SOURCES=ifj12 value symbols ast
+SOURCES=ifj12 value symbols ast exceptions
 
 ifj12: $(addprefix obj/,$(addsuffix .o,$(SOURCES)))
 	gcc -o $@ $^ $(CFLAGS)
@@ -21,7 +21,7 @@ obj/dbg/%.o: src/%.c
 #  Testy
 #  *****
 
-TESTS=value symbols ast
+TESTS=value symbols ast exceptions
 
 .PHONY: test debug clean
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
@@ -30,6 +30,7 @@ test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 unitests/value/test: obj/value.o
 unitests/symbols/test: obj/symbols.o obj/value.o
 unitests/ast/test: obj/value.o obj/ast.o
+unitests/exceptions/test: obj/exceptions.o
 
 unitests/%/test: unitests/%/test.c
 	gcc -o $@ $^ $(CFLAGS)
