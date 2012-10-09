@@ -72,8 +72,7 @@ char* getValueString(Value *object){
  switch(object->type){
 
   case typeUndefined:
-   fprintf(stderr,"\nError: Undefined variable!\n");
-   exit(3);
+   throw(UndefinedVariable,true);
   break;
   
   case typeNil:
@@ -120,8 +119,7 @@ bool getValueBoolean(Value *object){
  switch(object->type){
   
   case typeUndefined:
-   fprintf(stderr,"\nError: Undefined variable!\n");
-   exit(3);
+   throw(UndefinedVariable,true);
   break;
   
   case typeNil:
@@ -160,6 +158,9 @@ bool getValueBoolean(Value *object){
  * value1 == value2 (viz.5.1)
  */
 bool equalValue(Value *value1, Value *value2){
+ if(value1->type==typeUndefined || value2->type==typeUndefined){
+  throw(UndefinedVariable,true);
+ }else
  if(value1->type==typeNil && value2->type==typeNil){
   return true;
  }else
@@ -183,6 +184,9 @@ bool equalValue(Value *value1, Value *value2){
  * value1 > value2 (viz.5.1)
  */
 bool greaterValue(Value *value1, Value *value2){
+ if(value1->type==typeUndefined || value2->type==typeUndefined){
+  throw(UndefinedVariable,true);
+ }else
  if(value1->type==typeNumeric && value2->type==typeNumeric){
   return (value1->data.numeric>value2->data.numeric);
  }else
@@ -198,6 +202,9 @@ bool greaterValue(Value *value1, Value *value2){
  * value1 >= value2 (viz.5.1)
  */
 bool greaterEqualValue(Value *value1, Value *value2){
+ if(value1->type==typeUndefined || value2->type==typeUndefined){
+  throw(UndefinedVariable,true);
+ }else
  if(value1->type==typeNumeric && value2->type==typeNumeric){
   return (value1->data.numeric>=value2->data.numeric);
  }else

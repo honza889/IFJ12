@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <assert.h>
 #include "value.h"
@@ -14,9 +13,12 @@ BEGIN_TEST
  
  /************** nedefinovne **************/
 
- //EXCEPT_TEST( UndefinedVariable, greaterValue(&v,&w) )
- //EXCEPT_TEST( UndefinedVariable, greaterEqualValue(&v,&w) )
-
+ EXCEPT_TEST( UndefinedVariable, greaterValue(&v,&w) )
+ EXCEPT_TEST( UndefinedVariable, greaterEqualValue(&v,&w) )
+ EXCEPT_TEST( UndefinedVariable, equalValue(&v,&w) )
+ EXCEPT_TEST( UndefinedVariable, lesserEqualValue(&v,&w) )
+ EXCEPT_TEST( UndefinedVariable, lesserValue(&v,&w) )
+ 
  /************** set/get **************/
  
  setValueNil(&v);

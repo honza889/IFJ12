@@ -42,7 +42,7 @@
 #define EXCEPT_TEST( exception, expr ) \
 	status = 0; total++; \
 	try{ expr; } \
-	catch{ on( exception, e ){ status = 1; } } */ \
+	catch{ on( exception, e ){ status = 1; } } \
 	if( status != 1 ) \
 	{ \
 		failed++; \

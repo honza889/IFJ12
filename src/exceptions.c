@@ -1,4 +1,5 @@
 #include "exceptions.h"
+#include "global.h"
 
 #define MAX_TRY_BLOCKS 16
 
@@ -7,37 +8,37 @@ static int jumpBuffersSize;
 static Exception currentException;
 static bool currentExceptionHandled;
 
-void rethrow()
+inline void rethrow()
 {
 	exceptions_impl_throw( currentException ); 
 }
 
-void exceptions_init()
+inline void exceptions_init()
 {
 	jumpBuffersSize = 0;
 }
 
-jmp_buf* exceptions_pushBuffer()
+inline jmp_buf* exceptions_pushBuffer()
 {
 	return &jumpBuffers[jumpBuffersSize++];
 }
 
-jmp_buf* exceptions_topBuffer()
+inline jmp_buf* exceptions_topBuffer()
 {
-	return &jumpBuffers[jumpBuffersSize-1];
+	return ( jumpBuffersSize ? &jumpBuffers[jumpBuffersSize-1] : NULL);
 }
 
-void exceptions_popBuffer()
+inline void exceptions_popBuffer()
 {
 	jumpBuffersSize--;
 }
 
-Exception* exceptions_getCurrentException()
+inline Exception* exceptions_getCurrentException()
 {
 	return &currentException;
 }
 
-void exceptions_endCatchBlock()
+inline void exceptions_endCatchBlock()
 {
 	if( !currentExceptionHandled )
 	{
@@ -45,12 +46,12 @@ void exceptions_endCatchBlock()
 	}
 }
 
-void exceptions_setHandled( bool handled )
+inline void exceptions_setHandled( bool handled )
 {
 	currentExceptionHandled = handled;
 }
 
-bool exceptions_isHandled()
+inline bool exceptions_isHandled()
 {
 	return currentExceptionHandled;
 }
@@ -61,5 +62,10 @@ void exceptions_impl_throw( Exception e )
 {
 	currentException = e;
 	currentExceptionHandled = false;
-	longjmp( *exceptions_topBuffer(), 1 );
+	if(exceptions_topBuffer()){
+		longjmp( *exceptions_topBuffer(), 1 );
+	}else{
+		ERROR("Exception error: throw without try!");
+		exit(99);
+	}
 }
