@@ -5,8 +5,8 @@
 
 int main(int argc, char**argv)
 {
-	exceptions_init();
-	
+ exceptions_init();
+ 
  SymbolTable global = {NULL,0};
  SymbolTable local = {NULL,0};
  

@@ -6,37 +6,16 @@
 #include "../test.h"
 
 BEGIN_TEST
- 
  char *s;
+ exceptions_init();
  Value v = {typeUndefined};
  Value w = {typeUndefined};
  int status = 0;
  
  /************** nedefinovne **************/
 
- EXCEPT_TEST( IncompatibleComparison, greaterValue(&v,&w) )
-
- try{
-  greaterValue(&v,&w);
-  TEST( false )
- }
- catch{
-  on( IncompatibleComparison, e ){
-   status = 1;
-  }
- }
- TEST( status == 1 );
- 
- try{
-  greaterValue(&v,&w);
-  TEST( false )
- }
- catch{
-  on( IncompatibleComparison, e ){
-   status = 1;
-  }
- }
- TEST( status == 1 );
+ //EXCEPT_TEST( UndefinedVariable, greaterValue(&v,&w) )
+ //EXCEPT_TEST( UndefinedVariable, greaterEqualValue(&v,&w) )
 
  /************** set/get **************/
  
@@ -106,8 +85,6 @@ BEGIN_TEST
  TEST( greaterEqualValue(&v,&w) == true );
  TEST( lesserValue(&v,&w) == false );
  TEST( lesserEqualValue(&v,&w) == false );
- 
- EXCEPT_TEST( IncompatibleComparison, greaterValue(&v,&w) )
  
  /************** porovnavani - chybne **************/
  

@@ -32,7 +32,7 @@ unitests/symbols/test: obj/symbols.o obj/value.o obj/exceptions.o
 unitests/ast/test: obj/value.o obj/ast.o obj/exceptions.o
 unitests/exceptions/test: obj/exceptions.o
 
-unitests/%/test: unitests/%/test.c
+unitests/%/test: unitests/%/test.c obj/exceptions.o unitests/test.h
 	gcc -o $@ $^ $(CFLAGS)
 
 
@@ -43,6 +43,4 @@ debug: $(addprefix obj/dbg/,$(addsuffix .o,$(SOURCES)))
 
 clean:
 	rm -f obj/*.o obj/dbg/*.o dep/*.d ./ifj12 ./ifj12-dbg unitests/*/test unitests/*/test.o unitests/*/out
-
-
 
