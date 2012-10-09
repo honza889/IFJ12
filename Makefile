@@ -31,7 +31,7 @@ unitests/value/test: obj/value.o
 unitests/symbols/test: obj/symbols.o obj/value.o
 unitests/ast/test: obj/value.o obj/ast.o
 
-unitests/%/test: unitests/%/test.c obj/exceptions.o
+unitests/%/test: unitests/%/test.c obj/exceptions.o unitests/test.h
 	gcc -o $@ $^ $(CFLAGS)
 
 
