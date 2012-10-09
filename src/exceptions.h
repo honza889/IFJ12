@@ -5,12 +5,12 @@
 #include <stdbool.h>
 
 typedef int UndefinedVariableException;
-typedef double NecoJinyhoException;
+typedef bool IncompatibleComparisonException;
 
 typedef enum
 {
-	NecoJinyho,
-	UndefinedVariable
+	UndefinedVariable,
+	IncompatibleComparison
 } ExceptionType;
 
 typedef struct
@@ -18,8 +18,8 @@ typedef struct
 	ExceptionType type;
 	struct
 	{
-		NecoJinyhoException NecoJinyhoExceptionValue;
 		UndefinedVariableException UndefinedVariableExceptionValue;
+		IncompatibleComparisonException IncompatibleComparisonExceptionValue;
 	} value;
 } Exception;
 

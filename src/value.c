@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "global.h"
+#include "exceptions.h"
 
 #define BUFFERSIZE 128
 
@@ -188,8 +189,9 @@ bool greaterValue(Value *value1, Value *value2){
  if(value1->type==typeString && value2->type==typeString){
   return (strcmp(value1->data.string,value2->data.string)>0);
  }else{
-  return false; // TODO: chyba!
+  throw(IncompatibleComparison,true);
  }
+ return false;
 }
 
 /**
@@ -202,8 +204,9 @@ bool greaterEqualValue(Value *value1, Value *value2){
  if(value1->type==typeString && value2->type==typeString){
   return (strcmp(value1->data.string,value2->data.string)>=0);
  }else{
-  return false; // TODO: chyba!
+  throw(IncompatibleComparison,true);
  }
+ return false;
 }
 
 /**

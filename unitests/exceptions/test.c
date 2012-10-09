@@ -3,18 +3,19 @@
 
 BEGIN_TEST
 	exceptions_init();
+	
 	try
 	{
 		try
 		{
-			throw( NecoJinyho, 8.5 );
+			throw( IncompatibleComparison, true );
 			TEST( false )
 		}
 		catch
 		{
-			on( NecoJinyho, e )
+			on( IncompatibleComparison, e )
 			{
-				TEST( *e == 8.5 )
+				TEST( *e == true )
 				rethrow();
 			}
 		}
@@ -30,4 +31,37 @@ BEGIN_TEST
 			TEST( true )
 		}
 	}
+
+	try
+	{
+		try
+		{
+			throw( UndefinedVariable, true );
+			TEST( false )
+		}
+		catch
+		{
+			on( IncompatibleComparison, e )
+			{
+				TEST( false )
+			}
+			onAll
+			{
+				TEST( true )
+				rethrow();
+			}
+		}
+	}
+	catch
+	{
+		on( UndefinedVariable, e )
+		{
+			TEST( *e == true )
+		}
+		onAll
+		{
+			TEST( false )
+		}
+	}
+
 END_TEST

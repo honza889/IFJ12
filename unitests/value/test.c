@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "value.h"
+#include "exceptions.h"
 #include "../test.h"
 
 BEGIN_TEST
@@ -9,7 +10,34 @@ BEGIN_TEST
  char *s;
  Value v = {typeUndefined};
  Value w = {typeUndefined};
+ int status = 0;
  
+ /************** nedefinovne **************/
+
+ EXCEPT_TEST( IncompatibleComparison, greaterValue(&v,&w) )
+
+ try{
+  greaterValue(&v,&w);
+  TEST( false )
+ }
+ catch{
+  on( IncompatibleComparison, e ){
+   status = 1;
+  }
+ }
+ TEST( status == 1 );
+ 
+ try{
+  greaterValue(&v,&w);
+  TEST( false )
+ }
+ catch{
+  on( IncompatibleComparison, e ){
+   status = 1;
+  }
+ }
+ TEST( status == 1 );
+
  /************** set/get **************/
  
  setValueNil(&v);
@@ -37,7 +65,7 @@ BEGIN_TEST
  TEST( getValueBoolean(&v) == true );
  TEST( typeOfValue(&v) == 8 );
  
- /************** porovnavani **************/
+ /************** porovnavani - spravne **************/
  
  setValueNil(&v);
  setValueNil(&w);
@@ -77,7 +105,24 @@ BEGIN_TEST
  TEST( greaterValue(&v,&w) == true );
  TEST( greaterEqualValue(&v,&w) == true );
  TEST( lesserValue(&v,&w) == false );
- TEST( lesserEqualValue(&v,&w) == false ); 
+ TEST( lesserEqualValue(&v,&w) == false );
+ 
+ EXCEPT_TEST( IncompatibleComparison, greaterValue(&v,&w) )
+ 
+ /************** porovnavani - chybne **************/
+ 
+ setValueNumeric(&v,5.0);
+ setValueString(&w,"a");
+ try{
+  greaterValue(&v,&w);
+  TEST( false )
+ }
+ catch{
+  on( IncompatibleComparison, e ){
+   status = 2;
+  }
+ }
+ TEST( status == 2 );
  
  freeValue(&v);
  freeValue(&w);

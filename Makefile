@@ -27,9 +27,9 @@ TESTS=value symbols ast exceptions
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 	unitests/tests.sh
 
-unitests/value/test: obj/value.o
-unitests/symbols/test: obj/symbols.o obj/value.o
-unitests/ast/test: obj/value.o obj/ast.o
+unitests/value/test: obj/value.o obj/exceptions.o
+unitests/symbols/test: obj/symbols.o obj/value.o obj/exceptions.o
+unitests/ast/test: obj/value.o obj/ast.o obj/exceptions.o
 unitests/exceptions/test: obj/exceptions.o
 
 unitests/%/test: unitests/%/test.c
