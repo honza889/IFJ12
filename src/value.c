@@ -112,6 +112,9 @@ char* getValueString(Value *object){
  return output;
 }
 
+/**
+ * Dostat z Value logickou hodnotu (napr. pri pouziti ve vyrazu)
+ */
 bool getValueBoolean(Value *object){
  switch(object->type){
   
@@ -121,7 +124,7 @@ bool getValueBoolean(Value *object){
   break;
   
   case typeNil:
-   ERROR("Neni implementovano: getValueBoolean pro typeNil!");
+   return false;
   break;
   
   case typeBoolean:
@@ -129,15 +132,15 @@ bool getValueBoolean(Value *object){
   break;
   
   case typeNumeric:
-   if(object->data.numeric==0.0 || object->data.numeric==NAN){
-    return false;
+   if(object->data.numeric==0.0){
+    return false; // nulova hodnota ciselne promenne
    }else{
-    return true;
+    return true; // nenulova hodnota ciselne promenne
    }
   break;
   
   case typeFunction:
-   ERROR("Neni implementovano: getValueBoolean pro typeFunction!");
+   ERROR("getValueBoolean: neni implementovano pro typeFunction!");
   break;
   
   case typeString:
@@ -150,6 +153,57 @@ bool getValueBoolean(Value *object){
   
  }
  return false;
+}
+
+/**
+ * value1 == value2 (viz.5.1)
+ */
+bool equalValue(Value *value1, Value *value2){
+ if(value1->type==typeNil && value2->type==typeNil){
+  return true;
+ }else
+ if(value1->type==typeBoolean && value2->type==typeBoolean){
+  return (value1->data.boolean==value2->data.boolean);
+ }else
+ if(value1->type==typeNumeric && value2->type==typeNumeric){
+  return (value1->data.numeric==value2->data.numeric);
+ }else
+ if(value1->type==typeFunction && value2->type==typeFunction){
+  return (value1->data.function==value2->data.function);
+ }else
+ if(value1->type==typeString && value2->type==typeString){
+  return (strcmp(value1->data.string,value2->data.string)==0);
+ }else{
+  return false; // operandy nejsou stejneho typu, neni chyba!
+ }
+}
+
+/**
+ * value1 > value2 (viz.5.1)
+ */
+bool greaterValue(Value *value1, Value *value2){
+ if(value1->type==typeNumeric && value2->type==typeNumeric){
+  return (value1->data.numeric>value2->data.numeric);
+ }else
+ if(value1->type==typeString && value2->type==typeString){
+  return (strcmp(value1->data.string,value2->data.string)>0);
+ }else{
+  return false; // TODO: chyba!
+ }
+}
+
+/**
+ * value1 >= value2 (viz.5.1)
+ */
+bool greaterEqualValue(Value *value1, Value *value2){
+ if(value1->type==typeNumeric && value2->type==typeNumeric){
+  return (value1->data.numeric>=value2->data.numeric);
+ }else
+ if(value1->type==typeString && value2->type==typeString){
+  return (strcmp(value1->data.string,value2->data.string)>=0);
+ }else{
+  return false; // TODO: chyba!
+ }
 }
 
 /**

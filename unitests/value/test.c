@@ -8,27 +8,78 @@ BEGIN_TEST
  
  char *s;
  Value v = {typeUndefined};
+ Value w = {typeUndefined};
+ 
+ /************** set/get **************/
  
  setValueNil(&v);
  STRTEST( s=getValueString(&v),"Nil" );free(s);
- //TEST( getValueBoolean(&v) == false ); // nedefinovana nebo jen neimplementovana operace?
+ TEST( getValueBoolean(&v) == false );
+ TEST( typeOfValue(&v) == 0 );
  
  setValueBoolean(&v,true);
  STRTEST( s=getValueString(&v),"true" );free(s);
  TEST( getValueBoolean(&v) == true );
+ TEST( typeOfValue(&v) == 1 );
 
  setValueBoolean(&v,false);
  STRTEST( s=getValueString(&v), "false" );free(s);
  TEST( getValueBoolean(&v) == false );
+ TEST( typeOfValue(&v) == 1 );
 
  setValueNumeric(&v,123.456); // %g vypisuje jen na 6 cifer
  STRTEST( s=getValueString(&v), "123.456" ); free( s );
  TEST( getValueBoolean(&v) );
+ TEST( typeOfValue(&v) == 3 );
  
  setValueString(&v,"Toto je řetězec znaků");
  STRTEST( s=getValueString(&v), "Toto je řetězec znaků" );free(s);
  TEST( getValueBoolean(&v) == true );
+ TEST( typeOfValue(&v) == 8 );
+ 
+ /************** porovnavani **************/
+ 
+ setValueNil(&v);
+ setValueNil(&w);
+ TEST( equalValue(&v,&w) == true );
+ 
+ setValueBoolean(&v,true);
+ setValueBoolean(&w,true);
+ TEST( equalValue(&v,&w) == true );
+ 
+ setValueNumeric(&v,1.2);
+ setValueNumeric(&w,1.2);
+ TEST( equalValue(&v,&w) == true );
+ 
+ setValueString(&v,"Řetězec");
+ setValueString(&w,"Řetězec");
+ TEST( equalValue(&v,&w) == true );
+ 
+ setValueString(&v,"a");
+ setValueString(&w,"a");
+ TEST( equalValue(&v,&w) == true );
+ TEST( greaterValue(&v,&w) == false );
+ TEST( greaterEqualValue(&v,&w) == true );
+ TEST( lesserValue(&v,&w) == false );
+ TEST( lesserEqualValue(&v,&w) == true );
+ 
+ setValueString(&v,"a");
+ setValueString(&w,"z");
+ TEST( equalValue(&v,&w) == false );
+ TEST( greaterValue(&v,&w) == false );
+ TEST( greaterEqualValue(&v,&w) == false );
+ TEST( lesserValue(&v,&w) == true );
+ TEST( lesserEqualValue(&v,&w) == true );
 
+ setValueString(&v,"z");
+ setValueString(&w,"a");
+ TEST( equalValue(&v,&w) == false );
+ TEST( greaterValue(&v,&w) == true );
+ TEST( greaterEqualValue(&v,&w) == true );
+ TEST( lesserValue(&v,&w) == false );
+ TEST( lesserEqualValue(&v,&w) == false ); 
+ 
  freeValue(&v);
+ freeValue(&w);
  
 END_TEST

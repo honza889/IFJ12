@@ -48,7 +48,18 @@ void setValueString(Value *object, char *value);
 char* getValueString(Value *object);
 bool getValueBoolean(Value *object);
 
-inline int typeOfValue(Value *object){
+// Porovnavani
+bool equalValue(Value *value1, Value *value2); // value1 == value2
+bool greaterValue(Value *value1, Value *value2); // value1 > value2
+bool greaterEqualValue(Value *value1, Value *value2); // value1 >= value2
+static inline bool lesserValue(Value *value1, Value *value2){ // value1 < value2
+ return greaterValue(value2,value1);
+}
+static inline bool lesserEqualValue(Value *value1, Value *value2){ // value1 <= value2
+ return greaterEqualValue(value2,value1);
+}
+
+static inline int typeOfValue(Value *object){
 	return (int)object->type;
 }
 

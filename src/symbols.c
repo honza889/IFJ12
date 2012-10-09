@@ -76,14 +76,6 @@ int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable){
  return (inLocal?index:-index-1);
 }
 
-Value* initValueTable(SymbolTable *st){
- Value *table = malloc(st->count*sizeof(Value));
- for(int i=0;i<st->count;i++){
-  table[i].type=typeUndefined;
- }
- return table;
-}
-
 void freeSymbol(Symbol *s){
  free(s->name);
  if(s->lesser!=NULL) freeSymbol(s->lesser);
@@ -95,8 +87,16 @@ void freeSymbolTable(SymbolTable *st){
  if(st->root!=NULL) freeSymbol(st->root);
 }
 
-void freeValueTable(Value *table,SymbolTable *st){
- for(int i=0;i<st->count;i++){
+Value* initValueTable(int length){
+ Value *table = malloc(length*sizeof(Value));
+ for(int i=0;i<length;i++){
+  table[i].type=typeUndefined;
+ }
+ return table;
+}
+
+void freeValueTable(Value *table,int length){
+ for(int i=0;i<length;i++){
   if(table[i].type==typeString){
    free(table[i].data.string);
   }
