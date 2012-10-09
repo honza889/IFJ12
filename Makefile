@@ -30,9 +30,8 @@ test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 unitests/value/test: obj/value.o
 unitests/symbols/test: obj/symbols.o obj/value.o
 unitests/ast/test: obj/value.o obj/ast.o
-unitests/exceptions/test: obj/exceptions.o
 
-unitests/%/test: unitests/%/test.c
+unitests/%/test: unitests/%/test.c obj/exceptions.o
 	gcc -o $@ $^ $(CFLAGS)
 
 

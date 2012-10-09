@@ -2,7 +2,6 @@
 #include "../test.h"
 
 BEGIN_TEST
-	exceptions_init();
 	try
 	{
 		try
