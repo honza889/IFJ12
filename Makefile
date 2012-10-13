@@ -2,7 +2,7 @@ CFLAGS=-std=c99 -I src -Wall -Wno-unused-variable -pedantic
 # Úroveň množství debugovacích informací
 LDB=-g3
 
-SOURCES=ifj12 value symbols ast exceptions
+SOURCES=ifj12 value symbols ast exceptions rcstring
 
 ifj12: $(addprefix obj/,$(addsuffix .o,$(SOURCES)))
 	gcc -o $@ $^ $(CFLAGS)

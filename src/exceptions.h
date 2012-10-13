@@ -3,14 +3,19 @@
 
 #include <setjmp.h>
 #include <stdbool.h>
+#include "value.h"
 
 typedef int UndefinedVariableException;
 typedef bool IncompatibleComparisonException;
+typedef Value InvalidConversionException;
+typedef bool BadArgumentTypeException;
 
 typedef enum
 {
 	UndefinedVariable,
-	IncompatibleComparison
+	IncompatibleComparison,
+	InvalidConversion,
+	BadArgumentType
 } ExceptionType;
 
 typedef struct
@@ -20,6 +25,8 @@ typedef struct
 	{
 		UndefinedVariableException UndefinedVariableExceptionValue;
 		IncompatibleComparisonException IncompatibleComparisonExceptionValue;
+		InvalidConversionException InvalidConversionExceptionValue;
+		BadArgumentTypeException BadArgumentTypeExceptionValue;
 	} value;
 } Exception;
 
