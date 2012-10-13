@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <errno.h>
-#include <stdarg.h>
 
 #include "bif.h"
 #include "ast.h"
@@ -111,7 +110,7 @@ Value BIFnumeric(Value object)
 {
     switch(object.type)
     {
-        case typeUndefined: throw(UndefinedVariable,true);
+        case typeUndefined: throw(UndefinedVariable, true);
         case typeFunction:  throw(BadArgumentType, __FUNCTION__);
         case typeBoolean:
         case typeNil: throw(InvalidConversion, object);
@@ -128,34 +127,29 @@ Value BIFnumeric(Value object)
 }
 
 // Vypise to co dostane
-Value BIFprint(int count, ...)
+Value BIFprint(ValueList param, int count)
 {
-    va_list param;
-    va_start(param, count);
-    while(count > 1)
+    for(int i = 0; i < count; i++)
     {
-        Value object = va_arg(param, Value);
-        switch(object.type)
+        switch(param[i].type)
         {
             case typeNil:
                 printf("Nil");
                 break;
             case typeBoolean:
-                if(object.data.boolean) printf("true");
+                if(param[i].data.boolean) printf("true");
                 else printf("false");
                 break;
             case typeNumeric:
-                printf("%g", object.data.numeric);
+                printf("%g", param[i].data.numeric);
                 break;
             case typeString:
-                printf("%s", object.data.string);
+                printf("%s", param[i].data.string);
                 break;
             case typeFunction: throw(BadArgumentType, __FUNCTION__);
-            case typeUndefined: throw(UndefinedVariable,true);
+            case typeUndefined: throw(UndefinedVariable, true);
         }
-        count--;
     }
-    va_end(param);
     return newValueNil();
 
 }
@@ -170,7 +164,7 @@ Value BIFtypeOf(Value object)
         case typeNumeric: return newValueNumeric(3.0);
         case typeFunction: return newValueNumeric(6.0);
         case typeString: return newValueNumeric(8.0);
-        case typeUndefined: throw(UndefinedVariable,true);
+        case typeUndefined: throw(UndefinedVariable, true);
     }
 }
 
@@ -179,7 +173,7 @@ Value BIFlen(Value object)
 {
     switch(object.type)
     {
-        case typeUndefined: throw(UndefinedVariable,true);
+        case typeUndefined: throw(UndefinedVariable, true);
         case typeString: return newValueNumeric((double)strlen(object.data.string));
         default: return newValueNumeric(0.0);
     }

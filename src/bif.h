@@ -19,11 +19,12 @@ Value BIFinput();
 Value BIFnumeric(Value object);
 
 // Vypise co dostane
-// Prvni argument !!musi!! byt pocet argumentu s kolika je funkce volana
+// @parametr param - pole s parametry
+// @parametr count - pocet parametru v poli param
 // Pokud dostane nedefinovanou promenou nebo ukazatel na funkci vyvola vyjimku
 // Ostatni typy vypise podle zadani
 // Vraci Value type=typeNil
-Value BIFprint(int count, ...);
+Value BIFprint(ValueList param, int count);
 
 // Vrati cislo odpovidajici typu co dostala
 // Pokud dostane nedefinovanou promenou vyvola vyjimku
