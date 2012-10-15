@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <assert.h>
 #include "value.h"
 #include "exceptions.h"
 #include "../test.h"

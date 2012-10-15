@@ -1,6 +1,5 @@
 
 #include <stdio.h>
-#include <assert.h>
 #include "value.h"
 #include "symbols.h"
 #include "../test.h"

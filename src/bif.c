@@ -73,7 +73,7 @@ bool isNumberInString(char *str)
                 else state = OK;
                 break;
             default:
-					break;
+                break;
         }
         i++;
     }
