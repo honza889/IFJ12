@@ -72,6 +72,8 @@ bool isNumberInString(char *str)
                 if(str[i] >= '0' && str[i] <= '9') state = NUMBER3;
                 else state = OK;
                 break;
+            default:
+					break;
         }
         i++;
     }
@@ -111,7 +113,7 @@ Value BIFnumeric(Value object)
     switch(object.type)
     {
         case typeUndefined: throw(UndefinedVariable, true);
-        case typeFunction:  throw(BadArgumentType, __FUNCTION__);
+        case typeFunction:  throw(BadArgumentType, "numeric");
         case typeBoolean:
         case typeNil: throw(InvalidConversion, object);
         case typeNumeric: return object;
@@ -124,6 +126,7 @@ Value BIFnumeric(Value object)
             }
             else throw(InvalidConversion, object);
     }
+    exit(99); // Jen pro kompilaci
 }
 
 // Vypise to co dostane
@@ -146,7 +149,7 @@ Value BIFprint(ValueList param, int count)
             case typeString:
                 printf("%s", param[i].data.string);
                 break;
-            case typeFunction: throw(BadArgumentType, __FUNCTION__);
+            case typeFunction: throw(BadArgumentType, "print");
             case typeUndefined: throw(UndefinedVariable, true);
         }
     }
@@ -166,6 +169,7 @@ Value BIFtypeOf(Value object)
         case typeString: return newValueNumeric(8.0);
         case typeUndefined: throw(UndefinedVariable, true);
     }
+    exit(99); // Jen pro kompilaci
 }
 
 // Vrati delku retezce

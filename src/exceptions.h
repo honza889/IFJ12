@@ -8,7 +8,7 @@
 typedef int UndefinedVariableException;
 typedef bool IncompatibleComparisonException;
 typedef Value InvalidConversionException;
-typedef bool BadArgumentTypeException;
+typedef char* BadArgumentTypeException;
 
 typedef enum
 {
