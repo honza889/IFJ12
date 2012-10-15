@@ -9,26 +9,33 @@ typedef int UndefinedVariableException;
 typedef bool IncompatibleComparisonException;
 typedef Value InvalidConversionException;
 typedef char* BadArgumentTypeException;
+typedef int IndexOutOfBoundsException;
 
 typedef enum
 {
 	UndefinedVariable,
 	IncompatibleComparison,
 	InvalidConversion,
-	BadArgumentType
+	BadArgumentType,
+	IndexOutOfBounds
 } ExceptionType;
+
+#define EXCEPTION( name ) name##Exception name##ExceptionValue
 
 typedef struct
 {
 	ExceptionType type;
 	struct
 	{
-		UndefinedVariableException UndefinedVariableExceptionValue;
-		IncompatibleComparisonException IncompatibleComparisonExceptionValue;
-		InvalidConversionException InvalidConversionExceptionValue;
-		BadArgumentTypeException BadArgumentTypeExceptionValue;
+		EXCEPTION( UndefinedVariable );
+		EXCEPTION( IncompatibleComparison );
+		EXCEPTION( InvalidConversion );
+		EXCEPTION( BadArgumentType );
+		EXCEPTION( IndexOutOfBounds );
 	} value;
 } Exception;
+
+#undef EXCEPTION
 
 void exceptions_init();
 jmp_buf* exceptions_pushBuffer();
