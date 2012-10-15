@@ -1,7 +1,7 @@
 #include "exceptions.h"
 #include "global.h"
 
-#define MAX_TRY_BLOCKS 16
+#define MAX_TRY_BLOCKS 64
 
 static jmp_buf jumpBuffers[MAX_TRY_BLOCKS];
 static int jumpBuffersSize;
