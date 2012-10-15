@@ -2,7 +2,7 @@ CFLAGS=-std=c99 -I src -Wall -Wno-unused-variable -pedantic
 # Úroveň množství debugovacích informací
 LDB=-g3
 
-SOURCES=ifj12 value symbols ast exceptions rcstring bif
+SOURCES=ifj12 value symbols ast exceptions rcstring bif scanner
 
 ifj12: $(addprefix obj/,$(addsuffix .o,$(SOURCES)))
 	gcc -o $@ $^ $(CFLAGS)
@@ -21,7 +21,7 @@ obj/dbg/%.o: src/%.c
 #  Testy
 #  *****
 
-TESTS=value symbols ast exceptions
+TESTS=value symbols ast exceptions scanner
 
 .PHONY: test debug clean
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
@@ -33,6 +33,7 @@ unitests/value/test: obj/value.o obj/exceptions.o
 unitests/symbols/test: obj/symbols.o obj/value.o obj/exceptions.o
 unitests/ast/test: obj/value.o obj/ast.o obj/exceptions.o
 unitests/exceptions/test: obj/exceptions.o
+unitests/scanner/test: obj/scanner.o
 
 unitests/%/test: unitests/%/test.c obj/exceptions.o unitests/test.h
 	gcc -o $@ $^ $(CFLAGS)
