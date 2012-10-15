@@ -21,7 +21,7 @@ obj/dbg/%.o: src/%.c
 #  Testy
 #  *****
 
-TESTS=value symbols ast exceptions scanner
+TESTS=value symbols ast exceptions scanner rcstring
 
 .PHONY: test debug clean
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
@@ -34,6 +34,7 @@ unitests/symbols/test: obj/symbols.o obj/value.o obj/exceptions.o
 unitests/ast/test: obj/value.o obj/ast.o obj/exceptions.o
 unitests/exceptions/test: obj/exceptions.o
 unitests/scanner/test: obj/scanner.o
+unitests/rcstring/test: obj/rcstring.o
 
 unitests/%/test: unitests/%/test.c obj/exceptions.o unitests/test.h
 	gcc -o $@ $^ $(CFLAGS)
