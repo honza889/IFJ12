@@ -16,10 +16,17 @@ RCStringBuffer* newRCStringBuffer( int len )
   return buf;
 }
 
+RCString makeEmptyRCString()
+{
+	return makeRCString("");
+}
+
 RCString makeRCString( const char* str )
 {
   int len = strlen(str);
-  return (RCString){ newRCStringBuffer( len ), 0, len };
+  RCString ret = { newRCStringBuffer( len ), 0, len };
+  memcpy( ret.buffer->string, str, len );
+  return ret;
 }
 
 RCString copyRCString( RCString* str )

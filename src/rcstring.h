@@ -31,6 +31,7 @@ struct SRCStringBuffer{
   char* string;
 };
 
+RCString makeEmptyRCString();
 RCString makeRCString( const char* str );
 RCString copyRCString( RCString* str );
 void deleteRCString( RCString* str );
