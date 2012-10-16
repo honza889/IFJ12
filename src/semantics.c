@@ -18,6 +18,12 @@ void AddToStatementList(StatementList *list, Statement new){
 	memcpy(&new,&list->item[list->count-1],sizeof(Statement));
 }
 
+void freeStatementList(StatementList *list){
+	free(list->item);
+	list->item=NULL;
+	list->count=0;
+}
+
 Function semantics(FILE *f){
 	Token t;
 	StatementList list=newStatementList();
@@ -30,6 +36,7 @@ Function semantics(FILE *f){
 	
 	
 	
+	freeStatementList(&list);
 	return (Function){
 		.type=USER_DEFINED,
 		.value.userDefined={
