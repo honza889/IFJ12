@@ -24,7 +24,11 @@ typedef struct SStatement Statement;
 
 typedef struct SContext Context;
 
-typedef Statement* StatementList;
+typedef struct {
+	Statement* item;
+	int count;
+} StatementList;
+
 typedef Expression* ExpressionList;
 typedef Value* ValueList;
 
@@ -67,7 +71,6 @@ struct SFunction
 	union{
 		struct{
 			StatementList statements;
-			int statementCount;
 			int variableCount;
 		} userDefined;
 		BuiltinFunction builtin;

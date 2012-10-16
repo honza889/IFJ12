@@ -44,8 +44,10 @@ BEGIN_TEST
 		.type = USER_DEFINED,
 		.value = {
 			.userDefined = {
-				.statements = testStatements,
-				.statementCount = 2,
+				.statements = {
+					.item = testStatements,
+					.count = 2,
+				},
 				.variableCount = 1
 			}
 		},

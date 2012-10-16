@@ -154,7 +154,7 @@ Value evalFunction( Function* func, ExpressionList params, int parameterCount, C
 	
 	if( func->type == USER_DEFINED )
 	{
-		variableCount += func->value.userDefined.variableCount;
+		variableCount += func->value.userDefined.statements.count;
 	}
 	
 	Value variables[ variableCount ];
@@ -183,9 +183,9 @@ Value evalFunction( Function* func, ExpressionList params, int parameterCount, C
 	}
 	else
 	{
-		for( int i = 0; i < func->value.userDefined.statementCount; i++ )
+		for( int i = 0; i < func->value.userDefined.statements.count; i++ )
 		{
-			ReturnData r = evalStatement( &func->value.userDefined.statements[ i ], &nestedContext );
+			ReturnData r = evalStatement( &func->value.userDefined.statements.item[ i ], &nestedContext );
 			if( r.returned )
 			{
 				return r.ret;
