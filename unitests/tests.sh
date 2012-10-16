@@ -4,11 +4,11 @@ for FILE in $FILES; do
 	if [ -d "unitests/$FILE" ]; then
 		echo "*********************************"
 		echo "  Test: $FILE"
-		echo "*********************************"
+		echo "¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨"
 		if [ "$1" != "valgrind" ]; then
 			unitests/$FILE/test
 		  	if [ "$?" == "0" ]; then
-				echo "Exit korektni"
+				echo "Exit OK"
 			fi
 		else
 			valgrind --leak-check=full -q unitests/$FILE/test > "unitests/$FILE/out" 2>&1
@@ -16,10 +16,10 @@ for FILE in $FILES; do
 			if [[ $FILESIZE > 1 ]] ; then # Nekdy soubor obsahoval \n
 				cat unitests/$FILE/out
 			else
-				echo "Valgrind korektni"
+				echo "Valgrind OK"
 				unitests/$FILE/test
 		  	 	if [ "$?" == "0" ]; then
-					echo "Exit korektni"
+					echo "Exit OK"
 				fi
 			fi
 		fi

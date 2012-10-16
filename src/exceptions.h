@@ -5,20 +5,23 @@
 #include <stdbool.h>
 #include "value.h"
 
-typedef int UndefinedVariableException;
-typedef bool IncompatibleComparisonException;
-typedef Value InvalidConversionException;
-typedef char* BadArgumentTypeException;
-typedef int IndexOutOfBoundsException;
-
 typedef enum
 {
 	UndefinedVariable,
 	IncompatibleComparison,
 	InvalidConversion,
 	BadArgumentType,
-	IndexOutOfBounds
+	IndexOutOfBounds,
+	SyntaxError
 } ExceptionType;
+
+/* Parametry vyjimek - protoze musi byt jeden, bool=void */
+typedef int UndefinedVariableException;
+typedef bool IncompatibleComparisonException;
+typedef Value InvalidConversionException;
+typedef char* BadArgumentTypeException;
+typedef int IndexOutOfBoundsException;
+typedef int SyntaxErrorException; // Radek na kterem je syntakticka chyba
 
 #define EXCEPTION( name ) name##Exception name##ExceptionValue
 
@@ -32,6 +35,7 @@ typedef struct
 		EXCEPTION( InvalidConversion );
 		EXCEPTION( BadArgumentType );
 		EXCEPTION( IndexOutOfBounds );
+		EXCEPTION( SyntaxError );
 	} value;
 } Exception;
 
