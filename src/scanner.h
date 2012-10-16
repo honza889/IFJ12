@@ -21,6 +21,10 @@ typedef struct {
   } data;
 }  Token;
 
+/**
+ * Načte jeden token
+ * @return Token
+ */
 Token scanner(FILE *f);
 
 #endif
