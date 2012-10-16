@@ -1,0 +1,89 @@
+Program -> ""
+
+Program -> Whitespace Program
+
+Program -> Funkce  Program
+
+Program -> StatementList Program
+
+Funkce -> "function" Identifier LParen ParameterList RParen EOL StatementList End 
+
+ParameterList -> Identifier [, Identifier]
+
+StatementList -> EOL
+
+StatementList -> Statement [StatementList]
+
+Statement -> WhileLoop
+
+Statement -> Condition
+
+Statement -> Return
+
+Statement -> Assignment
+
+Statement -> Substring
+
+WhileLoop -> "while" Expression EOL StatementList End
+
+Condition -> "if" Expression EOL StatementList "else" EOL StatementList End
+
+Return -> "return" Expression EOL
+
+Assignment -> Identifier "=" Expression EOL
+
+Substring -> Identifier "=" Expression LSBracket [NumericLiteral] : [NumericLiteral] RSBracket EOL
+
+Expression -> Identifier
+
+Expression -> Expression Operator Expression
+
+Expression -> Identifier LParen PassedParameterList RParen
+
+Expression -> Literal
+
+Operator -> "+" | "-" | "*" | "/" | "**" | "==" | "!=" | "<" | ">" | "<=" | ">="
+
+PassedParameterList -> Expression [, PassedParameterList]
+
+Literal -> NumericLiteral | StringLiteral | BoolLiteral
+
+NumericLiteral -> NumericPart . NumericPart Exponent
+
+NumericLiteral -> NumericPart "." NumericPart
+
+NumericLiteral -> NumericPart Exponent
+
+NumericPart -> "0"-"9" [NumericPart]
+
+Exponent -> "e" [+|-] NumericPart
+
+StringLiteral -> "\"" StringContent "\""
+
+StringContent -> StringCharacter [StringContent]
+
+StringCharacter -> "\\n" | "\\t" | "\\\\" | "\\\"" 
+
+StringCharacter -> "\x" "01"-"FF"
+
+StringCharacter -> ne "\"" | ne "\""
+
+BoolLiteral -> "true"
+
+BoolLiteral -> "false"
+
+Identifier -> ("a"-"z"|"A"-"Z"|"_")("a"-"Z"|"A"-"Z"|"0"-"9"|"_")*
+
+EOL -> "\n"
+
+LParen -> "("
+
+RParen -> ")"
+
+LSBracket -> "["
+
+RSBracket -> "]"
+
+End -> [Whitespace ]"end" EOL [Whitespace]
+
+Whitespace -> " " | "\t" atd...
