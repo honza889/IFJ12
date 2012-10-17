@@ -1,6 +1,7 @@
 #include "semantics.h"
 #include "syntax.h"
 #include "ast.h"
+#include "exceptions.h"
 
 static inline StatementList newStatementList(){
 	return (StatementList){ .item=NULL, .count=0 };
@@ -29,8 +30,14 @@ Function semantics(FILE *f){
 	StatementList list=newStatementList();
 	
 	
-	
-	t=syntax(f);
+	try{
+		while(true){
+			t=syntax(f);
+		}
+	}
+	catch{
+		on(EndOfScanning,e){} // Neposilat dal vyjimku konce souboru
+	}
 	
 	AddToStatementList(&list, (Statement){.type=ASSIGNMENT});
 	

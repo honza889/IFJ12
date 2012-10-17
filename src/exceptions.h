@@ -7,6 +7,10 @@
 
 typedef enum
 {
+	ScannedBadNumber,
+	ScannedBadLexeme,
+	EndOfScanning,
+
 	UndefinedVariable,
 	IncompatibleComparison,
 	InvalidConversion,
@@ -16,6 +20,10 @@ typedef enum
 } ExceptionType;
 
 /* Parametry vyjimek - protoze musi byt jeden, bool=void */
+typedef int ScannedBadNumberException;
+typedef int ScannedBadLexemeException;
+typedef bool EndOfScanningException;
+
 typedef int UndefinedVariableException;
 typedef bool IncompatibleComparisonException;
 typedef Value InvalidConversionException;
@@ -30,6 +38,10 @@ typedef struct
 	ExceptionType type;
 	struct
 	{
+		EXCEPTION( ScannedBadNumber );
+		EXCEPTION( ScannedBadLexeme );
+		EXCEPTION( EndOfScanning );
+
 		EXCEPTION( UndefinedVariable );
 		EXCEPTION( IncompatibleComparison );
 		EXCEPTION( InvalidConversion );

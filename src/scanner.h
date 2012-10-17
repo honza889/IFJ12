@@ -38,6 +38,6 @@ typedef struct {
  * @param[out]	token	Ukazatel na strukturu Token.
  * @return Vrací chybový kód.
  */
-int scanner(FILE *f, Token *token);
+Token scanner(FILE *f);
 
 #endif
