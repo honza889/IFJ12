@@ -1,11 +1,22 @@
 #!/bin/bash
 FILES=`ls unitests`
-for FILE in $FILES; do
-	if [ -d "unitests/$FILE" ]; then
+
+if [ "$1" == "valgrind" ]; then
+	DOVALGRIND=true
+	shift
+else
+    DOVALGRIND=false
+fi
+
+
+for FILE in $1; do
+	FILE=${FILE%/test}
+	FILE=${FILE#unitests/}
+	if [ -f "unitests/$FILE/test" ]; then
 		echo "*********************************"
 		echo "  Test: $FILE"
 		echo "¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨"
-		if [ "$1" != "valgrind" ]; then
+		if [ $DOVALGRIND == false ]; then
 			unitests/$FILE/test
 		  	if [ "$?" == "0" ]; then
 				echo "Exit OK"

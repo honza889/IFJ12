@@ -25,9 +25,9 @@ TESTS=value symbols ast exceptions scanner rcstring
 
 .PHONY: test debug clean
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
-	unitests/tests.sh
+	unitests/tests.sh "$?"
 tests:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
-	unitests/tests.sh valgrind
+	unitests/tests.sh valgrind "$?"
 
 unitests/value/test: obj/value.o obj/exceptions.o
 unitests/symbols/test: obj/symbols.o obj/value.o obj/exceptions.o
