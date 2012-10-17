@@ -52,7 +52,7 @@ void implCopyRCString( RCString* str, int len )
 {
 	RCStringBuffer* newBuffer = newRCStringBuffer( len );
 
-	memcpy( newBuffer->string, str->buffer->string + str->offset, len );
+	memcpy( newBuffer->string, str->buffer->string + str->offset, str->length );
 
 	deleteRCString( str ); //odstranime referenci na buffer, pripadne smazeme buffer
 

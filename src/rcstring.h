@@ -30,38 +30,125 @@ struct SRCStringBuffer{
   int capacity;
   char* string;
 };
-
+/** 
+ * Vraci prazdny RCString 
+ */
 RCString makeEmptyRCString();
+
+/**
+ * Vytvori RCString, jehoz obsah je kopii \a str
+ */
 RCString makeRCString( const char* str );
+
+/** 
+ * "Kopirovaci konstruktor" RCStringu, tuto funkci
+ * je nutne volat kdykoliv prirazujeme RCString do jineho.
+ * 
+ * Kazde volani teto funkce musi byt doprovazeno pozdejsim volanim
+ * funkce deleteRCString.
+ * 
+ * Priklad:
+ * \code
+ *   void funkce( RCString str )
+ *   {
+ *     str = copyRCString( &str );
+ *     ...prace se str...
+ *     deleteRCString( &str );
+ *   }
+ * \endcode
+ * Pripadne:
+ *   void funkce( RCString* str )
+ *   {
+ *     RCString str2 = copyRCString( str );
+ *     ...prace se str2...
+ *     deleteRCString( &str2 );
+ *   }
+ */
 RCString copyRCString( RCString* str );
+
+/**
+ * "Destruktor" RCStringu. Veškeré RCStringy je nutné finalizovat
+ * touto funkcí.
+ * \see copyRCString
+ */
 void deleteRCString( RCString* str );
 
+/**
+ * Zajisti, ze RCString \a str je jedinou referenci na jeho buffer.
+ */
 void ensureUniqueRCString( RCString* str );
+
+/**
+ * Umoznuje prime cteni z vnitrniho bufferu RCStringu \a str
+ */
 const char* RCStringGetBuffer( const RCString* str );
 
 // Inspekční funkce
 
+/**
+ * Zjistuje prazdnost RCStringu \a str
+ */
 static inline bool RCStringEmpty( const RCString* str )
 {
 	return str->length == 0;
 }
 
+/**
+ * Zjistuje, zda \a str je jedina reference na jeho buffer
+ */
 static inline bool RCStringUnique( const RCString* str )
 {
 	return str->buffer->references == 1;
 }
 
+/**
+ * Vraci delku retezce \a str
+ */
 static inline int RCStringLength( const RCString* str )
 {
 	return str->length;
 }
 
+/**
+ * Vraci znak na pozici \a index retezce \a str
+ */
 char RCStringGet( const RCString* str, int index );
 
 // Mutátory
 
-void RCStringResize( RCString* str, int capacity );
+/**
+ * Změní velikost stringu \a str na \a length.
+ * Pokud je \a length vetsi nez soucasna delka retezce, tak bude
+ * retezec prodlouzen, ovsem nove vznikly prostor nebude nicim 
+ * inicializovan.
+ */
+void RCStringResize( RCString* str, int length );
+
+/**
+ * Nastaví znak na pozici \a index stringu \a str na \a c
+ */
 void RCStringSet( RCString* str, int index, char c );
+
+/**
+ * Přidá znak \a c na konec stringu \a str
+ */
 void RCStringAppendChar( RCString* str, char c );
+
+/**
+ * Posune zacatek stringu \a str na \a start a zmeni jeho delku 
+ * na \a length.
+ * 
+ * Priklad:
+ * \code
+ *   RCString s = makeRCString( "Ahoj svete!" );
+ *   RCStringSubstring( &s, 5, 4 );
+ *   ...s je nyni "svet"...
+ * \endcode
+ * 
+ * Pokud nova delka zpusobi, ze konec retezce by se nachazel
+ * az za koncem puvodniho retezce, tak bude retezec zvetsen 
+ * pomoci RCStringResize.
+ */
 void RCStringSubstring( RCString* str, int start, int length );
+
 #endif
