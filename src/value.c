@@ -104,10 +104,13 @@ RCString getValueString(Value *object){
    }
   break;
   
+  case typeFunction:
+    throw(BadArgumentType, "functionToString");
+  break;
+  
   case typeString:
    return copyRCString( &object->data.string );
   break;
-  
   
   default:
    ERROR("Neni implementovano: getValueString");
