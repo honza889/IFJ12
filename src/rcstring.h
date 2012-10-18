@@ -2,12 +2,13 @@
 #define RCSTRING_H
 
 #include <stdbool.h>
+#include <stdio.h>
 
 /**
  * Implementace stringů s počítáním referencí.
  * Pár pravidel pro používání:
- * 	  -	Funkce, která má jako parametr RCString musí na začátku zavolat
- * 		copyRCString a na konci deleteRCString (ekivalent volání
+ * 	  -	Funkce, která má jako parametr RCString by měla na začátku
+ * 		zavolat copyRCString a na konci deleteRCString (ekivalent volání
  * 		kopírovacího konstruktoru a destruktoru v C++)
  * 	  - Funkce, která má jako parametr pointer na RCString nemusí dělat
  * 		nic
@@ -113,6 +114,16 @@ static inline int RCStringLength( const RCString* str )
  * Vraci znak na pozici \a index retezce \a str
  */
 char RCStringGet( const RCString* str, int index );
+
+/**
+ * Porovnava retezce jako strcmp
+ */
+int RCStringCmp( const RCString* a, const RCString* b );
+
+/**
+ * Co to asi tak dela?
+ */
+void RCStringPrint( const RCString* str, FILE* stream );
 
 // Mutátory
 

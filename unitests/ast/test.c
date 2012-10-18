@@ -61,8 +61,8 @@ BEGIN_TEST
 	
 	Value ret = evalFunction( &f, NULL, 0, &ctx );
 	
-	char* s = getValueString( &ret );
+	RCString s = getValueString( &ret );
 	STRTEST( s, "5" );
-	free( s ); 
+	deleteRCString( &s ); 
 
 END_TEST

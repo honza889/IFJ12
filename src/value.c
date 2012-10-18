@@ -54,21 +54,25 @@ void setValueFunction(Value *object, Function *value){
 /**
  * Ulozit do Value retezec
  */
-void setValueString(Value *object, char *value){
- freeValue(object);
- int valueSize=(strlen(value)+1)*sizeof(char);
- object->type=typeString;
- object->data.string=malloc(valueSize);
- MALLCHECK(object->data.string);
- memcpy(object->data.string,value,valueSize);
+void setValueString(Value *object, RCString str){
+	str = copyRCString( &str );
+	freeValue( object );
+	object->type=typeString;
+	object->data.string = copyRCString( &str );
+	deleteRCString( &str );
+}
+
+void setValueCString(Value *object, const char* str)
+{
+	freeValue( object );
+	object->type=typeString;
+	object->data.string = makeRCString( str );
 }
 
 /**
  * Dostat z Value string (bez ohledu na to co obsahuje)
  */
-char* getValueString(Value *object){
- char *output=NULL;
- int outputSize=0;
+RCString getValueString(Value *object){
  switch(object->type){
 
   case typeUndefined:
@@ -76,40 +80,40 @@ char* getValueString(Value *object){
   break;
   
   case typeNil:
-   NEWSTRING(output,"Nil");
+   return makeRCString("Nil");
   break;
   
   case typeBoolean:
    if(object->data.boolean==true){
-    NEWSTRING(output,"true");
+    return makeRCString("true");
    }else{
-    NEWSTRING(output,"false");
+    return makeRCString("false");
    }
   break;
 
   case typeNumeric:
-   output=malloc(BUFFERSIZE*sizeof(char));
-   MALLCHECK(output);
-   if( snprintf(output,BUFFERSIZE,"%g",object->data.numeric) >= BUFFERSIZE ){
-    ERROR("Preteceni bufferu - necekane dlouhe cislo!");
+   {
+	char* output=malloc(BUFFERSIZE*sizeof(char));
+	MALLCHECK(output);
+	if( snprintf(output,BUFFERSIZE,"%g",object->data.numeric) >= BUFFERSIZE ){
+		ERROR("Preteceni bufferu - necekane dlouhe cislo!");
+	}
+	RCString ret = makeRCString( output );
+	free( output );
+	return ret;
    }
-   output=realloc(output,(strlen(output)+1)*sizeof(char));
-   MALLCHECK(output);
-  break;
-  
-  case typeFunction:
-   ERROR("Neni implementovano: getValueString pro typeFuntion!");
   break;
   
   case typeString:
-   outputSize=((strlen(object->data.string)+1)*sizeof(char));
-   output=malloc(outputSize);
-   MALLCHECK(output);
-   memcpy(output,object->data.string,outputSize);
+   return copyRCString( &object->data.string );
+  break;
+  
+  
+  default:
+   ERROR("Neni implementovano: getValueString");
   break;
   
  }
- return output;
 }
 
 /**
@@ -143,7 +147,7 @@ bool getValueBoolean(Value *object){
   break;
   
   case typeString:
-   if(object->data.string[0]=='\0'){
+   if(RCStringEmpty(&object->data.string)){
     return false; // prazdny retezec
    }else{
     return true; // neprazdny retezec
@@ -174,7 +178,7 @@ bool equalValue(Value *value1, Value *value2){
   return (value1->data.function==value2->data.function);
  }else
  if(value1->type==typeString && value2->type==typeString){
-  return (strcmp(value1->data.string,value2->data.string)==0);
+  return (RCStringCmp(&value1->data.string,&value2->data.string)==0);
  }
  return false; // operandy nejsou stejneho typu, neni chyba!
 }
@@ -190,7 +194,7 @@ bool greaterValue(Value *value1, Value *value2){
   return (value1->data.numeric>value2->data.numeric);
  }else
  if(value1->type==typeString && value2->type==typeString){
-  return (strcmp(value1->data.string,value2->data.string)>0);
+  return (RCStringCmp(&value1->data.string,&value2->data.string)>0);
  }
  throw(IncompatibleComparison,true);
  return false;
@@ -207,18 +211,28 @@ bool greaterEqualValue(Value *value1, Value *value2){
   return (value1->data.numeric>=value2->data.numeric);
  }else
  if(value1->type==typeString && value2->type==typeString){
-  return (strcmp(value1->data.string,value2->data.string)>=0);
+  return ( RCStringCmp(&value1->data.string,&value2->data.string)>=0);
  }
  throw(IncompatibleComparison,true);
  return false;
+}
+
+Value copyValue( Value* other )
+{
+	Value ret = *other;
+	if( ret.type == typeString )
+	{
+		ret.data.string = copyRCString( &ret.data.string );
+	}
+	return ret;
 }
 
 /**
  * Uvolnit obsah hodnoty
  */
 void freeValue(Value *object){
- if(object->type==typeString && object->data.string){
-  free(object->data.string);
+ if(object->type==typeString){
+  deleteRCString( &object->data.string );
  }
 }
 

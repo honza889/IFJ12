@@ -9,6 +9,7 @@
 #include "global.h"
 #include "ast.h"
 
+Value copyValue( Value* other ); // kvuli RCStringu
 void freeValue(Value *object);
 
 // Konstruktory Value...
@@ -32,8 +33,8 @@ static inline Value newValueFunction( struct SFunction *value){
 	return (Value){ .type=typeFunction, .data.function=value };
 }
 
-static inline Value newValueString(char *value){ 
-	return (Value){ .type=typeString, .data.string=value };
+static inline Value newValueString( RCString value){ 
+	return (Value){ .type=typeString, .data.string = copyRCString( &value ) };
 }
 
 // Ulozit do Value typ...
@@ -42,10 +43,11 @@ void setValueNil(Value *object);
 void setValueBoolean(Value *object, bool value);
 void setValueNumeric(Value *object, double value);
 void setValueFunction(Value *object, struct SFunction *value);
-void setValueString(Value *object, char *value);
+void setValueString(Value *object, RCString value);
+void setValueCString(Value *object, const char* str);
 
 // Ziskat z Value typ... (bez ohledu na to co obsahuje)
-char* getValueString(Value *object);
+RCString getValueString(Value *object);
 bool getValueBoolean(Value *object);
 
 // Porovnavani

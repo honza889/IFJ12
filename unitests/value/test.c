@@ -4,7 +4,7 @@
 #include "../test.h"
 
 BEGIN_TEST
- char *s;
+ RCString s;
  Value v = {typeUndefined};
  Value w = {typeUndefined};
  
@@ -21,27 +21,27 @@ BEGIN_TEST
  /************** set/get **************/
  
  setValueNil(&v);
- STRTEST( s=getValueString(&v),"Nil" );free(s);
+ STRTEST( s=getValueString(&v),"Nil" );deleteRCString(&s);
  TEST( getValueBoolean(&v) == false );
  TEST( typeOfValue(&v) == 0 );
  
  setValueBoolean(&v,true);
- STRTEST( s=getValueString(&v),"true" );free(s);
+ STRTEST( s=getValueString(&v),"true" );deleteRCString(&s);
  TEST( getValueBoolean(&v) == true );
  TEST( typeOfValue(&v) == 1 );
 
  setValueBoolean(&v,false);
- STRTEST( s=getValueString(&v), "false" );free(s);
+ STRTEST( s=getValueString(&v), "false" );deleteRCString(&s);
  TEST( getValueBoolean(&v) == false );
  TEST( typeOfValue(&v) == 1 );
 
  setValueNumeric(&v,123.456); // %g vypisuje jen na 6 cifer
- STRTEST( s=getValueString(&v), "123.456" ); free( s );
+ STRTEST( s=getValueString(&v), "123.456" ); deleteRCString( &s );
  TEST( getValueBoolean(&v) );
  TEST( typeOfValue(&v) == 3 );
  
- setValueString(&v,"Toto je řetězec znaků");
- STRTEST( s=getValueString(&v), "Toto je řetězec znaků" );free(s);
+ setValueCString(&v,"Toto je řetězec znaků");
+ STRTEST( s=getValueString(&v), "Toto je řetězec znaků" );deleteRCString(&s);
  TEST( getValueBoolean(&v) == true );
  TEST( typeOfValue(&v) == 8 );
  
@@ -60,28 +60,29 @@ BEGIN_TEST
  setValueNumeric(&w,1.2);
  TEST( equalValue(&v,&w) == true );
  
- setValueString(&v,"Řetězec");
- setValueString(&w,"Řetězec");
+ setValueCString(&v,"Řetězec");
+ setValueCString(&w,"Řetězec");
  TEST( equalValue(&v,&w) == true );
  
- setValueString(&v,"a");
- setValueString(&w,"a");
+ 
+ setValueCString(&v,"a");
+ setValueCString(&w,"a");
  TEST( equalValue(&v,&w) == true );
  TEST( greaterValue(&v,&w) == false );
  TEST( greaterEqualValue(&v,&w) == true );
  TEST( lesserValue(&v,&w) == false );
  TEST( lesserEqualValue(&v,&w) == true );
  
- setValueString(&v,"a");
- setValueString(&w,"z");
+ setValueCString(&v,"a");
+ setValueCString(&w,"z");
  TEST( equalValue(&v,&w) == false );
  TEST( greaterValue(&v,&w) == false );
  TEST( greaterEqualValue(&v,&w) == false );
  TEST( lesserValue(&v,&w) == true );
  TEST( lesserEqualValue(&v,&w) == true );
 
- setValueString(&v,"z");
- setValueString(&w,"a");
+ setValueCString(&v,"z");
+ setValueCString(&w,"a");
  TEST( equalValue(&v,&w) == false );
  TEST( greaterValue(&v,&w) == true );
  TEST( greaterEqualValue(&v,&w) == true );
@@ -92,7 +93,7 @@ BEGIN_TEST
  /************** porovnavani ruznych typu **************/
  
  setValueNumeric(&v,5.0);
- setValueString(&w,"a");
+ setValueCString(&w,"a");
  TEST( equalValue(&v,&w) == false );
  EXCEPT_TEST( IncompatibleComparison, greaterValue(&v,&w) );
  EXCEPT_TEST( IncompatibleComparison, greaterEqualValue(&v,&w) );

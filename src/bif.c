@@ -12,9 +12,10 @@
 #include "value.h"
 #include "global.h"
 #include "exceptions.h"
+#include "rcstring.h"
 
 // Zjisti jestli retezec obsahuje cislo ve spravnem tvaru
-bool isNumberInString(char *str)
+bool isNumberInString( const char *str)
 {
     int i = 0;
     enum
@@ -83,27 +84,12 @@ bool isNumberInString(char *str)
 // Nacte retezec ze stdin
 Value BIFinput()
 {
-    int c, i = 0, max = 64;
-    char *str = malloc(max * sizeof(char));
-    MALLCHECK(str);
+    RCString str = makeEmptyRCString();
+    int c;
     while((c = getchar()) != EOF && c != '\n')
     {
-        if(i == max - 1)
-        {
-            max = max * 2;
-            char *restr = realloc(str, max * sizeof(char));
-            if(restr == NULL)
-            {
-                free(str);
-                str = NULL;
-                MALLCHECK(restr);
-            }
-            str = restr;
-        }
-        str[i] = c;
-        i++;
+        RCStringAppendChar( &str, c );
     }
-    str[i] = '\0';
     return newValueString(str);
 }
 
@@ -118,9 +104,9 @@ Value BIFnumeric(Value object)
         case typeNil: throw(InvalidConversion, object);
         case typeNumeric: return object;
         case typeString:
-            if(isNumberInString(object.data.string))
+            if(isNumberInString(RCStringGetBuffer(&object.data.string)))
             {
-                Value number = newValueNumeric(atof(object.data.string));
+                Value number = newValueNumeric(atof(RCStringGetBuffer(&object.data.string)));
                 if(errno == ERANGE) throw(InvalidConversion, object);
                 else return number;
             }
@@ -134,24 +120,9 @@ Value BIFprint(ValueList param, int count)
 {
     for(int i = 0; i < count; i++)
     {
-        switch(param[i].type)
-        {
-            case typeNil:
-                printf("Nil");
-                break;
-            case typeBoolean:
-                if(param[i].data.boolean) printf("true");
-                else printf("false");
-                break;
-            case typeNumeric:
-                printf("%g", param[i].data.numeric);
-                break;
-            case typeString:
-                printf("%s", param[i].data.string);
-                break;
-            case typeFunction: throw(BadArgumentType, "print");
-            case typeUndefined: throw(UndefinedVariable, true);
-        }
+        RCString str = getValueString( &param[i] );
+        RCStringPrint( &str, stdout );
+        deleteRCString( &str );
     }
     return newValueNil();
 
@@ -178,7 +149,7 @@ Value BIFlen(Value object)
     switch(object.type)
     {
         case typeUndefined: throw(UndefinedVariable, true);
-        case typeString: return newValueNumeric((double)strlen(object.data.string));
+        case typeString: return newValueNumeric((double)RCStringLength(&object.data.string));
         default: return newValueNumeric(0.0);
     }
 }

@@ -36,8 +36,8 @@ unitests/exceptions/test: obj/exceptions.o
 unitests/scanner/test: obj/scanner.o obj/rcstring.o
 unitests/rcstring/test: obj/rcstring.o
 
-unitests/%/test: unitests/%/test.c obj/exceptions.o unitests/test.h
-	gcc -o $@ $^ $(CFLAGS)
+unitests/%/test: unitests/%/test.c obj/exceptions.o obj/rcstring.o unitests/test.h
+	gcc -o $@ $^ -g3 $(CFLAGS)
 
 #  Debug
 #  *****

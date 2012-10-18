@@ -2,6 +2,7 @@
 #define AST_H
 
 #include <stdbool.h>
+#include "rcstring.h"
 
 typedef struct SValue Value;
 typedef struct SFunction Function;
@@ -56,7 +57,7 @@ struct SValue {
   bool boolean;
   double numeric;
   Function *function;
-  char *string;
+  RCString string;
  } data;
  
 };

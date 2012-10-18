@@ -109,9 +109,7 @@ Value* initValueTable(int length){
  */
 void freeValueTable(Value *table,int length){
  for(int i=0;i<length;i++){
-  if(table[i].type==typeString){
-   free(table[i].data.string);
-  }
+  freeValue( &table[i] );
  }
  free(table);
 }

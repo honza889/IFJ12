@@ -1,5 +1,6 @@
 #include <string.h>
 #include "rcstring.h"
+#include "string.h"
 #include "global.h"
 #include "exceptions.h"
 
@@ -75,9 +76,6 @@ const char* RCStringGetBuffer( const RCString* str )
   return str->buffer->string;
 }
 
-
-
-
 char RCStringGet( const RCString* str, int index )
 {
 	if( index < str->length )
@@ -89,6 +87,20 @@ char RCStringGet( const RCString* str, int index )
 		throw( IndexOutOfBounds, index );
 	}
 	return '\0';
+}
+
+int RCStringCmp( const RCString* a, const RCString* b )
+{
+	int lenDiff = RCStringLength( b ) - RCStringLength( a );
+	int minLen = minInt( RCStringLength( a ), RCStringLength( b ) );
+	int cmp = strncmp( RCStringGetBuffer( a ), RCStringGetBuffer( b ), minLen );
+	if( cmp == 0 ) return lenDiff;
+	else return cmp;
+}
+
+void RCStringPrint( const RCString* str, FILE* stream )
+{
+	fwrite( RCStringGetBuffer( str ), sizeof(char), RCStringLength( str ), stream );
 }
 
 /// Helper pro resizeRCString

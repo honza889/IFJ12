@@ -12,11 +12,15 @@
 #define STRTEST( str1, str2 ) \
     total++; \
     { \
-        const char* _test_str = (str1); \
-        if( strcmp( _test_str, (str2) ) != 0 ){ \
+        RCString _test_str = (str1); \
+        RCString _test_str_2 = makeRCString( str2 ); \
+        if( RCStringCmp( &_test_str, &_test_str_2 ) != 0 ){ \
 			failed++; \
-			fprintf( stderr,"%s:%d: %s FAILED (got \"%s\")\n",__FILE__,__LINE__,#str1,_test_str); \
+			fprintf( stderr,"%s:%d: %s FAILED (got \"",__FILE__,__LINE__,#str1); \
+			RCStringPrint( &_test_str, stderr ); \
+			fprintf( stderr, "\")" ); \
 		} \
+		deleteRCString( &_test_str_2 ); \
 	}
 #define BEGIN_TEST \
 	int main() { \
