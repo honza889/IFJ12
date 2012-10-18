@@ -22,7 +22,7 @@ static inline Value newValueNil(){
 }
 
 static inline Value newValueBoolean(bool value){ 
-	return (Value){ .type=typeNil, .data.boolean=value };
+	return (Value){ .type=typeBoolean, .data.boolean=value };
 }
 
 static inline Value newValueNumeric(double value){ 

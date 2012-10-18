@@ -15,7 +15,7 @@
 #include "rcstring.h"
 
 // Zjisti jestli retezec obsahuje cislo ve spravnem tvaru
-bool isNumberInString( const char *str)
+bool isNumberInString(const char *str)
 {
     int i = 0;
     enum
@@ -120,6 +120,7 @@ Value BIFprint(ValueList param, int count)
 {
     for(int i = 0; i < count; i++)
     {
+        if(param[i].type == typeFunction) throw(BadArgumentType, "print");
         RCString str = getValueString( &param[i] );
         RCStringPrint( &str, stdout );
         deleteRCString( &str );
