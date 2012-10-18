@@ -2,7 +2,6 @@
 // Zdenek Tretter
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <errno.h>
@@ -10,7 +9,6 @@
 #include "bif.h"
 #include "ast.h"
 #include "value.h"
-#include "global.h"
 #include "exceptions.h"
 #include "rcstring.h"
 
