@@ -7,16 +7,21 @@
 
 typedef enum
 {
-	ScannedBadNumber,
-	ScannedBadLexeme,
+	/* Lexikalni analyza */
+	ScannedBadNumber, // exit 1
+	ScannedBadLexeme, // exit 1
 	EndOfScanning,
 
-	UndefinedVariable,
-	IncompatibleComparison,
-	InvalidConversion,
-	BadArgumentType,
-	IndexOutOfBounds,
-	SyntaxError
+	/* Syntakticka analyza */
+	SyntaxError, // exit 2
+
+	/* Lexikalni analyza */
+	UndefinedVariable, // exit 3
+	IncompatibleComparison, // exit 1
+	InvalidConversion, // exit 12 (chyba pretypovani na cislo)
+	BadArgumentType, // exit 11 (behova chyba nekompatibility typu)
+	IndexOutOfBounds // exit 13
+
 } ExceptionType;
 
 /* Parametry vyjimek - protoze musi byt jeden, bool=void */
@@ -24,12 +29,13 @@ typedef int ScannedBadNumberException;
 typedef int ScannedBadLexemeException;
 typedef bool EndOfScanningException;
 
+typedef int SyntaxErrorException; // Radek na kterem je syntakticka chyba
+
 typedef int UndefinedVariableException;
 typedef bool IncompatibleComparisonException;
 typedef Value InvalidConversionException;
 typedef char* BadArgumentTypeException;
 typedef int IndexOutOfBoundsException;
-typedef int SyntaxErrorException; // Radek na kterem je syntakticka chyba
 
 #define EXCEPTION( name ) name##Exception name##ExceptionValue
 

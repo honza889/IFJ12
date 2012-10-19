@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <errno.h>
 #include "global.h"
 #include "exceptions.h"
 
@@ -112,11 +113,9 @@ RCString getValueString(Value *object){
    return copyRCString( &object->data.string );
   break;
   
-  default:
-   ERROR("Neni implementovano: getValueString");
-  break;
-  
  }
+ ERROR("getValueString: Neni implementovano pro dany typ!");
+ exit(99);
 }
 
 /**
@@ -146,7 +145,7 @@ bool getValueBoolean(Value *object){
   break;
   
   case typeFunction:
-   ERROR("getValueBoolean: neni implementovano pro typeFunction!");
+   throw(BadArgumentType,"getValueBoolean neni implementovano pro typeFunction!");
   break;
   
   case typeString:
@@ -158,7 +157,110 @@ bool getValueBoolean(Value *object){
   break;
   
  }
- return false;
+ ERROR("getValueString: Neni implementovano pro dany typ!");
+ exit(99);
+}
+
+
+/**
+ * Zjisti jestli retezec obsahuje cislo ve spravnem tvaru
+ * @author Zdenek Tretter
+ */
+bool isNumberInString(const char *str)
+{
+    int i = 0;
+    enum
+    {
+        WHITESPACE,
+        NUMBER1,
+        POINT,
+        NUMBER2,
+        EXPONENT,
+        SIGN,
+        NUMBER3,
+        ERROR,
+        OK
+    }state;
+
+    if(str[i] == ' ' || str[i] == '\t' || str[i] == '\n') state = WHITESPACE;
+    else if(str[i] >= '0' && str[i] <= '9') state = NUMBER1;
+    else state = ERROR;
+    i++;
+    while(state != ERROR && state != OK)
+    {
+        switch(state)
+        {
+            case WHITESPACE:
+                if(str[i] == ' ' || str[i] == '\t' || str[i] == '\n')
+                    state = WHITESPACE;
+                else if(str[i] >= '0' && str[i] <= '9') state = NUMBER1;
+                else state = ERROR;
+                break;
+            case NUMBER1:
+                if(str[i] >= '0' && str[i] <= '9') state = NUMBER1;
+                else if(str[i] == '.') state = POINT;
+                else if(str[i] == 'e') state = EXPONENT;
+                else state = ERROR;
+                break;
+            case POINT:
+                if(str[i] >= '0' && str[i] <= '9') state = NUMBER2;
+                else state = ERROR;
+                break;
+            case NUMBER2:
+                if(str[i] >= '0' && str[i] <= '9') state = NUMBER2;
+                else if(str[i] == 'e') state = EXPONENT;
+                else state = OK;
+                break;
+            case EXPONENT:
+                if(str[i] >= '0' && str[i] <= '9') state = NUMBER3;
+                else if(str[i] == '+' || str[i] == '-') state = SIGN;
+                else state = ERROR;
+                break;
+            case SIGN:
+                if(str[i] >= '0' && str[i] <= '9') state = NUMBER3;
+                else state = ERROR;
+                break;
+            case NUMBER3:
+                if(str[i] >= '0' && str[i] <= '9') state = NUMBER3;
+                else state = OK;
+                break;
+            default:
+                break;
+        }
+        i++;
+    }
+    return (state == ERROR) ? false : true;
+}
+
+/**
+ * Dostat z value numerickou hodnotu
+ */
+double getValueNumeric(Value *object){
+    switch(object->type)
+    {
+        case typeUndefined: throw(UndefinedVariable, -1);
+        case typeFunction:  throw(BadArgumentType, NULL);
+        case typeBoolean: throw(InvalidConversion, *object);
+        case typeNil: throw(InvalidConversion, *object);
+        case typeNumeric: return object->data.numeric;
+        case typeString:
+            if(isNumberInString(RCStringGetBuffer(&object->data.string)))
+            {
+                double number = atof(RCStringGetBuffer(&object->data.string));
+                if(errno == ERANGE) throw(InvalidConversion, *object);
+                else return number;
+            }
+            else throw(InvalidConversion, *object);
+    }
+    ERROR("getValueNumeric: Neni implementovano pro dany typ!");
+    exit(99);
+}
+
+Function* getValueFunction(Value *object){
+    if(object->type!=typeFunction){
+        throw(InvalidConversion, *object);
+    }
+    return object->data.function;
 }
 
 /**

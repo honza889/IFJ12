@@ -47,8 +47,10 @@ void setValueString(Value *object, RCString value);
 void setValueCString(Value *object, const char* str);
 
 // Ziskat z Value typ... (bez ohledu na to co obsahuje)
-RCString getValueString(Value *object);
 bool getValueBoolean(Value *object);
+double getValueNumeric(Value *object);
+Function* getValueFunction(Value *object);
+RCString getValueString(Value *object);
 
 // Porovnavani
 bool equalValue(Value *value1, Value *value2); // value1 == value2
