@@ -33,7 +33,7 @@ typedef int SyntaxErrorException; // Radek na kterem je syntakticka chyba
 
 typedef int UndefinedVariableException;
 typedef bool IncompatibleComparisonException;
-typedef Value InvalidConversionException;
+typedef Value* InvalidConversionException;
 typedef char* BadArgumentTypeException;
 typedef int IndexOutOfBoundsException;
 
@@ -105,7 +105,7 @@ void exceptions_impl_throw( Exception e );
 	( \
 		expected_exception_type##Exception* name = \
 			&exceptions_getCurrentException()->value.expected_exception_type##ExceptionValue, \
-			exception_impl_loopHack = 1; \
+			exceptions_impl_loopHack = 1; \
 		exceptions_impl_loopHack != 0; \
 		exceptions_setHandled( true ), exceptions_impl_loopHack = 0 \
 	)

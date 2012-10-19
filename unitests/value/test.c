@@ -24,27 +24,39 @@ BEGIN_TEST
  STRTEST( s=getValueString(&v),"Nil" );deleteRCString(&s);
  TEST( getValueBoolean(&v) == false );
  TEST( typeOfValue(&v) == 0 );
- 
+ EXCEPT_TEST( InvalidConversion , getValueNumeric(&v) );
+
  setValueBoolean(&v,true);
  STRTEST( s=getValueString(&v),"true" );deleteRCString(&s);
  TEST( getValueBoolean(&v) == true );
  TEST( typeOfValue(&v) == 1 );
+ EXCEPT_TEST( InvalidConversion , getValueNumeric(&v) );
 
  setValueBoolean(&v,false);
  STRTEST( s=getValueString(&v), "false" );deleteRCString(&s);
  TEST( getValueBoolean(&v) == false );
  TEST( typeOfValue(&v) == 1 );
+ EXCEPT_TEST( InvalidConversion , getValueNumeric(&v) );
 
  setValueNumeric(&v,123.456); // %g vypisuje jen na 6 cifer
  STRTEST( s=getValueString(&v), "123.456" ); deleteRCString( &s );
  TEST( getValueBoolean(&v) );
  TEST( typeOfValue(&v) == 3 );
+ TEST( getValueNumeric(&v) == 123.456 );
  
  setValueCString(&v,"Toto je řetězec znaků");
  STRTEST( s=getValueString(&v), "Toto je řetězec znaků" );deleteRCString(&s);
  TEST( getValueBoolean(&v) == true );
  TEST( typeOfValue(&v) == 8 );
+ EXCEPT_TEST( InvalidConversion , getValueNumeric(&v) );
  
+ setValueCString(&v,"15.97");
+ TEST( typeOfValue(&v) == 8 );
+ TEST( getValueNumeric(&v) == 15.97 );
+
+ setValueCString(&v,"1.97e-3");
+ TEST( typeOfValue(&v) == 8 );
+ TEST( getValueNumeric(&v) == 0.00197 );
  
  /************** porovnavani - spravne **************/
  

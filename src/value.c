@@ -166,7 +166,7 @@ bool getValueBoolean(Value *object){
  * Zjisti jestli retezec obsahuje cislo ve spravnem tvaru
  * @author Zdenek Tretter
  */
-bool isNumberInString(const char *str)
+bool isNumberInString(const char *str,int strlen)
 {
     int i = 0;
     enum
@@ -186,7 +186,7 @@ bool isNumberInString(const char *str)
     else if(str[i] >= '0' && str[i] <= '9') state = NUMBER1;
     else state = ERROR;
     i++;
-    while(state != ERROR && state != OK)
+    while(state != ERROR && state != OK && i<strlen)
     {
         switch(state)
         {
@@ -240,17 +240,20 @@ double getValueNumeric(Value *object){
     {
         case typeUndefined: throw(UndefinedVariable, -1);
         case typeFunction:  throw(BadArgumentType, NULL);
-        case typeBoolean: throw(InvalidConversion, *object);
-        case typeNil: throw(InvalidConversion, *object);
+        case typeBoolean: throw(InvalidConversion, object);
+        case typeNil: throw(InvalidConversion, object);
         case typeNumeric: return object->data.numeric;
         case typeString:
-            if(isNumberInString(RCStringGetBuffer(&object->data.string)))
+            if(isNumberInString(RCStringGetBuffer(&object->data.string),RCStringLength(&object->data.string)))
             {
-                double number = atof(RCStringGetBuffer(&object->data.string));
-                if(errno == ERANGE) throw(InvalidConversion, *object);
+                RCString str = copyRCString(&object->data.string);
+                RCStringAppendChar(&str,'\0');
+                double number = atof(RCStringGetBuffer(&str));
+                deleteRCString(&str);
+                if(errno == ERANGE) throw(InvalidConversion, object);
                 else return number;
             }
-            else throw(InvalidConversion, *object);
+            else throw(InvalidConversion, object);
     }
     ERROR("getValueNumeric: Neni implementovano pro dany typ!");
     exit(99);
@@ -258,7 +261,7 @@ double getValueNumeric(Value *object){
 
 Function* getValueFunction(Value *object){
     if(object->type!=typeFunction){
-        throw(InvalidConversion, *object);
+        throw(InvalidConversion, object);
     }
     return object->data.function;
 }
