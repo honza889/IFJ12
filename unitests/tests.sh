@@ -1,5 +1,4 @@
 #!/bin/bash
-FILES=`ls unitests`
 
 if [ "$1" == "valgrind" ]; then
 	DOVALGRIND=true
