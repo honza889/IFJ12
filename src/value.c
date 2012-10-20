@@ -240,8 +240,8 @@ double getValueNumeric(Value *object){
     {
         case typeUndefined: throw(UndefinedVariable, -1);
         case typeFunction:  throw(BadArgumentType, NULL);
-        case typeBoolean: throw(InvalidConversion, object);
-        case typeNil: throw(InvalidConversion, object);
+        case typeBoolean: throw(InvalidConversion, *object);
+        case typeNil: throw(InvalidConversion, *object);
         case typeNumeric: return object->data.numeric;
         case typeString:
             if(isNumberInString(RCStringGetBuffer(&object->data.string),RCStringLength(&object->data.string)))
@@ -250,10 +250,10 @@ double getValueNumeric(Value *object){
                 RCStringAppendChar(&str,'\0');
                 double number = atof(RCStringGetBuffer(&str));
                 deleteRCString(&str);
-                if(errno == ERANGE) throw(InvalidConversion, object);
+                if(errno == ERANGE) throw(InvalidConversion, *object);
                 else return number;
             }
-            else throw(InvalidConversion, object);
+            else throw(InvalidConversion, *object);
     }
     ERROR("getValueNumeric: Neni implementovano pro dany typ!");
     exit(99);
@@ -261,7 +261,7 @@ double getValueNumeric(Value *object){
 
 Function* getValueFunction(Value *object){
     if(object->type!=typeFunction){
-        throw(InvalidConversion, object);
+        throw(InvalidConversion, *object);
     }
     return object->data.function;
 }

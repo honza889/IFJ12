@@ -33,7 +33,7 @@ typedef int SyntaxErrorException; // Radek na kterem je syntakticka chyba
 
 typedef int UndefinedVariableException;
 typedef bool IncompatibleComparisonException;
-typedef Value* InvalidConversionException;
+typedef Value InvalidConversionException;
 typedef char* BadArgumentTypeException;
 typedef int IndexOutOfBoundsException;
 
@@ -42,7 +42,7 @@ typedef int IndexOutOfBoundsException;
 typedef struct
 {
 	ExceptionType type;
-	struct
+	union
 	{
 		EXCEPTION( ScannedBadNumber );
 		EXCEPTION( ScannedBadLexeme );
@@ -94,18 +94,24 @@ void exceptions_impl_throw( Exception e );
  * Musí se nacházev v bloku catch.
  * 
  * Použití:
- * 	 	on( UNDEFINED_VARIABLE, e )
+ * 	 	on( UndefinedVariable, e )
  * 		{
+ *          // e je pointer na UndefinedVariableException
  * 			printf("%d", *e); // nebo něco takového
  * 		}
  */
 #define on( expected_exception_type, name) \
 	if( exceptions_getCurrentException()->type == expected_exception_type ) \
+    for \
+    ( \
+        exceptions_impl_loopHack = 1; \
+        exceptions_impl_loopHack != 0; \
+        exceptions_impl_loopHack = 0 \
+    ) \
 	for \
 	( \
-		expected_exception_type##Exception* name = \
-			&exceptions_getCurrentException()->value.expected_exception_type##ExceptionValue, \
-			exceptions_impl_loopHack = 1; \
+        expected_exception_type##Exception* name = \
+            &exceptions_getCurrentException()->value.expected_exception_type##ExceptionValue; \
 		exceptions_impl_loopHack != 0; \
 		exceptions_setHandled( true ), exceptions_impl_loopHack = 0 \
 	)
