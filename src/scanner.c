@@ -194,16 +194,17 @@ int cmp_key_words(RCString lexeme)
  * @param[out]	last_letter	Poslední načtený znak ze zdrojového kódu.
  * @return Vrací chybový kód.
  */
-void add_char(FILE *f, char *last_letter, RCString *lexeme)
+int add_char(FILE *f, char *last_letter, RCString *lexeme)
 {
 	assert(lexeme != NULL);
 	
 	if (*last_letter == EOF)
-		throw(EndOfScanning,true);
+		return EOF;
 	
 	// Načítání znaků do bufferu
 	RCStringAppendChar(lexeme, *last_letter);// Přidání znaku do řetězce.
 	*last_letter = getc(f);
+	return EXIT_SUCCESS;
 }
 
 /**
@@ -230,7 +231,10 @@ Token scanner(FILE *f)
 		last_letter = getc(f);
 	}
 	
-	if (last_letter == EOF) throw(EndOfScanning,true);
+	if (last_letter == EOF){
+		deleteRCString(&lexeme);
+		return (Token){.type=tokEndOfFile};
+	}
 	
 	if (isalpha(last_letter)) {
 		do {
@@ -266,6 +270,7 @@ Token scanner(FILE *f)
 			token.data.val.data.numeric = conv_num;
 		}
 		else {
+			deleteRCString(&lexeme);
 			throw(ScannedBadNumber,line_num);
 		}
 	}
@@ -280,6 +285,7 @@ Token scanner(FILE *f)
 	else {
 		FSM(f, &token, &last_letter, &line_num);
 	}
+	deleteRCString(&lexeme);
 	return token;
 }
 

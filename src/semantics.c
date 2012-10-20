@@ -30,13 +30,8 @@ Function semantics(FILE *f){
 	StatementList list=newStatementList();
 	
 	
-	try{
-		while(true){
-			t=syntax(f);
-		}
-	}
-	catch{
-		on(EndOfScanning,e){} // Neposilat dal vyjimku konce souboru
+	while((t=syntax(f)).type!=tokEndOfFile){
+		printf("cteni\n");
 	}
 	
 	AddToStatementList(&list, (Statement){.type=ASSIGNMENT});

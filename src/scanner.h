@@ -15,7 +15,8 @@ typedef struct {
     tokLParen,	/** Typ tokenu: levá závorka ( */
     tokRParen,	/** Typ tokenu: pravá závorka ) */
     tokLBracket,	/** Typ tokenu: levá hranatá závorka [ */
-    tokRBracket		/** Typ tokenu: pravá hranatá závorka ] */
+    tokRBracket,	/** Typ tokenu: pravá hranatá závorka ] */
+    tokEndOfFile	/** Typ tokenu: konec souboru */
   } type;
   union {
     RCString id;	/** Název symbolu */
