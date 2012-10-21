@@ -4,8 +4,10 @@ if a2 < 0.0
  while a2<8.9
  end
 else
+ // Komentář, který obsahuje "kdeco" :)
+ // Další komentář
 end
 
-// Toto moc nefungovalo... (komentar zpusobi zacykleni scanneru)
-x = print("Zadejte cislo pro vypocet faktorialu\n")
+x = print("text")
+x = print("")
 

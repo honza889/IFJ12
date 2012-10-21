@@ -16,20 +16,21 @@
  * @param[out]	token		Ukazatel na strukturu Token.
  * @param[out]	last_letter	Poslední načtený znak ze zdrojového kódu.
  * @param[out]	line_num	Ukazatel na počítadlo řádků vstupního zdrojového kódu.
- * @return Vrací chybový kód.
+ * @return Jestli byl načten token (jinak komentář -> restartovat načítání)
  */
-void FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num)
+bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num)
 {
 	switch (*last_letter) {
 		case '/':
 			*last_letter = getc(f);
 			if (*last_letter == '/')
 			{
-				while (*last_letter != '\n' || *last_letter != EOF)
+				while (*last_letter != '\n' && *last_letter != EOF){
 					*last_letter = getc(f);
-				if (*last_letter == '\n')
-					line_num++;
-				return;	// Nahlášení detekce EOF nechám na fci scanner()
+					if (*last_letter == '\n')
+						*line_num++;
+				}
+				return false;	// Nahlášení detekce EOF nechám na fci scanner()
 			}
 			else if (*last_letter == '*')
 			{
@@ -38,10 +39,10 @@ void FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num)
 					if (*last_letter == '\n') line_num++;
 					else if (*last_letter == '*' && (*last_letter = getc(f)) == '/') {
 						*last_letter = getc(f);
-						return;
+						return true;
 					}
 				}	// TODO: Nahlásit, když komentář nebude uzavřený?
-				return;	// Nahlášení detekce EOF nechám na fci scanner()
+				return true;	// Nahlášení detekce EOF nechám na fci scanner()
 			}
 			else
 			{
@@ -135,10 +136,12 @@ void FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num)
 			
 		case '(':
 			token->type = tokLParen;
+			*last_letter = getc(f);
 			break;
 			
 		case ')':
 			token->type = tokRParen;
+			*last_letter = getc(f);
 			break;
 			
 		case '[':
@@ -152,6 +155,7 @@ void FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num)
 		default:
 			throw(ScannedBadLexeme,*line_num);
 	}
+	return true;
 }
 
 /**
@@ -225,6 +229,11 @@ Token scanner(FILE *f)
 	double conv_num;	// proměnná do které se uloží převedené číslo
 	char *endptr = NULL;	// ukazatel na písmeno kde přestala číst funkce strtod()
 	
+	bool repeat; // true pokud se ma cteni restartovat, protoze se nic nenacetlo (byl komentar)
+	
+	do{
+	repeat = false;
+	
 	while (isspace(last_letter)) {
 		if (last_letter == '\n')
 			line_num++;
@@ -275,16 +284,21 @@ Token scanner(FILE *f)
 		}
 	}
 	else if (last_letter == '"') {
-		do {
+		last_letter = getc(f);
+		while (last_letter != '"'){
 			add_char(f, &last_letter, &lexeme);
 			if (last_letter == '\n')
 				line_num++;
 		// TODO: Detekovat backslash-nuté znaky (\n, \t, \\, \", \xFF, \x0a), které jsou v řetězci?
-		} while (last_letter != '"');
+		}
+		token.type = tokString;
+		token.data.string = copyRCString(&lexeme);
+		last_letter = getc(f);
 	}
 	else {
-		FSM(f, &token, &last_letter, &line_num);
+		repeat = ! FSM(f, &token, &last_letter, &line_num);
 	}
+	}while(repeat);
 	deleteRCString(&lexeme);
 	return token;
 }

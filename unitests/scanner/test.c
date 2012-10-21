@@ -25,10 +25,11 @@ BEGIN_TEST
   Token t;
   RCString s;
 
-  t=scanner(f); // Zpusobuje leak!
+  t=scanner(f);
   s=makeRCString("a2");
   TEST( t.type==tokId )
   TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  deleteRCString(&t.data.id);
   deleteRCString(&s);
 
   t=scanner(f);
@@ -43,10 +44,11 @@ BEGIN_TEST
   TEST( t.type==tokKeyW )
   TEST( t.data.keyw==kIf )
 
-  t=scanner(f); // Zpusobuje leak!
+  t=scanner(f);
   s=makeRCString("a2");
   TEST( t.type==tokId )
   TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  deleteRCString(&t.data.id);
   deleteRCString(&s);
 
   t=scanner(f);
@@ -62,10 +64,11 @@ BEGIN_TEST
   TEST( t.type==tokKeyW )
   TEST( t.data.keyw==kWhile )
 
-  t=scanner(f); // Zpusobuje leak!
+  t=scanner(f);
   s=makeRCString("a2");
   TEST( t.type==tokId )
   TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  deleteRCString(&t.data.id);
   deleteRCString(&s);
 
   t=scanner(f);
@@ -89,14 +92,66 @@ BEGIN_TEST
   TEST( t.type==tokKeyW )
   TEST( t.data.keyw==kEnd )
 
-  // Pri nacteni komentare se zacykli!
-/*
   t=scanner(f);
   s=makeRCString("x");
   TEST( t.type==tokId )
   TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  deleteRCString(&t.data.id);
   deleteRCString(&s);
-*/
+
+  t=scanner(f);
+  TEST( t.type==tokAssign )
+
+  t=scanner(f);
+  s=makeRCString("print");
+  TEST( t.type==tokId )
+  TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  deleteRCString(&t.data.id);
+  deleteRCString(&s);
+
+  t=scanner(f);
+  TEST( t.type==tokLParen )
+
+  t=scanner(f);
+  s=makeRCString("text");
+  TEST( t.type==tokString )
+  TEST( RCStringCmp(&t.data.string,&s) == 0 )
+  deleteRCString(&t.data.string);
+  deleteRCString(&s);
+
+  t=scanner(f);
+  TEST( t.type==tokRParen )
+
+  t=scanner(f);
+  s=makeRCString("x");
+  TEST( t.type==tokId )
+  TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  deleteRCString(&t.data.id);
+  deleteRCString(&s);
+
+  t=scanner(f);
+  TEST( t.type==tokAssign )
+
+  t=scanner(f);
+  s=makeRCString("print");
+  TEST( t.type==tokId )
+  TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  deleteRCString(&t.data.id);
+  deleteRCString(&s);
+
+  t=scanner(f);
+  TEST( t.type==tokLParen )
+
+  t=scanner(f);
+  s=makeRCString("");
+  TEST( t.type==tokString )
+  TEST( RCStringCmp(&t.data.string,&s) == 0 )
+  deleteRCString(&t.data.string);
+  deleteRCString(&s);
+
+  t=scanner(f);
+  TEST( t.type==tokRParen )
+
   fclose(f);
   
 END_TEST
