@@ -8,9 +8,7 @@
 typedef enum
 {
 	/* Lexikalni analyza */
-	ScannedBadNumber, // exit 1
-	ScannedBadLexeme, // exit 1
-	EndOfScanning,
+	ScannerError, // exit 1
 
 	/* Syntakticka analyza */
 	SyntaxError, // exit 2
@@ -25,9 +23,16 @@ typedef enum
 } ExceptionType;
 
 /* Parametry vyjimek - protoze musi byt jeden, bool=void */
-typedef int ScannedBadNumberException;
-typedef int ScannedBadLexemeException;
-typedef bool EndOfScanningException;
+typedef struct {
+  enum {
+    InvalidNumericLiteral,
+    InvalidToken,
+    UnterminatedComment,
+    UnterminatedString,
+    BadEscSequence
+  } type;
+  unsigned line_num;
+} ScannerErrorException;
 
 typedef int SyntaxErrorException; // Radek na kterem je syntakticka chyba
 
@@ -44,9 +49,7 @@ typedef struct
 	ExceptionType type;
 	union
 	{
-		EXCEPTION( ScannedBadNumber );
-		EXCEPTION( ScannedBadLexeme );
-		EXCEPTION( EndOfScanning );
+		EXCEPTION( ScannerError );
 
 		EXCEPTION( UndefinedVariable );
 		EXCEPTION( IncompatibleComparison );

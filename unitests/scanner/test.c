@@ -38,7 +38,7 @@ BEGIN_TEST
   t=scanner(f);
   TEST( t.type==tokNum )
   TEST( t.data.val.type==typeNumeric )
-  TEST( t.data.val.data.numeric==5.7 )
+  TEST( t.data.val.data.numeric == (double) 5.7 )
 
   t=scanner(f);
   TEST( t.type==tokKeyW )
@@ -78,7 +78,7 @@ BEGIN_TEST
   t=scanner(f);
   TEST( t.type==tokNum )
   TEST( t.data.val.type==typeNumeric )
-  TEST( t.data.val.data.numeric==8.9 )
+  TEST( t.data.val.data.numeric == (double) 8.9 )
 
   t=scanner(f);
   TEST( t.type==tokKeyW )

@@ -34,10 +34,15 @@ typedef struct {
 
 
 /**
- * Načte lexém, zpracuje a vrátí token v parametru.
+ * Načte lexém, zpracuje a vrátí token.
+ * Může vracet tyto vyjímky:
+ *    InvalidNumericLiteral	- nepovedl se převest řetězec na číslo
+ *    InvalidToken		- špatný token
+ *    UnterminatedComment	- neukončený blokový komentář
+ *    UnterminatedString	- neukončený řetězec
+ *    BadEscSequence		- špatná escape sekvence
  * @param[in]	f	Ukazatel na otevřený soubor.
- * @param[out]	token	Ukazatel na strukturu Token.
- * @return Vrací chybový kód.
+ * @return Vrací token.
  */
 Token scanner(FILE *f);
 
