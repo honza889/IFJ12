@@ -42,7 +42,7 @@ BEGIN_TEST
  STRTEST( s=getValueString(&v), "123.456" ); deleteRCString( &s );
  TEST( getValueBoolean(&v) );
  TEST( typeOfValue(&v) == 3 );
- TEST( getValueNumeric(&v) == 123.456 );
+ DBLTEST( getValueNumeric(&v), 123.456 );
  
  setValueCString(&v,"Toto je řetězec znaků");
  STRTEST( s=getValueString(&v), "Toto je řetězec znaků" );deleteRCString(&s);
@@ -52,11 +52,11 @@ BEGIN_TEST
  
  setValueCString(&v,"15.97");
  TEST( typeOfValue(&v) == 8 );
- TEST( getValueNumeric(&v) == 15.97 );
+ DBLTEST( getValueNumeric(&v), 15.97 );
 
  setValueCString(&v,"1.97e-3");
  TEST( typeOfValue(&v) == 8 );
- TEST( getValueNumeric(&v) == 0.00197 );
+ DBLTEST( getValueNumeric(&v), 0.00197 );
  
  /************** porovnavani - spravne **************/
  

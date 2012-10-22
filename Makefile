@@ -1,4 +1,4 @@
-CFLAGS=-std=c99 -I src -Wall -Wno-unused-variable -pedantic
+CFLAGS=-std=c99 -I src -Wall -Wno-unused-variable -pedantic -Wdouble-promotion
 # Úroveň množství debugovacích informací
 LDB=-g3
 

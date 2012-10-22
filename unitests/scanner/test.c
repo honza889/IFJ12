@@ -15,6 +15,7 @@ void printTokenType(Token* t){
     case tokRParen: printf("[RParen]\n"); break;
     case tokLBracket: printf("[LBracket]\n"); break;
     case tokRBracket: printf("[RBracket]\n"); break;
+    case tokColon: printf("[Colon]\n"); break;
     case tokEndOfFile: printf("[EndOfFile]\n"); break;
   }
 }
