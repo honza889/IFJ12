@@ -7,8 +7,8 @@
 #include "ast.h"
 
 // Nacte retezec ze stdin
-// Vraci Value type=typeString, data=ukazatel na nacteny retezec
-Value BIFinput();
+// Vraci Value type=typeString, data=ukazatel RCString s nactenym retezecem
+Value BIFinput(ValueList param, int count);
 
 // Prevede retezec na cislo
 // Pokud dostane nedefinovanou promenou nebo ukazatel na funkci vyvola vyjimku
@@ -16,7 +16,7 @@ Value BIFinput();
 // Pokud dostane Numeric vrati ho
 // Pokud dostane String prevede ho na cislo a pokud je cislo korektni vrati ho,
 // jinak vyvola vyjimku (chyba 12)
-Value BIFnumeric(Value object);
+Value BIFnumeric(ValueList param, int count);
 
 // Vypise co dostane
 // @parametr param - pole s parametry
@@ -29,12 +29,12 @@ Value BIFprint(ValueList param, int count);
 // Vrati cislo odpovidajici typu co dostala
 // Pokud dostane nedefinovanou promenou vyvola vyjimku
 // Pro ostatni typy vraci Value type=typeNumeric, data=cislo odpovidajici typu
-Value BIFtypeOf(Value object);
+Value BIFtypeOf(ValueList param, int count);
 
 // Vrati delku retezce
 // Pokud dostane nedefinovanou promenou vyvola vyjimku
 // Pro retezec vraci Value type=typeNumeric data=delka retezce
 // Pro ostatni typy vraci Value type=typeNumeric, data=0.0
-Value BIFlen(Value object);
+Value BIFlen(ValueList param, int count);
 
 #endif
