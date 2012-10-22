@@ -22,7 +22,8 @@ int main(int argc, char**argv)
 	
 	try{
 		
-		semantics(f);
+		SymbolTable globalSymbolTable = {NULL,0};
+		semantics(0,f,&globalSymbolTable);
 		
 	}catch{
 		on(SyntaxError,row){

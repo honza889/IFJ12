@@ -21,7 +21,7 @@ obj/dbg/%.o: src/%.c
 #  Testy
 #  *****
 
-TESTS=value symbols ast exceptions scanner rcstring ial
+TESTS=value symbols ast exceptions scanner rcstring ial semantics
 
 .PHONY: test debug clean
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
@@ -34,6 +34,7 @@ unitests/symbols/test: obj/symbols.o obj/value.o obj/exceptions.o
 unitests/ast/test: obj/value.o obj/ast.o obj/exceptions.o
 unitests/exceptions/test: obj/exceptions.o
 unitests/scanner/test: obj/scanner.o obj/rcstring.o
+unitests/semantics/test: obj/semantics.o obj/syntax.o obj/scanner.o obj/symbols.o obj/rcstring.o obj/value.o
 unitests/rcstring/test: obj/rcstring.o
 unitests/ial/test: obj/ial.o obj/value.o
 
