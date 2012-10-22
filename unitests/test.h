@@ -18,7 +18,7 @@
 			failed++; \
 			fprintf( stderr,"%s:%d: %s FAILED (got \"",__FILE__,__LINE__,#str1); \
 			RCStringPrint( &_test_str, stderr ); \
-			fprintf( stderr, "\")" ); \
+			fprintf( stderr, "\")\n" ); \
 		} \
 		deleteRCString( &_test_str_2 ); \
 	}

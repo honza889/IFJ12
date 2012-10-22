@@ -25,12 +25,12 @@ BEGIN_TEST
   Token t;
   RCString s;
 
+  try{
+
   t=scanner(f);
-  s=makeRCString("a2");
   TEST( t.type==tokId )
-  TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  STRTEST( t.data.id, "a2" )
   deleteRCString(&t.data.id);
-  deleteRCString(&s);
 
   t=scanner(f);
   TEST( t.type==tokAssign )
@@ -45,11 +45,9 @@ BEGIN_TEST
   TEST( t.data.keyw==kIf )
 
   t=scanner(f);
-  s=makeRCString("a2");
   TEST( t.type==tokId )
-  TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  STRTEST( t.data.id, "a2" )
   deleteRCString(&t.data.id);
-  deleteRCString(&s);
 
   t=scanner(f);
   TEST( t.type==tokOp )
@@ -65,11 +63,9 @@ BEGIN_TEST
   TEST( t.data.keyw==kWhile )
 
   t=scanner(f);
-  s=makeRCString("a2");
   TEST( t.type==tokId )
-  TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  STRTEST( t.data.id, "a2" )
   deleteRCString(&t.data.id);
-  deleteRCString(&s);
 
   t=scanner(f);
   TEST( t.type==tokOp )
@@ -93,64 +89,155 @@ BEGIN_TEST
   TEST( t.data.keyw==kEnd )
 
   t=scanner(f);
-  s=makeRCString("x");
   TEST( t.type==tokId )
-  TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  STRTEST( t.data.id, "x" )
   deleteRCString(&t.data.id);
-  deleteRCString(&s);
 
   t=scanner(f);
   TEST( t.type==tokAssign )
 
   t=scanner(f);
-  s=makeRCString("print");
   TEST( t.type==tokId )
-  TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  STRTEST( t.data.id, "print" )
   deleteRCString(&t.data.id);
-  deleteRCString(&s);
 
   t=scanner(f);
   TEST( t.type==tokLParen )
 
   t=scanner(f);
-  s=makeRCString("text");
   TEST( t.type==tokString )
-  TEST( RCStringCmp(&t.data.string,&s) == 0 )
+  STRTEST( t.data.string, "text" )
   deleteRCString(&t.data.string);
-  deleteRCString(&s);
 
   t=scanner(f);
   TEST( t.type==tokRParen )
 
   t=scanner(f);
-  s=makeRCString("x");
   TEST( t.type==tokId )
-  TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  STRTEST( t.data.id, "x" )
   deleteRCString(&t.data.id);
-  deleteRCString(&s);
 
   t=scanner(f);
   TEST( t.type==tokAssign )
 
   t=scanner(f);
-  s=makeRCString("print");
   TEST( t.type==tokId )
-  TEST( RCStringCmp(&t.data.id,&s) == 0 )
+  STRTEST( t.data.id, "print" )
   deleteRCString(&t.data.id);
-  deleteRCString(&s);
 
   t=scanner(f);
   TEST( t.type==tokLParen )
 
   t=scanner(f);
-  s=makeRCString("");
   TEST( t.type==tokString )
-  TEST( RCStringCmp(&t.data.string,&s) == 0 )
+  STRTEST( t.data.string, "" )
   deleteRCString(&t.data.string);
-  deleteRCString(&s);
 
   t=scanner(f);
   TEST( t.type==tokRParen )
+
+  t=scanner(f);
+  TEST( t.type==tokId )
+  STRTEST( t.data.id, "retezec" )
+  deleteRCString(&t.data.id);
+
+  t=scanner(f);
+  TEST( t.type==tokAssign )
+
+  t=scanner(f);
+  TEST( t.type==tokString )
+  STRTEST( t.data.string, "retez" )
+  deleteRCString(&t.data.string);
+
+  t=scanner(f);
+  TEST( t.type==tokOp )
+  TEST( t.data.op==opPlus )
+
+  t=scanner(f);
+  TEST( t.type==tokString )
+  STRTEST( t.data.string, " \n \t \\ \" \x01 \xFF " )
+  deleteRCString(&t.data.string);
+
+  t=scanner(f);
+  TEST( t.type==tokKeyW )
+  TEST( t.data.keyw==kFunction )
+
+  t=scanner(f);
+  TEST( t.type==tokId )
+  STRTEST( t.data.id, "podretezec" )
+  deleteRCString(&t.data.id);
+
+  t=scanner(f);
+  TEST( t.type==tokLParen )
+
+  t=scanner(f);
+  TEST( t.type==tokRParen )
+
+  t=scanner(f);
+  TEST( t.type==tokKeyW )
+  TEST( t.data.keyw==kReturn )
+
+  t=scanner(f);
+  TEST( t.type==tokId )
+  STRTEST( t.data.id, "retezec" )
+  deleteRCString(&t.data.id);
+
+  t=scanner(f);
+  TEST( t.type==tokLBracket )
+
+  t=scanner(f);
+  TEST( t.type==tokColon )
+
+  t=scanner(f);
+  TEST( t.type==tokNum )
+  TEST( t.data.val.type==typeNumeric )
+  TEST( t.data.val.data.numeric==19.0 )
+
+  t=scanner(f);
+  TEST( t.type==tokRBracket )
+
+  t=scanner(f);
+  TEST( t.type==tokOp )
+  TEST( t.data.op==opPlus )
+
+  t=scanner(f);
+  TEST( t.type==tokId )
+  STRTEST( t.data.id, "retezec" )
+  deleteRCString(&t.data.id);
+
+  t=scanner(f);
+  TEST( t.type==tokLBracket )
+
+  t=scanner(f);
+  TEST( t.type==tokNum )
+  TEST( t.data.val.type==typeNumeric )
+  TEST( t.data.val.data.numeric==0.0 )
+
+  t=scanner(f);
+  TEST( t.type==tokColon )
+
+  t=scanner(f);
+  TEST( t.type==tokNum )
+  TEST( t.data.val.type==typeNumeric )
+  TEST( t.data.val.data.numeric==1.0 )
+
+  t=scanner(f);
+  TEST( t.type==tokRBracket )
+
+  t=scanner(f);
+  TEST( t.type==tokKeyW )
+  TEST( t.data.keyw==kEnd )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfFile )
+
+  }
+  catch{
+   on(ScannerError,e){
+    scannerErrorPrint(*e);
+    exit(1);
+   }
+  }
 
   fclose(f);
   
