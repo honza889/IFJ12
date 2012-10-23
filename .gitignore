@@ -1,9 +1,0 @@
-*~
-ifj12
-ifj12-dbg
-obj
-unitests/*/test
-unitests/*/test.o
-unitests/*/out
-dep
-
