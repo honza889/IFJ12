@@ -1,0 +1,8 @@
+*~
+ifj12
+ifj12-dbg
+obj
+unitest/*/test
+unitest/*/test.o
+unitest/*/out
+dep
