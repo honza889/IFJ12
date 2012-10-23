@@ -151,6 +151,8 @@ struct SExpression
 		Operator operator;
 		FunctionCall functionCall;
 	} value;
+
+	Expression *parent;
 };
 
 struct SAssignment

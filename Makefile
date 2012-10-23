@@ -1,4 +1,4 @@
-CFLAGS=-std=c99 -I src -Wall -Wno-unused-variable -pedantic
+CFLAGS=-std=c99 -I src -Wall -Wno-unused-variable -pedantic -Wdouble-promotion
 # Úroveň množství debugovacích informací
 LDB=-g3
 
@@ -21,7 +21,7 @@ obj/dbg/%.o: src/%.c
 #  Testy
 #  *****
 
-TESTS=value symbols ast exceptions scanner rcstring ial
+TESTS=value symbols ast exceptions scanner rcstring ial semantics
 
 .PHONY: test debug clean
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
@@ -34,11 +34,13 @@ unitests/symbols/test: obj/dbg/symbols.o obj/dbg/value.o obj/dbg/exceptions.o
 unitests/ast/test: obj/dbg/value.o obj/dbg/ast.o obj/dbg/exceptions.o
 unitests/exceptions/test: obj/dbg/exceptions.o
 unitests/scanner/test: obj/dbg/scanner.o obj/dbg/rcstring.o
+unitests/semantics/test: obj/dbg/semantics.o obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o
 unitests/rcstring/test: obj/dbg/rcstring.o
 unitests/ial/test: obj/dbg/ial.o obj/dbg/value.o
 
 unitests/%/test: unitests/%/test.c obj/dbg/exceptions.o obj/dbg/rcstring.o unitests/test.h
 	gcc -o $@ $^ $(LDB) $(CFLAGS)
+
 
 #  Debug
 #  *****

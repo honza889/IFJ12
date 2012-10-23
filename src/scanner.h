@@ -3,6 +3,7 @@
 
 #include "value.h"
 #include "rcstring.h"
+#include "exceptions.h"
 
 typedef struct {
   enum {
@@ -16,6 +17,7 @@ typedef struct {
     tokRParen,	/** Typ tokenu: pravá závorka ) */
     tokLBracket,	/** Typ tokenu: levá hranatá závorka [ */
     tokRBracket,	/** Typ tokenu: pravá hranatá závorka ] */
+    tokColon,	/** Typ tokenu: dvojtečka : */
     tokEndOfFile	/** Typ tokenu: konec souboru */
   } type;
   union {
@@ -45,5 +47,11 @@ typedef struct {
  * @return Vrací token.
  */
 Token scanner(FILE *f);
+
+/**
+ * Vrátí text chybové hlášky pro danou vyjímku
+ * @param Vyjimka vracena scannerem
+ */
+void scannerErrorPrint(ScannerErrorException e);
 
 #endif

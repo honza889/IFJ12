@@ -2,9 +2,7 @@
 // Zdenek Tretter
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
-#include <errno.h>
 
 #include "bif.h"
 #include "ast.h"
@@ -13,21 +11,21 @@
 #include "rcstring.h"
 
 // Nacte retezec ze stdin
-Value BIFinput()
+Value BIFinput(ValueList param, int count)
 {
     RCString str = makeEmptyRCString();
     int c;
     while((c = getchar()) != EOF && c != '\n')
     {
-        RCStringAppendChar( &str, c );
+        RCStringAppendChar(&str, c);
     }
     return newValueString(str);
 }
 
 // Prevede retezec na cislo
-Value BIFnumeric(Value object)
+Value BIFnumeric(ValueList param, int count)
 {
-    return newValueNumeric(getValueNumeric(&object));
+    return newValueNumeric(getValueNumeric(&param[0]));
 }
 
 // Vypise to co dostane
@@ -36,27 +34,27 @@ Value BIFprint(ValueList param, int count)
     for(int i = 0; i < count; i++)
     {
         if(param[i].type == typeFunction) throw(BadArgumentType, "print");
-        RCString str = getValueString( &param[i] );
-        RCStringPrint( &str, stdout );
-        deleteRCString( &str );
+        RCString str = getValueString(&param[i]);
+        RCStringPrint(&str, stdout);
+        deleteRCString(&str);
     }
     return newValueNil();
 
 }
 
 // Vrati cislo odpovidajici typu co dostala
-Value BIFtypeOf(Value object)
+Value BIFtypeOf(ValueList param, int count)
 {
-    return newValueNumeric((double)object.type);
+    return newValueNumeric((double)param[0].type);
 }
 
 // Vrati delku retezce
-Value BIFlen(Value object)
+Value BIFlen(ValueList param, int count)
 {
-    switch(object.type)
+    switch(param[0].type)
     {
         case typeUndefined: throw(UndefinedVariable, true);
-        case typeString: return newValueNumeric((double)RCStringLength(&object.data.string));
+        case typeString: return newValueNumeric((double)RCStringLength(&param[0].data.string));
         default: return newValueNumeric(0.0);
     }
 }

@@ -158,6 +158,11 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
       token->type = tokRBracket;
       *last_letter = getc(f);
       break;
+
+    case ':':
+      token->type = tokColon;
+      *last_letter = getc(f);
+      break;
       
     default:
       deleteRCString(lexeme);
@@ -393,4 +398,15 @@ Token scanner(FILE *f)
   
   deleteRCString(&lexeme);
   return token;
+}
+
+void scannerErrorPrint(ScannerErrorException e){
+  switch(e.type){
+    case InvalidNumericLiteral: fprintf(stderr,"Parse error: Chybne zadane cislo"); break;
+    case InvalidToken: fprintf(stderr,"Parse error: Nesmyslny lexem"); break;
+    case UnterminatedComment: fprintf(stderr,"Parse error: Neukonceny komentar"); break;
+    case UnterminatedString: fprintf(stderr,"Parse error: Neukonceny retezec"); break;
+    case BadEscSequence: fprintf(stderr,"Parse error: Chybna escapovaci sekvence v retezci"); break;
+  }
+  fprintf(stderr," na radku %d\n",e.line_num);
 }

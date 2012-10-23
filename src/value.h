@@ -59,6 +59,9 @@ RCString getValueString(Value *object);
 
 // Porovnavani
 bool equalValue(Value *value1, Value *value2); // value1 == value2
+static inline bool notEqualValue(Value *value1, Value *value2){ // value1 < value2
+ return ! equalValue(value2,value1);
+}
 bool greaterValue(Value *value1, Value *value2); // value1 > value2
 bool greaterEqualValue(Value *value1, Value *value2); // value1 >= value2
 static inline bool lesserValue(Value *value1, Value *value2){ // value1 < value2

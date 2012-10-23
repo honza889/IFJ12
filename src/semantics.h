@@ -7,11 +7,12 @@
 
 #include <stdio.h>
 #include "ast.h"
+#include "symbols.h"
 
 /**
  * Získává od syntax() tokeny a sestaví z nich AST
  * @return AST tabulka
  */
-Function semantics(FILE *f);
+Function semantics(int paramCount,FILE *f,SymbolTable *global);
 
 #endif
