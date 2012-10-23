@@ -37,6 +37,11 @@ static inline Value newValueString( RCString value){
 	return (Value){ .type=typeString, .data.string = copyRCString( &value ) };
 }
 
+static inline Value newValueCString( const char* str)
+{
+    return (Value){ .type=typeString, .data.string = makeRCString( str ) };
+}
+
 // Ulozit do Value typ...
 void setValueUndefined(Value *object);
 void setValueNil(Value *object);
@@ -62,6 +67,9 @@ static inline bool lesserValue(Value *value1, Value *value2){ // value1 < value2
 static inline bool lesserEqualValue(Value *value1, Value *value2){ // value1 <= value2
  return greaterEqualValue(value2,value1);
 }
+
+//Operace
+Value addValue( Value* a, Value* b );
 
 static inline int typeOfValue(Value *object){
 	return (int)object->type;

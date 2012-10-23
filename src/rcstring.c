@@ -117,7 +117,7 @@ void resizeRCString( RCString* str, int length )
 		{
 			// jsme unikátní, nemusíme se starat o ostatní reference
 			int alignedLength = align( length + str->offset );
-			char* newData = realloc( str->buffer->string, align( alignedLength ) );
+			char* newData = realloc( str->buffer->string, alignedLength );
 			MALLCHECK( newData );
 			str->buffer->string = newData;
 			str->buffer->capacity = alignedLength;
@@ -147,6 +147,16 @@ void RCStringAppendChar( RCString* str, char c )
 {
 	RCStringSet( str, str->length, c );
 }
+
+void RCStringAppendStr( RCString* str1, const RCString* str2 )
+{
+    int oldStr1Len = RCStringLength( str1 );
+    resizeRCString( str1, oldStr1Len + RCStringLength( str2 ) );
+    memcpy( str1->buffer->string + str1->offset + oldStr1Len, 
+            str2->buffer->string + str2->offset, 
+            RCStringLength( str2 ) * sizeof( char ) );
+}
+    
 
 void RCStringSubstring( RCString* str, int start, int length )
 {

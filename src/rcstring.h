@@ -128,7 +128,7 @@ void RCStringPrint( const RCString* str, FILE* stream );
 // Mutátory
 
 /**
- * Změní velikost stringu \a str na \a length.
+ * Zmeni velikost stringu \a str na \a length.
  * Pokud je \a length vetsi nez soucasna delka retezce, tak bude
  * retezec prodlouzen, ovsem nove vznikly prostor nebude nicim 
  * inicializovan.
@@ -136,14 +136,19 @@ void RCStringPrint( const RCString* str, FILE* stream );
 void RCStringResize( RCString* str, int length );
 
 /**
- * Nastaví znak na pozici \a index stringu \a str na \a c
+ * Nastavi znak na pozici \a index stringu \a str na \a c
  */
 void RCStringSet( RCString* str, int index, char c );
 
 /**
- * Přidá znak \a c na konec stringu \a str
+ * Prida znak \a c na konec stringu \a str
  */
 void RCStringAppendChar( RCString* str, char c );
+
+/**
+ * Prida retezec \a str2 na konec \a str1
+ */
+void RCStringAppendStr( RCString* str1, const RCString* str2 );
 
 /**
  * Posune zacatek stringu \a str na \a start a zmeni jeho delku 

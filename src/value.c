@@ -344,3 +344,28 @@ void freeValue(Value *object){
  }
 }
 
+Value addValue( Value* a, Value* b )
+{
+    if( a->type == typeNumeric && b->type == typeNumeric )
+    {
+        return newValueNumeric( getValueNumeric( a ) + getValueNumeric( b ) );
+    }
+    else if( ( a->type == typeString && b->type == typeString ) ||
+             ( a->type == typeNumeric && b->type == typeString ) ||
+             ( a->type == typeString && b->type == typeNumeric ) )
+    {
+        RCString as = getValueString( a );
+        RCString bs = getValueString( b );
+        RCStringAppendStr( &as, &bs );
+        Value ret = newValueString( as );
+        deleteRCString( &as );
+        deleteRCString( &bs );
+        return ret;
+    }
+    else
+    {
+        throw( BadArgumentType, "addValue" );
+    }
+    return newValueUndefined();
+}
+        

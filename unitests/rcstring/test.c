@@ -112,5 +112,18 @@ BEGIN_TEST
 		deleteRCString(&s2);
 		deleteRCString(&s3);
 	}
-
+    {
+        RCString s1 = makeRCString( "rofl" );
+        RCString s2 = makeRCString( "mao" );
+        RCStringAppendStr( &s1, &s2 );
+        STRTEST( s1, "roflmao" );
+        deleteRCString( &s2 );
+        deleteRCString( &s1 );
+        s1 = makeRCString( "Tohle je nejdelší řetězec na světě, protože je nutné otestovat schopnosti RCStringu se libovolně zvětšovat. Tudíž je silně nutné udělat tento řetězec velice dlouhý, možná dokonce i delší. " );
+        s2 = makeRCString( "Samozřejmě potřebujeme i druhý string, který k tomu prvnímu připojíme. Ten by taktéž měl být dlouhý, jelikož chceme vyvolat další realokaci. A mimochodem, vůbec mi nevadí, že je to delší než 80 znaků." );
+        RCStringAppendStr( &s1, &s2 );
+        STRTEST( s1, "Tohle je nejdelší řetězec na světě, protože je nutné otestovat schopnosti RCStringu se libovolně zvětšovat. Tudíž je silně nutné udělat tento řetězec velice dlouhý, možná dokonce i delší. Samozřejmě potřebujeme i druhý string, který k tomu prvnímu připojíme. Ten by taktéž měl být dlouhý, jelikož chceme vyvolat další realokaci. A mimochodem, vůbec mi nevadí, že je to delší než 80 znaků." );
+        deleteRCString( &s1 );
+        deleteRCString( &s2 );
+    }
 END_TEST

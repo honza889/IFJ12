@@ -36,30 +36,30 @@ typedef Value* ValueList;
 typedef Value( *BuiltinFunction )( ValueList, int );
 
 Value evalFunction( Function* func, ExpressionList params, int parameterCount, Context* context );
+void deleteStatementList( StatementList func );
 
 /**
  * Hodnota promenne generickeho datoveho typu
  */
 struct SValue {
  
- // Aktualni typ
- enum {
-  typeUndefined=-1,
-  typeNil=0,
-  typeBoolean=1,
-  typeNumeric=3,
-  typeFunction=6,
-  typeString=8
- } type;
+    // Aktualni typ
+    enum {
+        typeUndefined=-1,
+        typeNil=0,
+        typeBoolean=1,
+        typeNumeric=3,
+        typeFunction=6,
+        typeString=8
+    } type;
  
- // Hodnota
- union {
-  bool boolean;
-  double numeric;
-  Function *function;
-  RCString string;
- } data;
- 
+    // Hodnota
+    union {
+        bool boolean;
+        double numeric;
+        Function *function;
+        RCString string;
+    } data;
 };
 
 struct SFunction
@@ -163,8 +163,8 @@ struct SSubstring
 {
 	Variable destination;
 	Expression source;
-	int left;
-	int right;
+	int offset;
+	int length;
 };
 
 struct SLoop
