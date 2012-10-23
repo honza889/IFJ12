@@ -2,7 +2,7 @@
 ifj12
 ifj12-dbg
 obj
-unitest/*/test
-unitest/*/test.o
-unitest/*/out
+unitests/*/test
+unitests/*/test.o
+unitests/*/out
 dep
