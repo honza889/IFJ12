@@ -26,6 +26,21 @@ void freeStatementList(StatementList *list){
 	list->count=0;
 }
 
+/** Pro ladeni */
+void printExpression(Expression e,int odsazeni){
+	for(int i=0;i<odsazeni;i++) printf(" ");
+	printf("Ex\n");
+	if(e.type==OPERATOR){
+		if(e.value.operator.type==UNARYOP){
+			printExpression(*e.value.operator.value.unary.operand,odsazeni+2);
+		}else{
+			printExpression(*e.value.operator.value.binary.left,odsazeni+2);
+			printExpression(*e.value.operator.value.binary.right,odsazeni+2);
+		}
+	}
+}
+
+/** Sestavi z tokenu Expression */
 Expression semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
 	Expression *wholeExpression = NULL;
 	Expression *new, *old, *tmp;
@@ -69,13 +84,28 @@ Expression semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
 					case opDivide: new->value.operator.value.binary.type = DIVIDE; break;
 					default: exit(99);
 				}
-				if(pt.type==tokEndOfFile){
+				if(pt.type==tokEndOfFile){ // prvnim tokenem vyrazu?
 					wholeExpression = new; // do korene (je prvnim prvkem vyrazu - unarni minus)
 					new->parent = NULL;
-				}else{
-					// zatim bez prednosti operatoru - hazi neopravneny pristup do pameti!
-					//new->value.operator.value.binary.left = old->parent->value.operator.value.binary.right;
-					//old->parent->value.operator.value.binary.right = new;
+				}else{ // ve vyrazu jiz neco je (old je promenna/konstanta)
+					new->parent = old->parent;
+					old->parent = new;
+					new->value.operator.value.binary.left = old;
+					new->value.operator.value.binary.right = NULL;
+					if(new->parent==NULL){ // je-li prvek novym korenem:
+						printf("-Predchozi prvek je koren\n");
+						wholeExpression = new;
+					}else{ // neni-li korenem
+						if(new->parent->type!=OPERATOR) ERROR("Rodicem prvku neni operator!");
+						printf("-Predchozi prvek neni koren\n");
+						if(new->parent->value.operator.type==BINARYOP){
+							printf("-Rodic predchoziho prvku je binarni operator\n");
+							new->parent->value.operator.value.binary.right = new;
+						}else{
+							printf("-Rodic predchoziho prvku je unarni operator\n");
+							new->parent->value.operator.value.unary.operand = new;
+						}
+					}
 				}
 			break;
 			
@@ -86,6 +116,8 @@ Expression semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
 	}
 	return *wholeExpression;
 }
+
+
 
 /**
  * Funkce načte obsah funkce
@@ -112,6 +144,9 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
 						.source=semanticOfExpression(f,global,&local)
 					}
 				});
+
+				Expression test = list.item->value.assignment.source;
+
 			break;
 			
 			default: exit(99); // osetrit
