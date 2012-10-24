@@ -8,6 +8,10 @@ static inline StatementList newStatementList(){
 	return (StatementList){ .item=NULL, .count=0 };
 }
 
+static inline SymbolTable newSymbolTable(){
+	return (SymbolTable){ .root=NULL, .count=0 };
+}
+
 void AddToStatementList(StatementList *list, Statement new){
 	if(list->item==NULL){ // novy seznam
 		list->count=1;
@@ -17,27 +21,13 @@ void AddToStatementList(StatementList *list, Statement new){
 		list->item=realloc(list->item,list->count*sizeof(Statement));		
 	}
 	MALLCHECK(list->item);
-	memcpy(&new,&list->item[list->count-1],sizeof(Statement));
+	memcpy(&list->item[list->count-1],&new,sizeof(Statement));
 }
 
 void freeStatementList(StatementList *list){
 	free(list->item);
 	list->item=NULL;
 	list->count=0;
-}
-
-/** Pro ladeni */
-void printExpression(Expression e,int odsazeni){
-	for(int i=0;i<odsazeni;i++) printf(" ");
-	printf("Ex\n");
-	if(e.type==OPERATOR){
-		if(e.value.operator.type==UNARYOP){
-			printExpression(*e.value.operator.value.unary.operand,odsazeni+2);
-		}else{
-			printExpression(*e.value.operator.value.binary.left,odsazeni+2);
-			printExpression(*e.value.operator.value.binary.right,odsazeni+2);
-		}
-	}
 }
 
 /** Sestavi z tokenu Expression */
@@ -62,7 +52,6 @@ Expression semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
 			break;
 			case tokNum:
 				printf("ctuNum\n");
-
 				new = malloc(sizeof(Expression));
 				*new = (Expression){ .type=CONSTANT, .value.constant=t.data.val };
 				if(pt.type==tokEndOfFile){
@@ -82,27 +71,23 @@ Expression semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
 					case opMinus: new->value.operator.value.binary.type = SUBTRACT; break;
 					case opMultiple: new->value.operator.value.binary.type = MULTIPLY; break;
 					case opDivide: new->value.operator.value.binary.type = DIVIDE; break;
-					default: exit(99);
+					default: ERROR("Neznama operace!"); // vyjimku?
 				}
 				if(pt.type==tokEndOfFile){ // prvnim tokenem vyrazu?
 					wholeExpression = new; // do korene (je prvnim prvkem vyrazu - unarni minus)
 					new->parent = NULL;
-				}else{ // ve vyrazu jiz neco je (old je promenna/konstanta)
+				}else{ // ve vyrazu jiz je promenna/konstanta
 					new->parent = old->parent;
 					old->parent = new;
 					new->value.operator.value.binary.left = old;
 					new->value.operator.value.binary.right = NULL;
-					if(new->parent==NULL){ // je-li prvek novym korenem:
-						printf("-Predchozi prvek je koren\n");
-						wholeExpression = new;
+					if(new->parent==NULL){ // je-li exitujici promenna/konstanta korenem
+						wholeExpression = new; // bude novy operator novym korenem
 					}else{ // neni-li korenem
-						if(new->parent->type!=OPERATOR) ERROR("Rodicem prvku neni operator!");
-						printf("-Predchozi prvek neni koren\n");
+						if(new->parent->type!=OPERATOR) ERROR("Rodicem prvku neni operator!"); // vyjimku?
 						if(new->parent->value.operator.type==BINARYOP){
-							printf("-Rodic predchoziho prvku je binarni operator\n");
 							new->parent->value.operator.value.binary.right = new;
 						}else{
-							printf("-Rodic predchoziho prvku je unarni operator\n");
 							new->parent->value.operator.value.unary.operand = new;
 						}
 					}
@@ -126,8 +111,8 @@ Expression semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
  */
 Function semantics(int paramCount,FILE *f,SymbolTable *global){
 	Token t;
-	StatementList list=newStatementList();
-	SymbolTable local = {NULL,0};
+	StatementList list = newStatementList();
+	SymbolTable local = newSymbolTable();
 	
 	// Čtení jednotlivých Statementů
 	while((t=syntax(f)).type!=tokEndOfFile){
@@ -136,7 +121,7 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
 			/* Statement začíná Id - zřejmě id = ... */
 			case tokId:
 				//RCString id = copyRCString(t.data.id);
-				if((t=syntax(f)).type!=tokAssign) exit(99); // osetrit
+				if((t=syntax(f)).type!=tokAssign) ERROR("Prirazeni bez operatoru prirazeni!"); // vyjimku?
 				AddToStatementList(&list, (Statement){
 					.type=ASSIGNMENT,
 					.value.assignment={
@@ -144,12 +129,9 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
 						.source=semanticOfExpression(f,global,&local)
 					}
 				});
-
-				Expression test = list.item->value.assignment.source;
-
 			break;
 			
-			default: exit(99); // osetrit
+			default: ERROR("Tokeny nedavaji semantiku (smysl)!"); // vyjimku?
 		}
 		
 	}

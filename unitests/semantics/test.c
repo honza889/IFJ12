@@ -16,10 +16,7 @@ BEGIN_TEST
   Statement *s = mainFunc.value.userDefined.statements.item;
 
   TEST( mainFunc.value.userDefined.statements.count == 1 )
-
-  TEST( mainFunc.value.userDefined.statements.item->type == ASSIGNMENT ) //->type
-
-  //mainFunc.value.userDefined.statements.item->value.assignment.destination
+  TEST( mainFunc.value.userDefined.statements.item->type == ASSIGNMENT )
 
   TEST( s->value.assignment.source.type == OPERATOR )
 
