@@ -209,4 +209,8 @@ struct SContext
 	Value* locals;
 };
 
+static inline StatementList newStatementList(){
+	return (StatementList){ .item=NULL, .count=0 };
+}
+
 #endif

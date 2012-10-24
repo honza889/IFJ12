@@ -11,7 +11,7 @@ BEGIN_TEST
   printf("\nTento test leakuje, protoze je v rannem stadiu vyvoje.\n");
   printf("Jestli vas to neblokuje, nestezujte si!\n\n");
 
-  SymbolTable globalSymbolTable = {NULL,0};
+  SymbolTable globalSymbolTable = newSymbolTable();
   Function mainFunc = semantics(0,f,&globalSymbolTable);
   Statement *s = mainFunc.value.userDefined.statements.item;
 

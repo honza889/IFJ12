@@ -345,6 +345,27 @@ void freeValue(Value *object){
  }
 }
 
+/**
+ * Alokuje tabulku symbolu
+ */
+Value* initValueTable(int length){
+ Value *table = malloc(length*sizeof(Value));
+ for(int i=0;i<length;i++){
+  table[i].type=typeUndefined;
+ }
+ return table;
+}
+
+/**
+ * Uvolni tabulku symbolu
+ */
+void freeValueTable(Value *table,int length){
+ for(int i=0;i<length;i++){
+  freeValue( &table[i] );
+ }
+ free(table);
+}
+
 Value addValue( Value* a, Value* b )
 {
     if( a->type == typeNumeric && b->type == typeNumeric )

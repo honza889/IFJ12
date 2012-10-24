@@ -4,14 +4,6 @@
 #include "ast.h"
 #include "exceptions.h"
 
-static inline StatementList newStatementList(){
-	return (StatementList){ .item=NULL, .count=0 };
-}
-
-static inline SymbolTable newSymbolTable(){
-	return (SymbolTable){ .root=NULL, .count=0 };
-}
-
 void AddToStatementList(StatementList *list, Statement new){
 	if(list->item==NULL){ // novy seznam
 		list->count=1;
@@ -41,7 +33,7 @@ Expression semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
 			case tokId:
 				printf("ctuId\n");
 				new = malloc(sizeof(Expression));
-				*new = (Expression){ .type=VARIABLE, .value.variable=getSymbol("promenna",global,local) };
+				*new = (Expression){ .type=VARIABLE, .value.variable=getSymbol(t.data.id,global,local) };
 				if(pt.type==tokEndOfFile){
 					wholeExpression = new; // do korene (je prvnim prvkem vyrazu)
 					new->parent = NULL;
@@ -113,6 +105,7 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
 	Token t;
 	StatementList list = newStatementList();
 	SymbolTable local = newSymbolTable();
+	RCString id;
 	
 	// Čtení jednotlivých Statementů
 	while((t=syntax(f)).type!=tokEndOfFile){
@@ -120,12 +113,12 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
 		switch(t.type){
 			/* Statement začíná Id - zřejmě id = ... */
 			case tokId:
-				//RCString id = copyRCString(t.data.id);
+				id = t.data.id;
 				if((t=syntax(f)).type!=tokAssign) ERROR("Prirazeni bez operatoru prirazeni!"); // vyjimku?
 				AddToStatementList(&list, (Statement){
 					.type=ASSIGNMENT,
 					.value.assignment={
-						.destination=getSymbol("promenna",global,&local), // nazev bude treba prevest na RCString
+						.destination=getSymbol(id,global,&local), // nazev bude treba prevest na RCString
 						.source=semanticOfExpression(f,global,&local)
 					}
 				});

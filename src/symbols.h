@@ -17,7 +17,7 @@
  */
 typedef struct Symbol Symbol; // Aby mohl obsahovat sam sebe
 struct Symbol {
- char *name; // Nazev promenne
+ RCString name; // Nazev promenne
  int index; // Index Value v poli symbolu (kladny=lokalni tabulka, zaporny=globalni tabulka)
  Symbol *lesser; // Větev - menší prvek
  Symbol *greater; // Větev - větší prvek
@@ -29,19 +29,17 @@ typedef struct {
 } SymbolTable;
 
 /** Vrati index symbolu daneho jmena, pokud neexistuje, vytvori ho */
-int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable);
-
-/** Alokuje a inicializuje tabulku symbolu */
-Value* initValueTable(int length);
+int getSymbol(RCString name, SymbolTable *globalTable, SymbolTable *localTable);
 
 /** Uvolnuje symboly stromu symbolu (pocet prvku zachova) */
 void freeSymbolTable(SymbolTable *st);
 
-/** Uvolnuje Value tabulky symbolu (potrebuje st->count) */
-void freeValueTable(Value *table,int length);
-
 static inline Value* symbol(int index,Context* context){
  return (index>=0?&(context->locals)[index]:&(context->globals)[-index-1]);
+}
+
+static inline SymbolTable newSymbolTable(){
+	return (SymbolTable){ .root=NULL, .count=0 };
 }
 
 #endif

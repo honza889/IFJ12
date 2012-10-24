@@ -71,6 +71,12 @@ static inline bool lesserEqualValue(Value *value1, Value *value2){ // value1 <= 
  return greaterEqualValue(value2,value1);
 }
 
+/** Alokuje a inicializuje tabulku symbolu */
+Value* initValueTable(int length);
+
+/** Uvolnuje Value tabulky symbolu */
+void freeValueTable(Value *table, int length);
+
 //Operace
 Value addValue( Value* a, Value* b );
 

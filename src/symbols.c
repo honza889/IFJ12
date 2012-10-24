@@ -7,9 +7,9 @@
  * Vstupem ukazatel na ukazatel na vrchol stromu (Symbol**)
  * Vystupem ukazatel na uzel pro symbol (Symbol**)
  */
-Symbol** searchSymbol(Symbol **destination, char *name, bool *exist){
+Symbol** searchSymbol(Symbol **destination, RCString name, bool *exist){
  while(*destination!=NULL){
-  int cmp=strcmp((*destination)->name,name);
+  int cmp=RCStringCmp(&(*destination)->name,&name);
   if(cmp==0){ // destination name == name
    *exist=true; // symbol nalezen
    break;
@@ -27,7 +27,7 @@ Symbol** searchSymbol(Symbol **destination, char *name, bool *exist){
  * Vrati index symbolu daneho jmena, pokud neexistuje, vytvori ho
  * @return index (zaporny=globalTable, kladny=localTable)
  */
-int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable){
+int getSymbol(RCString name, SymbolTable *globalTable, SymbolTable *localTable){
  
  bool inLocal=false;
  bool exist=false;
@@ -52,10 +52,7 @@ int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable){
   MALLCHECK(newSymbol);
   
   // Kopie nazvu promenne
-  int nameSize = (strlen(name)+1)*sizeof(char);
-  newSymbol->name=malloc(nameSize);
-  MALLCHECK(newSymbol->name);
-  memcpy(newSymbol->name,name,nameSize);
+  newSymbol->name=copyRCString(&name);
   
   // Ziskani a nasledne navyseni indexu
   index=(inLocal?localTable:globalTable)->count++;
@@ -80,7 +77,7 @@ int getSymbol(char *name, SymbolTable *globalTable, SymbolTable *localTable){
  * Uvolni symbol (vcetne obsahu)
  */
 void freeSymbol(Symbol *s){
- free(s->name);
+ deleteRCString(&s->name);
  if(s->lesser!=NULL) freeSymbol(s->lesser);
  if(s->greater!=NULL) freeSymbol(s->greater);
  free(s);
@@ -91,26 +88,5 @@ void freeSymbol(Symbol *s){
  */
 void freeSymbolTable(SymbolTable *st){
  if(st->root!=NULL) freeSymbol(st->root);
-}
-
-/**
- * Alokuje tabulku symbolu
- */
-Value* initValueTable(int length){
- Value *table = malloc(length*sizeof(Value));
- for(int i=0;i<length;i++){
-  table[i].type=typeUndefined;
- }
- return table;
-}
-
-/**
- * Uvolni tabulku symbolu
- */
-void freeValueTable(Value *table,int length){
- for(int i=0;i<length;i++){
-  freeValue( &table[i] );
- }
- free(table);
 }
 
