@@ -13,12 +13,18 @@ BEGIN_TEST
 
   SymbolTable globalSymbolTable = newSymbolTable();
   Function mainFunc = semantics(0,f,&globalSymbolTable);
-  Statement *s = mainFunc.value.userDefined.statements.item;
 
-  TEST( mainFunc.value.userDefined.statements.count == 1 )
-  TEST( mainFunc.value.userDefined.statements.item->type == ASSIGNMENT )
+  TEST( mainFunc.value.userDefined.statements.count == 2 )
 
-  TEST( s->value.assignment.source.type == OPERATOR )
+  TEST( mainFunc.value.userDefined.statements.item[0].type == ASSIGNMENT )
+  TEST( mainFunc.value.userDefined.statements.item[0].value.assignment.source.type == CONSTANT )
+
+  TEST( mainFunc.value.userDefined.statements.item[1].type == ASSIGNMENT )
+  TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.type == OPERATOR )
+TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.left->type == CONSTANT )
+  TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->type == OPERATOR )
+  TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->value.operator.value.binary.left->type == CONSTANT )
+  TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->value.operator.value.binary.right->type == VARIABLE )
 
   fclose(f);
   

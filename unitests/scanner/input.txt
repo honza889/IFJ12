@@ -8,7 +8,7 @@ else
  // Další komentář
 end
 
-x = print("text")
+x = print("text","text2")
 x = print("")
 
 retezec="retez"

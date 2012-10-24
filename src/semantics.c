@@ -76,7 +76,7 @@ Expression semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
 					if(new->parent==NULL){ // je-li exitujici promenna/konstanta korenem
 						wholeExpression = new; // bude novy operator novym korenem
 					}else{ // neni-li korenem
-						if(new->parent->type!=OPERATOR) ERROR("Rodicem prvku neni operator!"); // vyjimku?
+						if(new->parent->type!=OPERATOR){ ERROR("Rodicem prvku neni operator!");exit(99); } // vyjimku?
 						if(new->parent->value.operator.type==BINARYOP){
 							new->parent->value.operator.value.binary.right = new;
 						}else{
@@ -85,8 +85,10 @@ Expression semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
 					}
 				}
 			break;
-			
-			default: exit(99); // osetrit
+			case tokComma: case tokEndOfLine:
+				return *wholeExpression;
+			break;
+			default: printf("(%d,%d)\n",t.type,tokEndOfLine); ERROR("Spatny typ tokenu ve vyrazu!");exit(99); // osetrit
 		}
 		pt = t;
 		old = new;
@@ -114,7 +116,7 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
 			/* Statement začíná Id - zřejmě id = ... */
 			case tokId:
 				id = t.data.id;
-				if((t=syntax(f)).type!=tokAssign) ERROR("Prirazeni bez operatoru prirazeni!"); // vyjimku?
+				if((t=syntax(f)).type!=tokAssign){ ERROR("Prirazeni bez operatoru prirazeni!");exit(99); } // vyjimku?
 				AddToStatementList(&list, (Statement){
 					.type=ASSIGNMENT,
 					.value.assignment={
@@ -123,8 +125,8 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
 					}
 				});
 			break;
-			
-			default: ERROR("Tokeny nedavaji semantiku (smysl)!"); // vyjimku?
+			case tokEndOfLine: break;
+			default: printf("(%d)\n",t.type);ERROR("Tokeny nedavaji semantiku (smysl)!");exit(99); // vyjimku?
 		}
 		
 	}

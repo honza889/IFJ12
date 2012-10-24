@@ -16,6 +16,8 @@ void printTokenType(Token* t){
     case tokLBracket: printf("[LBracket]\n"); break;
     case tokRBracket: printf("[RBracket]\n"); break;
     case tokColon: printf("[Colon]\n"); break;
+    case tokComma: printf("[Comma]\n"); break;
+    case tokEndOfLine: printf("[EndOfLine]\n"); break;
     case tokEndOfFile: printf("[EndOfFile]\n"); break;
   }
 }
@@ -42,6 +44,12 @@ BEGIN_TEST
   TEST( t.data.val.data.numeric == (double) 5.7 )
 
   t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
   TEST( t.type==tokKeyW )
   TEST( t.data.keyw==kIf )
 
@@ -58,6 +66,9 @@ BEGIN_TEST
   TEST( t.type==tokNum )
   TEST( t.data.val.type==typeNumeric )
   TEST( t.data.val.data.numeric==0.0 )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
 
   t=scanner(f);
   TEST( t.type==tokKeyW )
@@ -78,16 +89,37 @@ BEGIN_TEST
   TEST( t.data.val.data.numeric == (double) 8.9 )
 
   t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
   TEST( t.type==tokKeyW )
   TEST( t.data.keyw==kEnd )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
 
   t=scanner(f);
   TEST( t.type==tokKeyW )
   TEST( t.data.keyw==kElse )
 
   t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
   TEST( t.type==tokKeyW )
   TEST( t.data.keyw==kEnd )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
 
   t=scanner(f);
   TEST( t.type==tokId )
@@ -111,7 +143,18 @@ BEGIN_TEST
   deleteRCString(&t.data.string);
 
   t=scanner(f);
+  TEST( t.type==tokComma )
+
+  t=scanner(f);
+  TEST( t.type==tokString )
+  STRTEST( t.data.string, "text2" )
+  deleteRCString(&t.data.string);
+
+  t=scanner(f);
   TEST( t.type==tokRParen )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
 
   t=scanner(f);
   TEST( t.type==tokId )
@@ -138,6 +181,12 @@ BEGIN_TEST
   TEST( t.type==tokRParen )
 
   t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
   TEST( t.type==tokId )
   STRTEST( t.data.id, "retezec" )
   deleteRCString(&t.data.id);
@@ -151,6 +200,9 @@ BEGIN_TEST
   deleteRCString(&t.data.string);
 
   t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
   TEST( t.type==tokOp )
   TEST( t.data.op==opPlus )
 
@@ -158,6 +210,12 @@ BEGIN_TEST
   TEST( t.type==tokString )
   STRTEST( t.data.string, " \n \t \\ \" \x01 \xFF " )
   deleteRCString(&t.data.string);
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
 
   t=scanner(f);
   TEST( t.type==tokKeyW )
@@ -173,6 +231,9 @@ BEGIN_TEST
 
   t=scanner(f);
   TEST( t.type==tokRParen )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
 
   t=scanner(f);
   TEST( t.type==tokKeyW )
@@ -226,8 +287,17 @@ BEGIN_TEST
   TEST( t.type==tokRBracket )
 
   t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
   TEST( t.type==tokKeyW )
   TEST( t.data.keyw==kEnd )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
+
+  t=scanner(f);
+  TEST( t.type==tokEndOfLine )
 
   t=scanner(f);
   TEST( t.type==tokEndOfFile )

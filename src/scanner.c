@@ -158,9 +158,14 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
       token->type = tokRBracket;
       *last_letter = getc(f);
       break;
-
+      
     case ':':
       token->type = tokColon;
+      *last_letter = getc(f);
+      break;
+      
+    case ',':
+      token->type = tokComma;
       *last_letter = getc(f);
       break;
       
@@ -314,14 +319,18 @@ Token scanner(FILE *f)
     
     // přeskočení bílých znaků
     while (isspace(last_letter)) {
-      if (last_letter == '\n')
-        line_num++;
+      if (last_letter == '\n') break;
       last_letter = getc(f);
     }
     
     // následuje dlouhý přepínač if-else
     if (last_letter == EOF) {
       token.type = tokEndOfFile;
+    }
+    else if (last_letter == '\n'){
+      line_num++;
+      token.type = tokEndOfLine;
+      last_letter = getc(f);
     }
     else if (isalpha(last_letter)) {
       do {

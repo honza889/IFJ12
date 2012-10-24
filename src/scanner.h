@@ -18,6 +18,8 @@ typedef struct {
     tokLBracket,	/** Typ tokenu: levá hranatá závorka [ */
     tokRBracket,	/** Typ tokenu: pravá hranatá závorka ] */
     tokColon,	/** Typ tokenu: dvojtečka : */
+    tokComma,	/** Typ tokenu: konec řádku (enter) */
+    tokEndOfLine,	/** Typ tokenu: konec řádku (\n) */
     tokEndOfFile	/** Typ tokenu: konec souboru */
   } type;
   union {
