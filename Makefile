@@ -34,7 +34,7 @@ unitests/symbols/test: obj/dbg/symbols.o obj/dbg/value.o obj/dbg/exceptions.o
 unitests/ast/test: obj/dbg/value.o obj/dbg/ast.o obj/dbg/exceptions.o
 unitests/exceptions/test: obj/dbg/exceptions.o
 unitests/scanner/test: obj/dbg/scanner.o obj/dbg/rcstring.o
-unitests/semantics/test: obj/dbg/semantics.o obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o
+unitests/semantics/test: obj/dbg/semantics.o obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o
 unitests/rcstring/test: obj/dbg/rcstring.o
 unitests/ial/test: obj/dbg/ial.o obj/dbg/value.o
 

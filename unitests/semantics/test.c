@@ -28,4 +28,13 @@ TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.valu
 
   fclose(f);
   
+  Value* glob = NULL;   
+  Value* loc = NULL;
+    
+  Context ctx = { glob, loc };
+  
+  Value ret = evalFunction( &mainFunc, NULL, 0, &ctx );
+  freeValue( &ret );
+  deleteStatementList( mainFunc.value.userDefined.statements );
+  
 END_TEST
