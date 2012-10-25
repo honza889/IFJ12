@@ -33,6 +33,8 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
       }
       else if (*last_letter == '*')
       {
+        unsigned start_line_num = *line_num;	// Pomocná proměnná, která si pamatuje řádek s počátkem blokového komentáře.
+        
         while (*last_letter != EOF) {
           *last_letter = getc(f);
           if (*last_letter == '\n') (*line_num)++;
@@ -43,8 +45,8 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
         }
         // Narazilo se na EOF -> error: unterminated comment
         deleteRCString(lexeme);
-        // TODO: .line_num bude zde obsahovat počátek blokového komentáře
-        throw(ScannerError,((ScannerErrorException){.type=UnterminatedComment, .line_num=*line_num}));
+        // .line_num zde obsahuje počátek neukončeného blokového komentáře
+        throw(ScannerError,((ScannerErrorException){.type=UnterminatedComment, .line_num=start_line_num}));
       }
       else
       {
@@ -371,6 +373,8 @@ Token scanner(FILE *f)
       }
     }
     else if (last_letter == '"') {
+      unsigned start_line_num = line_num;	// Pomocná proměnná, která si pamatuje řádek s počátkem řetězce.
+      
       last_letter = getc(f);
       while (last_letter != '"') {
         // Pokud add_char neuspěje narazilo se na EOF.
@@ -389,8 +393,8 @@ Token scanner(FILE *f)
           // Pokud det_esc_sequence neuspěje narazilo se na špatnou escape sekvenci.
           if (! det_esc_sequence(f, &last_letter, &lexeme, &line_num)) {
             deleteRCString(&lexeme);
-            // TODO: .line_num bude zde obsahovat počátek řetězce
-            throw(ScannerError,((ScannerErrorException){.type=BadEscSequence, .line_num=line_num}));
+            // .line_num zde obsahuje počátek neukončeného řetězce
+            throw(ScannerError,((ScannerErrorException){.type=BadEscSequence, .line_num=start_line_num}));
           }
         }
       }
