@@ -1,3 +1,4 @@
 promenna1 = 5.0
 b = 1.0 + 2.0 + promenna1
-
+c = (-1.0+13.0)/(promenna1+1.0)
+return c // vrati 2.0

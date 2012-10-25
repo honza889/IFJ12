@@ -14,7 +14,7 @@ BEGIN_TEST
   SymbolTable globalSymbolTable = newSymbolTable();
   Function mainFunc = semantics(0,f,&globalSymbolTable);
 
-  TEST( mainFunc.value.userDefined.statements.count == 2 )
+  TEST( mainFunc.value.userDefined.statements.count == 4 )
 
   TEST( mainFunc.value.userDefined.statements.item[0].type == ASSIGNMENT )
   TEST( mainFunc.value.userDefined.statements.item[0].value.assignment.source.type == CONSTANT )
@@ -27,7 +27,7 @@ TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.valu
   TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->value.operator.value.binary.right->type == VARIABLE )
 
   fclose(f);
-  
+  printf("interpretace:\n");
   Value* glob = NULL;   
   Value* loc = NULL;
     
