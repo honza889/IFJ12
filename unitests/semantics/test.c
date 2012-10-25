@@ -21,19 +21,25 @@ BEGIN_TEST
 
   TEST( mainFunc.value.userDefined.statements.item[1].type == ASSIGNMENT )
   TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.type == OPERATOR )
-TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.left->type == CONSTANT )
+  TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.left->type == CONSTANT )
   TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->type == OPERATOR )
   TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->value.operator.value.binary.left->type == CONSTANT )
   TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->value.operator.value.binary.right->type == VARIABLE )
 
   fclose(f);
-  printf("interpretace:\n");
-  Value* glob = NULL;   
+
+  printf("\nVysledek interpretace:\n");
+  Value* glob = NULL;
   Value* loc = NULL;
     
   Context ctx = { glob, loc };
-  
   Value ret = evalFunction( &mainFunc, NULL, 0, &ctx );
+
+  TEST( ret.type == typeNumeric )
+  RCString retString = getValueString(&ret);
+  RCStringPrint(&retString,stdout);
+  printf("\n\n");
+
   freeValue( &ret );
   deleteStatementList( mainFunc.value.userDefined.statements );
   
