@@ -79,6 +79,9 @@ void freeValueTable(Value *table, int length);
 
 //Operace
 Value addValue( Value* a, Value* b );
+Value subtractValue( Value* a, Value* b );
+Value multiplyValue( Value* a, Value* b );
+Value divideValue( Value* a, Value* b );
 
 static inline int typeOfValue(Value *object){
 	return (int)object->type;

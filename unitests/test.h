@@ -57,7 +57,7 @@
 #define END_TEST \
 		} catch { \
 			onAll { \
-				fprintf( stderr, "Abort: Unhandled exception\n" ); \
+				fprintf( stderr, "Abort: Unhandled exception (%d)\n", (int)exceptions_getCurrentException()->type ); \
 				return -1; \
 			} \
 		} \

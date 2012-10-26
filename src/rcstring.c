@@ -109,7 +109,7 @@ static int align( int length )
 	return ( length + 128 ) & 0xFFFFFF80;
 }
 
-void resizeRCString( RCString* str, int length )
+void RCStringResize( RCString* str, int length )
 {
 	if( str->length < length )
 	{
@@ -135,7 +135,7 @@ void RCStringSet( RCString* str, int index, char c )
 {
 	if( index >= str->length )
 	{
-		resizeRCString( str, index + 1 );
+		RCStringResize( str, index + 1 );
 	}
 	
 	ensureUniqueRCString( str );
@@ -151,7 +151,7 @@ void RCStringAppendChar( RCString* str, char c )
 void RCStringAppendStr( RCString* str1, const RCString* str2 )
 {
     int oldStr1Len = RCStringLength( str1 );
-    resizeRCString( str1, oldStr1Len + RCStringLength( str2 ) );
+    RCStringResize( str1, oldStr1Len + RCStringLength( str2 ) );
     memcpy( str1->buffer->string + str1->offset + oldStr1Len, 
             str2->buffer->string + str2->offset, 
             RCStringLength( str2 ) * sizeof( char ) );
@@ -162,5 +162,5 @@ void RCStringSubstring( RCString* str, int start, int length )
 {
 	str->offset += start;
 	str->length -= start;
-	resizeRCString( str, length );
+	RCStringResize( str, length );
 }

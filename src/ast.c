@@ -61,9 +61,9 @@ Value evalBinaryOp( BinaryOp* op, Context* context )
     {
         // TODO
         case ADD: ret = addValue( &left, &right ); break;
-        case SUBTRACT: break;
-        case MULTIPLY: break;
-        case DIVIDE: break;
+        case SUBTRACT: ret = subtractValue( &left, &right ); break;
+        case MULTIPLY: ret = multiplyValue( &left, &right ); break;
+        case DIVIDE: ret = divideValue( &left, &right ); break;
         case POWER: break; 
         case EQUALS: ret = newValueBoolean( equalValue( &left, &right ) ); break;
         case NOTEQUALS: ret = newValueBoolean( !equalValue( &left, &right ) ); break;

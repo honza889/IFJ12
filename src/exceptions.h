@@ -133,11 +133,11 @@ void exceptions_impl_throw( Exception e );
 	)
 
 #define throw( exception_type, exception_value ) \
-	exceptions_impl_throw( (Exception)\
-	{ \
-		.type = exception_type, \
-		.value.exception_type##ExceptionValue = exception_value \
-	} )
+    exceptions_impl_throw( (Exception)\
+    { \
+        .type = exception_type, \
+        .value.exception_type##ExceptionValue = exception_value \
+	 } )
 
 void rethrow();
 

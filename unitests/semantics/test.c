@@ -33,14 +33,23 @@ BEGIN_TEST
   Value* loc = NULL;
     
   Context ctx = { glob, loc };
-  Value ret = evalFunction( &mainFunc, NULL, 0, &ctx );
-
-  TEST( ret.type == typeNumeric )
-  RCString retString = getValueString(&ret);
-  RCStringPrint(&retString,stdout);
-  printf("\n\n");
-
-  freeValue( &ret );
-  deleteStatementList( mainFunc.value.userDefined.statements );
+  try
+  {
+    Value ret = evalFunction( &mainFunc, NULL, 0, &ctx );
   
+    TEST( ret.type == typeNumeric )
+    RCString retString = getValueString(&ret);
+    RCStringPrint(&retString,stdout);
+    printf("\n\n");
+
+    freeValue( &ret );
+    deleteStatementList( mainFunc.value.userDefined.statements );
+  }
+  catch
+  {
+    on( BadArgumentType, e )
+    {
+      fprintf( stderr, "Chyba v %s.\n", *e );
+    }
+  }
 END_TEST

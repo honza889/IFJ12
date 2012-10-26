@@ -386,8 +386,59 @@ Value addValue( Value* a, Value* b )
     }
     else
     {
-        throw( BadArgumentType, "addValue" );
+        throw( BadArgumentType, "operator +" );
     }
     return newValueUndefined();
 }
-        
+    
+Value subtractValue( Value* a, Value* b )
+{
+    if( a->type == typeNumeric && b->type == typeNumeric )
+    {
+        return newValueNumeric( getValueNumeric( a ) - getValueNumeric( b ) );
+    }
+    else
+    {
+        throw( BadArgumentType, "operator -" );
+    }
+    return newValueUndefined();
+}
+
+Value multiplyValue( Value* a, Value* b )
+{
+    if( a->type == typeNumeric && b->type == typeNumeric )
+    {
+        return newValueNumeric( getValueNumeric( a ) * getValueNumeric( b ) );
+    }
+    else if( a->type == typeString && b->type == typeNumeric )
+    {
+        RCString result = makeEmptyRCString();
+        RCString addedStr = getValueString( a );
+        int howMany = (int)getValueNumeric( b );
+        RCStringResize( &result, howMany*RCStringLength( &addedStr ) );
+        for( int i = 0; i < howMany; i++ )
+        {
+            RCStringAppendStr( &result, &addedStr );
+        }
+        Value ret = newValueString( result );
+        deleteRCString( &result );
+        return ret;
+    }
+    else
+    {
+        throw( BadArgumentType, "operator *" );
+    }
+}
+
+Value divideValue( Value* a, Value* b )
+{
+    if( a->type == typeNumeric && b->type == typeNumeric )
+    {
+        return newValueNumeric( getValueNumeric( a ) / getValueNumeric( b ) );
+    }
+    else
+    {
+        throw( BadArgumentType, "operator /" );
+    }
+    return newValueUndefined();
+}
