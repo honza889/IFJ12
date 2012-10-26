@@ -4,6 +4,9 @@
 #include "ast.h"
 #include "exceptions.h"
 
+/**
+ * Přidá položku do StatementListu
+ */
 void AddToStatementList(StatementList *list, Statement new){
 	if(list->item==NULL){ // novy seznam
 		list->count=1;
@@ -16,13 +19,18 @@ void AddToStatementList(StatementList *list, Statement new){
 	memcpy(&list->item[list->count-1],&new,sizeof(Statement));
 }
 
+/**
+ * Uvolní StatementList
+ */
 void freeStatementList(StatementList *list){
 	free(list->item);
 	list->item=NULL;
 	list->count=0;
 }
 
-/** Sestavi z tokenu Expression */
+/**
+ * Čte Tokeny až sestaví Expression
+ */
 Expression* semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
 	Expression *wholeExpression = NULL;
 	Expression *new, *old, *tmp;
@@ -65,16 +73,22 @@ Expression* semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local)
 						wholeExpression = new; // do korene (je prvnim prvkem vyrazu - unarni minus)
 						new->parent = NULL;
 					}else{
-						ERROR("Neznama operace, nebo neminusovy operator na zacatku vyrazu!"); // vyjimku?
+						throw(SyntaxError,((SyntaxErrorException){.type=BinaryOperatorAtBegin}));
 					}
 				}else{ // ve vyrazu jiz je promenna/konstanta
 					new->value.operator.type = BINARYOP;
 					switch(t.data.op){
-						case opPlus: new->value.operator.value.binary.type = ADD; break;
-						case opMinus: new->value.operator.value.binary.type = SUBTRACT; break;
+						case opPlus:     new->value.operator.value.binary.type = ADD; break;
+						case opMinus:    new->value.operator.value.binary.type = SUBTRACT; break;
 						case opMultiple: new->value.operator.value.binary.type = MULTIPLY; break;
-						case opDivide: new->value.operator.value.binary.type = DIVIDE; break;
-						default: ERROR("Neznama operace!"); // vyjimku?
+						case opDivide:   new->value.operator.value.binary.type = DIVIDE; break;
+						case opPower:    new->value.operator.value.binary.type = POWER; break;
+						case opEQ:       new->value.operator.value.binary.type = EQUALS; break;
+						case opNE:       new->value.operator.value.binary.type = NOTEQUALS; break;
+						case opLT:       new->value.operator.value.binary.type = LESS; break;
+						case opGT:       new->value.operator.value.binary.type = GREATER; break;
+						case opLE:       new->value.operator.value.binary.type = LEQUAL; break;
+						case opGE:       new->value.operator.value.binary.type = GEQUAL; break;
 					}
 					new->parent = old->parent;
 					old->parent = new;
@@ -83,7 +97,10 @@ Expression* semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local)
 					if(new->parent==NULL){ // je-li exitujici promenna/konstanta korenem
 						wholeExpression = new; // bude novy operator novym korenem
 					}else{ // neni-li korenem
-						if(new->parent->type!=OPERATOR){ ERROR("Rodicem prvku neni operator!");exit(99); } // vyjimku?
+						if(new->parent->type!=OPERATOR){
+							ERROR("Interni chyba interpretru pri sestavovani AST: Rodicem prvku ve vyrazu neni operator ani NULL!");
+							exit(99);
+						}
 						
 						// zde by jeste musim udelat hop nahoru, je-li novy operator mensi priority nez stary
 						if(new->parent->value.operator.type==BINARYOP){
@@ -110,7 +127,8 @@ Expression* semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local)
 				printf("konecVyrazu\n");
 				return wholeExpression;
 			break;
-			default: printf("(%d,%d)\n",t.type,tokEndOfLine); ERROR("Spatny typ tokenu ve vyrazu!");exit(99); // osetrit
+			default:
+				throw(SyntaxError,((SyntaxErrorException){.type=BadTokenInExpression}));
 		}
 		pt = t;
 		old = new;
@@ -118,27 +136,28 @@ Expression* semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local)
 	return wholeExpression;
 }
 
-
-
 /**
- * Funkce načte obsah funkce
- * Volána na začátku souboru (pro načtení main)
- * nebo po vstupu do definice funkce (pro načtení této funkce)
+ * Čte Tokeny až sestaví Function
+ * Volána na začátku souboru (pro načtení main) nebo
+ * po vstupu do definice funkce (pro načtení této funkce)
  */
 Function semantics(int paramCount,FILE *f,SymbolTable *global){
 	Token t;
 	StatementList list = newStatementList();
 	SymbolTable local = newSymbolTable();
 	RCString id;
+	bool wasntEnd = true;
 	
 	// Čtení jednotlivých Statementů
-	while((t=syntax(f)).type!=tokEndOfFile){
+	while(wasntEnd && (t=syntax(f)).type!=tokEndOfFile){
 		
 		switch(t.type){
 			/* Statement začíná Id - zřejmě id = ... */
 			case tokId:
 				id = t.data.id; // t bude prepsano tokAssignem
-				if((t=syntax(f)).type!=tokAssign){ ERROR("Prirazeni bez operatoru prirazeni!");exit(99); } // vyjimku?
+				if((t=syntax(f)).type!=tokAssign){ // musi nasledovat operator prirazeni
+					throw(SyntaxError,((SyntaxErrorException){.type=AssignWithoutAssignOperator}));
+				}
 				AddToStatementList(&list, (Statement){
 					.type=ASSIGNMENT,
 					.value.assignment={
@@ -149,29 +168,36 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
 			break;
 			case tokKeyW:
 				switch(t.data.keyw){
+					case kEnd:
+						wasntEnd = false; // ukonci nacitani funkce
+					break;
 					case kReturn:
 						AddToStatementList(&list, (Statement){
 							.type=RETURN,
 							.value.ret=*semanticOfExpression(f,global,&local)
 						});
 					break;
-					default: ERROR("Neimplementovane klicove slovo!");exit(99); // vyjimku?
+					default: ERROR("Neimplementovane klicove slovo!");exit(99); // nevyjikovat, bude odstraneno po implementaci
 				}
 				
 			break;
 			case tokEndOfLine: break;
-			default: printf("(%d)\n",t.type);ERROR("Tokeny nedavaji semantiku (smysl)!");exit(99); // vyjimku?
+			default:
+				throw(SyntaxError,((SyntaxErrorException){.type=BadTokenAtBeginOfStatement}));
 		}
 		
 	}
+	
+	int variableCount = local.count;
+	freeSymbolTable(&local);
 	
 	return (Function){
 		.type=USER_DEFINED,
 		.value.userDefined={
 			.statements=list,
-			.variableCount=0
+			.variableCount=variableCount
 		},
-		.paramCount=0
+		.paramCount=paramCount
 	};
 }
 

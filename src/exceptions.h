@@ -34,7 +34,14 @@ typedef struct {
   unsigned line_num;
 } ScannerErrorException;
 
-typedef int SyntaxErrorException; // Radek na kterem je syntakticka chyba
+typedef struct {
+  enum {
+    BinaryOperatorAtBegin,
+    BadTokenInExpression,
+    BadTokenAtBeginOfStatement,
+    AssignWithoutAssignOperator
+  } type;
+} SyntaxErrorException;
 
 typedef int UndefinedVariableException;
 typedef bool IncompatibleComparisonException;
