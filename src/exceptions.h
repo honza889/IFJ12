@@ -39,7 +39,8 @@ typedef struct {
     BinaryOperatorAtBegin,
     BadTokenInExpression,
     BadTokenAtBeginOfStatement,
-    AssignWithoutAssignOperator
+    AssignWithoutAssignOperator,
+    StrangeSyntax
   } type;
 } SyntaxErrorException;
 

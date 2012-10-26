@@ -13,7 +13,7 @@ BEGIN_TEST
   SymbolTable globalSymbolTable = newSymbolTable();
   Function mainFunc = semantics(0,f,&globalSymbolTable);
 
-  TEST( mainFunc.value.userDefined.statements.count == 4 )
+  TEST( mainFunc.value.userDefined.statements.count >= 4 )
 
   TEST( mainFunc.value.userDefined.statements.item[0].type == ASSIGNMENT )
   TEST( mainFunc.value.userDefined.statements.item[0].value.assignment.source.type == CONSTANT )

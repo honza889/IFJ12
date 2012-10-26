@@ -31,7 +31,7 @@ void freeStatementList(StatementList *list){
 /**
  * Čte Tokeny až sestaví Expression
  */
-Expression* semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local){
+Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *local, Token *lastToken){
 	Expression *wholeExpression = NULL;
 	Expression *new, *old, *tmp;
 	Token t; // aktualni token
@@ -114,17 +114,34 @@ Expression* semanticOfExpression(FILE *f,SymbolTable *global,SymbolTable *local)
 			break;
 			case tokLParen:
 				printf("ctuZavorku\n");
-				new = semanticOfExpression(f,global,local);
 				if(pt.type==tokEndOfFile){
+					new = semanticOfExpression(f,global,local,NULL);
 					wholeExpression = new; // do korene (je prvnim prvkem vyrazu)
 					new->parent = NULL;
 				}else if(pt.type==tokOp){
+					new = semanticOfExpression(f,global,local,NULL);
 					old->value.operator.value.binary.right = new; // pripojit za nejnovejsi operator
 					new->parent = old;
+				}else if(pt.type==tokId){ // zavorka volani funkce
+					// čeká na standardizaci ExpressionListu
+					//FunctionCall call={.params={NULL,0}, .function=getSymbol(pt.data.id,global,NULL) };
+					Token previousToken;
+					int paramsCount=0;
+					do{
+						new = semanticOfExpression(f,global,local,&previousToken);
+						if(new == NULL) break;
+						printf("ctuParametr\n");
+						paramsCount++;
+					}while(previousToken.type==tokComma);
+					printf("docteno=%d\n",paramsCount);
+					
+				}else{
+					throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
 				}
 			break;
 			case tokRParen: case tokComma: case tokEndOfLine:
 				printf("konecVyrazu\n");
+				if(lastToken) *lastToken = t;
 				return wholeExpression;
 			break;
 			default:
@@ -158,11 +175,12 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
 				if((t=syntax(f)).type!=tokAssign){ // musi nasledovat operator prirazeni
 					throw(SyntaxError,((SyntaxErrorException){.type=AssignWithoutAssignOperator}));
 				}
+				printf("ID\n");
 				AddToStatementList(&list, (Statement){
 					.type=ASSIGNMENT,
 					.value.assignment={
 						.destination=getSymbol(id,global,&local),
-						.source=*semanticOfExpression(f,global,&local)
+						.source=*semanticOfExpression(f,global,&local,NULL)
 					}
 				});
 			break;
@@ -172,9 +190,10 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
 						wasntEnd = false; // ukonci nacitani funkce
 					break;
 					case kReturn:
+						printf("RETURN\n");
 						AddToStatementList(&list, (Statement){
 							.type=RETURN,
-							.value.ret=*semanticOfExpression(f,global,&local)
+							.value.ret=*semanticOfExpression(f,global,&local,NULL)
 						});
 					break;
 					default: ERROR("Neimplementovane klicove slovo!");exit(99); // nevyjikovat, bude odstraneno po implementaci
