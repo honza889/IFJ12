@@ -18,6 +18,13 @@ Value find( ValueList data, int count )
     const char* string  = RCStringGetBuffer( &a ); //retezec
     const char* pattern  = RCStringGetBuffer( &b );//hledany retezec
 
+    if(stringLength == 0 || patternLength == 0){   //kontrola parametru
+        deleteRCString( &a );
+        deleteRCString( &b );
+        return newValueNumeric( stringLength );
+    }
+
+
     ///vytvorime pole pro korekci pri chybe
     int correctionArray[ RCStringLength( &b ) ];
 
@@ -43,11 +50,16 @@ Value find( ValueList data, int count )
        }
     }//konec vytvareni pole
 
-/*      //pro kontrolu vypis vytvoreneho pole
+/*
+      //pro kontrolu vypis vytvoreneho pole
+      printf("vypis pole chyb\n");
+
     for( i = 0, j=0; i < RCStringLength( &b ); i++ ){
         printf("%d", correctionArray[i]);
     }
+    printf("\n");
 */
+
     /**
     *   nyni samotny KMP algoritmus
     *   porovnavame znaky vzorku a retezce a podle tabulky kterou jsme si udelali
@@ -58,11 +70,14 @@ Value find( ValueList data, int count )
     i=0;
     j=0;
 
-    while(patternLength+i < stringLength){
+
+    while(patternLength+i-1 < stringLength){
 
         if(string[i+j] == pattern[j]){      //shoda znaku
-
             if( j == patternLength-1 ){     //konec: dosli jsme na konec vzorku
+
+                deleteRCString( &a );
+                deleteRCString( &b );
                 return newValueNumeric( i );//vratime pozici nalezeneho vzorku
             }
 
@@ -72,7 +87,8 @@ Value find( ValueList data, int count )
             i = i + j - correctionArray[j]; //posuneme vyhledavani v retezci o j(tam kde byla nalezena chyba)
             // minus vypocitana hodnota pro znak
 
-            if(correctionArray[i] != -1){   //mimo prvni prvek
+            if(correctionArray[j] > -1){   //mimo prvni prvek
+
                 j = correctionArray[j];     //posun se ve vzorku na pozici z pole
             }else{
                 j = 0;                      //nebo zacni od prvniho prvku
@@ -80,7 +96,6 @@ Value find( ValueList data, int count )
             }
         }
     }
-
 
     deleteRCString( &a );
     deleteRCString( &b );
