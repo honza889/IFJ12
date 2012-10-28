@@ -18,7 +18,9 @@ typedef enum
 	IncompatibleComparison, // exit 1
 	InvalidConversion, // exit 12 (chyba pretypovani na cislo)
 	BadArgumentType, // exit 11 (behova chyba nekompatibility typu)
-	IndexOutOfBounds // exit 13
+	IndexOutOfBounds, // exit 13
+    
+    OutOfMemory, // exit 99 (chyba alokace pameti)
 
 } ExceptionType;
 
@@ -47,8 +49,9 @@ typedef struct {
 typedef int UndefinedVariableException;
 typedef bool IncompatibleComparisonException;
 typedef Value InvalidConversionException;
-typedef char* BadArgumentTypeException;
+typedef const char* BadArgumentTypeException;
 typedef int IndexOutOfBoundsException;
+typedef const char* OutOfMemoryException;
 
 #define EXCEPTION( name ) name##Exception name##ExceptionValue
 
@@ -65,6 +68,7 @@ typedef struct
 		EXCEPTION( BadArgumentType );
 		EXCEPTION( IndexOutOfBounds );
 		EXCEPTION( SyntaxError );
+        EXCEPTION( OutOfMemory );
 	} value;
 } Exception;
 
@@ -149,4 +153,22 @@ void exceptions_impl_throw( Exception e );
 
 void rethrow();
 
+/**
+ * Provede \a statement, pokud ten vyhodi libovolnou vyjimku, tak se 
+ * provede \a handler a vyjimka se znovu vyhodi
+ */
+#define onAnyException( statement, handler ) \
+    try \
+    { \
+        statement; \
+    } \
+    catch \
+    { \
+        onAll \
+        { \
+            handler; \
+            rethrow(); \
+        } \
+    }
+    
 #endif

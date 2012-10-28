@@ -28,10 +28,17 @@ int main(int argc, char**argv)
 	}catch{
 		on(SyntaxError,row){
 			fprintf(stderr, "\nSyntakticka chyba programu na radku %d!\n\n",*row);
+            fclose( f );
 			exit(2);
 		}
+        on( OutOfMemory, typename ){
+            fprintf(stderr, "Nebylo mozne alokovat pamet pro typ '%s'", *typename );
+            fclose( f );
+            exit(99);
+        }
 		onAll{
 			fprintf(stderr, "\nInterpretace skončila neodchycenou vyjímkou!\n\n");
+            fclose( f );
 			exit(99);
 		}
 	}

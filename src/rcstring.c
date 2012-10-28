@@ -3,18 +3,22 @@
 #include "string.h"
 #include "global.h"
 #include "exceptions.h"
+#include "alloc.h"
 
 
 RCStringBuffer* newRCStringBuffer( int len )
 {
-  RCStringBuffer* buf = malloc( sizeof( RCStringBuffer ) );
-  MALLCHECK(buf);
-  char* string = malloc( len * sizeof( char ) );
-  MALLCHECK(string);
-  buf->references = 1;
-  buf->capacity = len;
-  buf->string = string;
-  return buf;
+    RCStringBuffer* buf = new( RCStringBuffer );
+    try{
+        char* string = newArray( char, len );
+  
+        buf->references = 1;
+        buf->capacity = len;
+        buf->string = string;
+    }catch{
+        onAll{ free( buf ); rethrow(); }
+    }
+    return buf;
 }
 
 RCString makeEmptyRCString()
@@ -41,7 +45,7 @@ void deleteRCString( RCString* str )
   str->buffer->references--;
   if( str->buffer->references == 0 )
   {
-	free( str->buffer->string );
+    free( str->buffer->string );
     free( str->buffer );
   }
   str->buffer=NULL;
@@ -117,9 +121,7 @@ void RCStringResize( RCString* str, int length )
 		{
 			// jsme unikátní, nemusíme se starat o ostatní reference
 			int alignedLength = align( length + str->offset );
-			char* newData = realloc( str->buffer->string, alignedLength );
-			MALLCHECK( newData );
-			str->buffer->string = newData;
+			str->buffer->string = resizeArray( str->buffer->string, char, alignedLength );
 			str->buffer->capacity = alignedLength;
 		}
 		else
