@@ -10,62 +10,62 @@ static bool currentExceptionHandled;
 
 inline void rethrow()
 {
-	exceptions_impl_throw( currentException ); 
+  exceptions_impl_throw( currentException ); 
 }
 
 inline void exceptions_init()
 {
-	jumpBuffersSize = 0;
+  jumpBuffersSize = 0;
 }
 
 inline jmp_buf* exceptions_pushBuffer()
 {
-	return &jumpBuffers[jumpBuffersSize++];
+  return &jumpBuffers[jumpBuffersSize++];
 }
 
 inline jmp_buf* exceptions_topBuffer()
 {
-	return ( jumpBuffersSize ? &jumpBuffers[jumpBuffersSize-1] : NULL);
+  return ( jumpBuffersSize ? &jumpBuffers[jumpBuffersSize-1] : NULL);
 }
 
 inline void exceptions_popBuffer()
 {
-	jumpBuffersSize--;
+  jumpBuffersSize--;
 }
 
 inline Exception* exceptions_getCurrentException()
 {
-	return &currentException;
+  return &currentException;
 }
 
 inline void exceptions_endCatchBlock()
 {
-	if( !currentExceptionHandled )
-	{
-		rethrow();
-	}
+  if( !currentExceptionHandled )
+  {
+    rethrow();
+  }
 }
 
 inline void exceptions_setHandled( bool handled )
 {
-	currentExceptionHandled = handled;
+  currentExceptionHandled = handled;
 }
 
 inline bool exceptions_isHandled()
 {
-	return currentExceptionHandled;
+  return currentExceptionHandled;
 }
 
 int exceptions_impl_loopHack;
 
 void exceptions_impl_throw( Exception e )
 {
-	currentException = e;
-	currentExceptionHandled = false;
-	if(exceptions_topBuffer()){
-		longjmp( *exceptions_topBuffer(), 1 );
-	}else{
-		ERROR("Exception error: throw without try!");
-		exit(99);
-	}
+  currentException = e;
+  currentExceptionHandled = false;
+  if(exceptions_topBuffer()){
+    longjmp( *exceptions_topBuffer(), 1 );
+  }else{
+    ERROR("Exception error: throw without try!");
+    exit(99);
+  }
 }
