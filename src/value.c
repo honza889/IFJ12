@@ -428,6 +428,7 @@ Value multiplyValue( Value* a, Value* b )
     {
         throw( BadArgumentType, "operator *" );
     }
+    return newValueUndefined();
 }
 
 Value divideValue( Value* a, Value* b )
