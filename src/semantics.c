@@ -32,42 +32,42 @@ void freeStatementList(StatementList *list){
  * Porovná prioritu operátorů
  * (Používá se při sestavování Expression - Nechť první je existující
  *  a druhý je nový. Vrátí-li true, musím o patro výše.)
- * @return true je-li 1. prioritnější než 2, jinak false
+ * @return true je-li 1. mene prioritní než 2, jinak false
  */
 bool compareOperators(Operator op1, Operator op2){
   // unární jsou prioritnější
-  if(op1.type==UNARYOP) return true;
-  if(op2.type==UNARYOP) return false;
+  if(op2.type==UNARYOP) return true;
+  if(op1.type==UNARYOP) return false;
   
   // porovnávací operátory mají přednost
   if((
-    op1.value.binary.type==EQUALS ||
-    op1.value.binary.type==NOTEQUALS ||
-    op1.value.binary.type==LESS ||
-    op1.value.binary.type==GREATER ||
-    op1.value.binary.type==LEQUAL ||
-    op1.value.binary.type==GEQUAL
+    op2.value.binary.type==EQUALS ||
+    op2.value.binary.type==NOTEQUALS ||
+    op2.value.binary.type==LESS ||
+    op2.value.binary.type==GREATER ||
+    op2.value.binary.type==LEQUAL ||
+    op2.value.binary.type==GEQUAL
   ) && (
-    op2.value.binary.type!=EQUALS &&
-    op2.value.binary.type!=NOTEQUALS &&
-    op2.value.binary.type!=LESS &&
-    op2.value.binary.type!=GREATER &&
-    op2.value.binary.type!=LEQUAL &&
-    op2.value.binary.type!=GEQUAL
+    op1.value.binary.type!=EQUALS &&
+    op1.value.binary.type!=NOTEQUALS &&
+    op1.value.binary.type!=LESS &&
+    op1.value.binary.type!=GREATER &&
+    op1.value.binary.type!=LEQUAL &&
+    op1.value.binary.type!=GEQUAL
   )) return true;
   // umocňování má přednost
   if((
-    op1.value.binary.type==POWER
+    op2.value.binary.type==POWER
   ) && (
-    op2.value.binary.type!=POWER
+    op1.value.binary.type!=POWER
   )) return true;
   // násobení a dělení má přednost
   if((
-    op1.value.binary.type==MULTIPLY ||
-    op1.value.binary.type==DIVIDE
+    op2.value.binary.type==MULTIPLY ||
+    op2.value.binary.type==DIVIDE
   ) && (
-    op2.value.binary.type!=MULTIPLY &&
-    op2.value.binary.type!=DIVIDE
+    op1.value.binary.type!=MULTIPLY &&
+    op1.value.binary.type!=DIVIDE
   )) return true;
   
   return false;
@@ -78,7 +78,7 @@ bool compareOperators(Operator op1, Operator op2){
  */
 Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *local, Token *lastToken){
   Expression *wholeExpression = NULL;
-  Expression *newExp, *old, *tmp;
+  Expression *newExp, *oldExp, *tmp;
   Token t; // aktualni token
   Token pt = {.type=tokEndOfFile}; // predchazejici token
   while((t=syntax(f)).type!=tokEndOfFile){
@@ -91,8 +91,8 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
           wholeExpression = newExp; // do korene (je prvnim prvkem vyrazu)
           newExp->parent = NULL;
         }else if(pt.type==tokOp){
-          old->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
-          newExp->parent = old;
+          oldExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
+          newExp->parent = oldExp;
         }
       break;
       case tokNum:
@@ -103,8 +103,8 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
           wholeExpression = newExp; // do korene (je prvnim prvkem vyrazu)
           newExp->parent = NULL;
         }else if(pt.type==tokOp){
-          old->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
-          newExp->parent = old;
+          oldExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
+          newExp->parent = oldExp;
         }
       break;
       case tokOp:
@@ -135,9 +135,20 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
             case opLE:       newExp->value.operator.value.binary.type = LEQUAL; break;
             case opGE:       newExp->value.operator.value.binary.type = GEQUAL; break;
           }
-          newExp->parent = old->parent;
-          old->parent = newExp;
-          newExp->value.operator.value.binary.left = old;
+          
+          // Je-li operace mene prioritni nez predchozi, misto predchozi operace
+          // pujdeme na misto jeste predchodnejsi (parentnejsi) operace
+          // TODO: Zprovoznit!
+          //while( oldExp!=NULL && compareOperators(oldExp->value.operator, newExp->value.operator) ){
+          //  printf("lezuVys\n");
+          //  oldExp = oldExp->parent;
+          //}
+          //printf("vylezeno-%d\n",oldExp->type);
+          // nyni musi oldExp ukazovat na prvek, na jehoz misto nastoupi novy
+          
+          newExp->parent = oldExp->parent;
+          oldExp->parent = newExp;
+          newExp->value.operator.value.binary.left = oldExp;
           newExp->value.operator.value.binary.right = NULL;
           if(newExp->parent==NULL){ // je-li exitujici promenna/konstanta korenem
             wholeExpression = newExp; // bude novy operator novym korenem
@@ -146,14 +157,11 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
               ERROR("Interni chyba interpretru pri sestavovani AST: Rodicem prvku ve vyrazu neni operator ani NULL!");
               exit(99);
             }
-            
-            // zde by jeste musim udelat hop nahoru, je-li novy operator mensi priority nez stary
             if(newExp->parent->value.operator.type==BINARYOP){
               newExp->parent->value.operator.value.binary.right = newExp;
             }else{
               newExp->parent->value.operator.value.unary.operand = newExp;
             }
-            
           }
         }
       break;
@@ -165,8 +173,8 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
           newExp->parent = NULL;
         }else if(pt.type==tokOp){
           newExp = semanticOfExpression(f,global,local,NULL);
-          old->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
-          newExp->parent = old;
+          oldExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
+          newExp->parent = oldExp;
         }else if(pt.type==tokId){ // zavorka volani funkce
           // čeká na standardizaci ExpressionListu
           //FunctionCall call={.params={NULL,0}, .function=getSymbol(pt.data.id,global,NULL) };
@@ -193,7 +201,7 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
         throw(SyntaxError,((SyntaxErrorException){.type=BadTokenInExpression}));
     }
     pt = t;
-    old = newExp;
+    oldExp = newExp;
   }
   return wholeExpression;
 }

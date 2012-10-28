@@ -15,4 +15,10 @@
  */
 Function semantics(int paramCount,FILE *f,SymbolTable *global);
 
+/**
+ * Porovná prioritu operátorů
+ * @return true je-li 1. prioritnější než 2, jinak false
+ */
+bool compareOperators(Operator op1, Operator op2);
+
 #endif
