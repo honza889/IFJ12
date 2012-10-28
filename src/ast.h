@@ -30,12 +30,15 @@ typedef struct {
 	int count;
 } StatementList;
 
-typedef Expression* ExpressionList;
+typedef struct {
+    Expression* expressions;
+    int count;
+} ExpressionList;
 typedef Value* ValueList;
 
 typedef Value( *BuiltinFunction )( ValueList, int );
 
-Value evalFunction( Function* func, ExpressionList params, int parameterCount, Context* context );
+Value evalFunction( Function* func, ExpressionList params, Context* context );
 void deleteStatementList( StatementList func );
 
 /**
@@ -130,7 +133,6 @@ struct SOperator
 struct SFunctionCall
 {
 	ExpressionList params;
-	int parameterCount;
 	Variable function;
 };
 	

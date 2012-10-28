@@ -47,7 +47,7 @@ BEGIN_TEST
     
     Context ctx = { glob, loc };
     
-    Value ret = evalFunction( &f, NULL, 0, &ctx );
+    Value ret = evalFunction( &f, (ExpressionList){NULL,0}, &ctx );
     
     RCString s = getValueString( &ret );
     STRTEST( s, "5" );
@@ -203,7 +203,7 @@ BEGIN_TEST
         .paramCount = 0
     };
     
-    Value ret = evalFunction( &f, NULL, 0, &ctx );
+    Value ret = evalFunction( &f, (ExpressionList){NULL,0}, &ctx );
     RCString retStr = getValueString( &ret );
     STRTEST( retStr, "necoLOLLOLLOLLOLLOLLOLLOLLOLLOLLOL" );
     deleteStatementList( f.value.userDefined.statements );

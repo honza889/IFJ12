@@ -24,7 +24,7 @@ ReturnData evalReturn( Return* ret, Context* context );
 ReturnData evalStatement( Statement* statement, Context* context );
 ReturnData evalStatementList( StatementList sl, Context* context );
 
-Value evalFunction( Function* func, ExpressionList params, int parameterCount, Context* context );
+Value evalFunction( Function* func, ExpressionList params, Context* context );
 
 // Pozor: value uz musi byt nakopirovana ( drobna optimalizace predavani )
 static inline void setVariable( Variable* var, Context* context, Value value )
@@ -200,20 +200,20 @@ ReturnData evalStatementList( StatementList sl, Context* context )
     return (ReturnData){ false };
 }
 
-Value evalFunction( Function* func, ExpressionList params, int parameterCount, Context* context )
+Value evalFunction( Function* func, ExpressionList params, Context* context )
 {
     int variableCount;
     
     if( func->paramCount < 0 )
     {
-        variableCount = parameterCount;
+        variableCount = params.count;
     }
     else
     {
         variableCount = func->paramCount;
-        if( parameterCount > func->paramCount )
+        if( params.count > func->paramCount )
         {
-            parameterCount = func->paramCount;
+            params.count = func->paramCount;
         }
     }
     
@@ -228,9 +228,9 @@ Value evalFunction( Function* func, ExpressionList params, int parameterCount, C
     
     for( int i = 0; i < variableCount; i++ )
     {
-        if( i < parameterCount )
+        if( i < params.count )
         {
-            variables[ i ] = evalExpression( &params[ i ], context );
+            variables[ i ] = evalExpression( &params.expressions[ i ], context );
         }
         else if( i < func->paramCount )
         {
@@ -244,7 +244,7 @@ Value evalFunction( Function* func, ExpressionList params, int parameterCount, C
     
     if( func->type == BUILTIN )
     {
-        return func->value.builtin( variables, parameterCount );
+        return func->value.builtin( variables, params.count );
     }
     else
     {
@@ -302,9 +302,9 @@ void deleteOperator( Operator* op )
 
 void deleteFunctionCall( FunctionCall* func )
 {
-    for( int i = 0; i < func->parameterCount; i++ )
+    for( int i = 0; i < func->params.count; i++ )
     {
-        deleteExpression( func->params + i );
+        deleteExpression( func->params.expressions + i );
     }
     deleteVariable( &func->function );
 }

@@ -35,7 +35,7 @@ BEGIN_TEST
   Context ctx = { glob, loc };
   try
   {
-    Value ret = evalFunction( &mainFunc, NULL, 0, &ctx );
+    Value ret = evalFunction( &mainFunc, (ExpressionList){NULL,0}, &ctx );
   
     TEST( ret.type == typeNumeric )
     RCString retString = getValueString(&ret);
