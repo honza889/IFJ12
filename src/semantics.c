@@ -29,6 +29,51 @@ void freeStatementList(StatementList *list){
 }
 
 /**
+ * Porovná prioritu operátorů
+ * (Používá se při sestavování Expression - Nechť první je existující
+ *  a druhý je nový. Vrátí-li true, musím o patro výše.)
+ * @return true je-li 1. prioritnější než 2, jinak false
+ */
+bool compareOperators(Operator op1, Operator op2){
+	// unární jsou prioritnější
+	if(op1.type==UNARYOP) return true;
+	if(op2.type==UNARYOP) return false;
+	
+	// porovnávací operátory mají přednost
+	if((
+		op1.value.binary.type==EQUALS ||
+		op1.value.binary.type==NOTEQUALS ||
+		op1.value.binary.type==LESS ||
+		op1.value.binary.type==GREATER ||
+		op1.value.binary.type==LEQUAL ||
+		op1.value.binary.type==GEQUAL
+	) && (
+		op2.value.binary.type!=EQUALS &&
+		op2.value.binary.type!=NOTEQUALS &&
+		op2.value.binary.type!=LESS &&
+		op2.value.binary.type!=GREATER &&
+		op2.value.binary.type!=LEQUAL &&
+		op2.value.binary.type!=GEQUAL
+	)) return true;
+	// umocňování má přednost
+	if((
+		op1.value.binary.type==POWER
+	) && (
+		op2.value.binary.type!=POWER
+	)) return true;
+	// násobení a dělení má přednost
+	if((
+		op1.value.binary.type==MULTIPLY ||
+		op1.value.binary.type==DIVIDE
+	) && (
+		op2.value.binary.type!=MULTIPLY &&
+		op2.value.binary.type!=DIVIDE
+	)) return true;
+	
+	return false;
+}
+
+/**
  * Čte Tokeny až sestaví Expression
  */
 Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *local, Token *lastToken){

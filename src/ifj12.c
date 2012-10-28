@@ -27,7 +27,7 @@ int main(int argc, char**argv)
 		
 	}catch{
 		on(SyntaxError,row){
-			fprintf(stderr, "\nSyntakticka chyba programu na radku %d!\n\n",*row);
+			fprintf(stderr, "\nSyntakticka chyba programu typu %d!\n\n",row->type);
             fclose( f );
 			exit(2);
 		}
