@@ -13,6 +13,12 @@ BEGIN_TEST
   SymbolTable globalSymbolTable = newSymbolTable();
   Function mainFunc = semantics(0,f,&globalSymbolTable);
 
+  // compareOperators() jen zletma
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } ) == false )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } ) == false )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } ) == false )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } ) == true )
+
   TEST( mainFunc.value.userDefined.statements.count >= 4 )
 
   TEST( mainFunc.value.userDefined.statements.item[0].type == ASSIGNMENT )

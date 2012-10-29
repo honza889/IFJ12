@@ -34,8 +34,8 @@ typedef struct {
 } FunctionList;
 
 typedef struct {
-	Statement* item;
-	int count;
+    Statement* item;
+    int count;
 } StatementList;
 
 typedef struct {
@@ -75,150 +75,150 @@ struct SValue {
 
 struct SFunction
 {
-	enum{
-		USER_DEFINED,
-		BUILTIN
-	} type;
-	
-	union{
-		struct{
-			StatementList statements;
-			int variableCount;
-		} userDefined;
-		BuiltinFunction builtin;
-	} value;
+    enum{
+        USER_DEFINED,
+        BUILTIN
+    } type;
+    
+    union{
+        struct{
+            StatementList statements;
+            int variableCount;
+        } userDefined;
+        BuiltinFunction builtin;
+    } value;
 
-	int paramCount; // zaporne cislo znamena volitelny pocet argumentu
+    int paramCount; // zaporne cislo znamena volitelny pocet argumentu
     RCString name;
     SymbolTable symTable;
 };
 
 struct SBinaryOp
 {
-	enum
-	{
-		ADD,
-		SUBTRACT,
-		MULTIPLY,
-		DIVIDE,
-		/* ROW ROW FIGHT THE */ POWER,
-		EQUALS,
-		NOTEQUALS,
-		LESS,
-		GREATER,
-		LEQUAL,
-		GEQUAL
-	} type;
-	
-	Expression* left;
-	Expression* right;
+  enum
+  {
+    ADD,
+    SUBTRACT,
+    MULTIPLY,
+    DIVIDE,
+    /* ROW ROW FIGHT THE */ POWER,
+    EQUALS,
+    NOTEQUALS,
+    LESS,
+    GREATER,
+    LEQUAL,
+    GEQUAL
+  } type;
+  
+  Expression* left;
+  Expression* right;
 };
 
 struct SUnaryOp
 {
-	enum
-	{
-		MINUS
-	} type;
-	
-	Expression* operand;
+  enum
+  {
+    MINUS
+  } type;
+  
+  Expression* operand;
 };
-		
+    
 
 struct SOperator
 {
-	enum
-	{
-		BINARYOP,
-		UNARYOP
-	} type;
-	
-	union
-	{
-		BinaryOp binary;
-		UnaryOp unary;
-	} value;
+  enum
+  {
+    BINARYOP,
+    UNARYOP
+  } type;
+  
+  union
+  {
+    BinaryOp binary;
+    UnaryOp unary;
+  } value;
 };
 
 struct SFunctionCall
 {
-	ExpressionList params;
-	Variable function;
+  ExpressionList params;
+  Variable function;
 };
-	
+  
 struct SExpression
 {
-	enum
-	{
-		CONSTANT,
-		VARIABLE,
-		OPERATOR,
-		FUNCTION_CALL
-	} type;
-	
-	union
-	{
-		Constant constant;
-		Variable variable;
-		Operator operator;
-		FunctionCall functionCall;
-	} value;
+  enum
+  {
+    CONSTANT,
+    VARIABLE,
+    OPERATOR,
+    FUNCTION_CALL
+  } type;
+  
+  union
+  {
+    Constant constant;
+    Variable variable;
+    Operator operator;
+    FunctionCall functionCall;
+  } value;
 
-	Expression *parent;
+  Expression *parent;
 };
 
 struct SAssignment
 {
-	Variable destination;
-	Expression source;
+  Variable destination;
+  Expression source;
 };
 
 struct SSubstring
 {
-	Variable destination;
-	Expression source;
-	int offset;
-	int length;
+  Variable destination;
+  Expression source;
+  int offset;
+  int length;
 };
 
 struct SLoop
 {
-	Expression condition;
-	StatementList statements;
+  Expression condition;
+  StatementList statements;
 };
 
 struct SCondition
 {
-	Expression condition;
-	StatementList ifTrue;
-	StatementList ifFalse;
+  Expression condition;
+  StatementList ifTrue;
+  StatementList ifFalse;
 };
 
 struct SStatement
 {
-	enum
-	{
-		ASSIGNMENT,
-		SUBSTRING,
-		LOOP,
-		CONDITION,
-		RETURN
-	} type;
-	
-	union
-	{
-		Assignment assignment;
-		Substring substring;
-		Loop loop;
-		Condition condition;
-		Return ret;
-	} value;
+  enum
+  {
+    ASSIGNMENT,
+    SUBSTRING,
+    LOOP,
+    CONDITION,
+    RETURN
+  } type;
+  
+  union
+  {
+    Assignment assignment;
+    Substring substring;
+    Loop loop;
+    Condition condition;
+    Return ret;
+  } value;
 };
 
 struct SContext
 {
-	Value* globals;
-	Value* locals;
+  Value* globals;
+  Value* locals;
 };
 
 struct SAst
@@ -229,7 +229,7 @@ struct SAst
 
 
 static inline StatementList newStatementList(){
-	return (StatementList){ .item=NULL, .count=0 };
+  return (StatementList){ .item=NULL, .count=0 };
 }
 
 static inline Value* symbol(int index,Context* context){

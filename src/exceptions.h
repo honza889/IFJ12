@@ -7,23 +7,22 @@
 
 typedef enum
 {
-	/* Lexikalni analyza */
-	ScannerError, // exit 1
+    /* Lexikalni analyza */
+    ScannerError, // exit 1
 
-	/* Syntakticka analyza */
-	SyntaxError, // exit 2
+    /* Syntakticka analyza */
+    SyntaxError, // exit 2
     UnexpectedToken,
     UnexpectedKeyWord,
 
-	/* Lexikalni analyza */
-	UndefinedVariable, // exit 3
-	IncompatibleComparison, // exit 1
-	InvalidConversion, // exit 12 (chyba pretypovani na cislo)
-	BadArgumentType, // exit 11 (behova chyba nekompatibility typu)
-	IndexOutOfBounds, // exit 13
+    /* Lexikalni analyza */
+    UndefinedVariable, // exit 3
+    IncompatibleComparison, // exit 1
+    InvalidConversion, // exit 12 (chyba pretypovani na cislo)
+    BadArgumentType, // exit 11 (behova chyba nekompatibility typu)
+    IndexOutOfBounds, // exit 13
     
     OutOfMemory, // exit 99 (chyba alokace pameti)
-
 } ExceptionType;
 
 /* Parametry vyjimek - protoze musi byt jeden, bool=void */
@@ -71,21 +70,21 @@ typedef const char* OutOfMemoryException;
 
 typedef struct
 {
-	ExceptionType type;
-	union
-	{
-		EXCEPTION( ScannerError );
-
-		EXCEPTION( UndefinedVariable );
-		EXCEPTION( IncompatibleComparison );
-		EXCEPTION( InvalidConversion );
-		EXCEPTION( BadArgumentType );
-		EXCEPTION( IndexOutOfBounds );
-		EXCEPTION( SyntaxError );
+    ExceptionType type;
+    union
+    {
+        EXCEPTION( ScannerError );
+    
+        EXCEPTION( UndefinedVariable );
+        EXCEPTION( IncompatibleComparison );
+        EXCEPTION( InvalidConversion );
+        EXCEPTION( BadArgumentType );
+        EXCEPTION( IndexOutOfBounds );
+        EXCEPTION( SyntaxError );
         EXCEPTION( UnexpectedToken );
         EXCEPTION( UnexpectedKeyWord );
         EXCEPTION( OutOfMemory );
-	} value;
+    } value;
 } Exception;
 
 #undef EXCEPTION
@@ -111,12 +110,12 @@ void exceptions_impl_throw( Exception e );
  * Definuje blok handlerů výjimek
  */
 #define catch \
-	else for \
-	( \
-		exceptions_popBuffer(), exceptions_impl_loopHack = 1; \
-		exceptions_impl_loopHack != 0; \
-		exceptions_endCatchBlock(), exceptions_impl_loopHack = 0 \
-	)
+  else for \
+  ( \
+    exceptions_popBuffer(), exceptions_impl_loopHack = 1; \
+    exceptions_impl_loopHack != 0; \
+    exceptions_endCatchBlock(), exceptions_impl_loopHack = 0 \
+  )
 
 /**
  * Definuje handler výjimky expected_exception_type, pointer 
@@ -125,47 +124,47 @@ void exceptions_impl_throw( Exception e );
  * Musí se nacházev v bloku catch.
  * 
  * Použití:
- * 	 	on( UndefinedVariable, e )
- * 		{
+ *      on( UndefinedVariable, e )
+ *     {
  *          // e je pointer na UndefinedVariableException
- * 			printf("%d", *e); // nebo něco takového
- * 		}
+ *       printf("%d", *e); // nebo něco takového
+ *     }
  */
 #define on( expected_exception_type, name) \
-	if( exceptions_getCurrentException()->type == expected_exception_type ) \
-    for \
-    ( \
-        exceptions_impl_loopHack = 1; \
-        exceptions_impl_loopHack != 0; \
-        exceptions_impl_loopHack = 0 \
-    ) \
-	for \
-	( \
-        expected_exception_type##Exception* name = \
-            &exceptions_getCurrentException()->value.expected_exception_type##ExceptionValue; \
-		exceptions_impl_loopHack != 0; \
-		exceptions_setHandled( true ), exceptions_impl_loopHack = 0 \
-	)
+  if( exceptions_getCurrentException()->type == expected_exception_type ) \
+  for \
+  ( \
+    exceptions_impl_loopHack = 1; \
+    exceptions_impl_loopHack != 0; \
+    exceptions_impl_loopHack = 0 \
+  ) \
+  for \
+  ( \
+    expected_exception_type##Exception* name = \
+    &exceptions_getCurrentException()->value.expected_exception_type##ExceptionValue; \
+    exceptions_impl_loopHack != 0; \
+    exceptions_setHandled( true ), exceptions_impl_loopHack = 0 \
+  )
 
 /**
  * Definuje handler všech druhů výjimek. Je třeba jej dát jako poslední
  * v catch bloku
  */
 #define onAll \
-	if( !exceptions_isHandled() ) \
-	for \
-	( \
-		exceptions_impl_loopHack = 1; \
-		exceptions_impl_loopHack != 0; \
-		exceptions_setHandled( true ), exceptions_impl_loopHack = 0 \
-	)
+  if( !exceptions_isHandled() ) \
+  for \
+  ( \
+    exceptions_impl_loopHack = 1; \
+    exceptions_impl_loopHack != 0; \
+    exceptions_setHandled( true ), exceptions_impl_loopHack = 0 \
+  )
 
 #define throw( exception_type, exception_value ) \
-    exceptions_impl_throw( (Exception)\
-    { \
-        .type = exception_type, \
-        .value.exception_type##ExceptionValue = exception_value \
-	 } )
+  exceptions_impl_throw( (Exception)\
+  { \
+    .type = exception_type, \
+    .value.exception_type##ExceptionValue = exception_value \
+  } )
 
 void rethrow();
 
@@ -174,17 +173,17 @@ void rethrow();
  * provede \a handler a vyjimka se znovu vyhodi
  */
 #define onAnyException( statement, handler ) \
-    try \
+  try \
+  { \
+    statement; \
+  } \
+  catch \
+  { \
+    onAll \
     { \
-        statement; \
+      handler; \
+      rethrow(); \
     } \
-    catch \
-    { \
-        onAll \
-        { \
-            handler; \
-            rethrow(); \
-        } \
-    }
-    
+  }
+
 #endif

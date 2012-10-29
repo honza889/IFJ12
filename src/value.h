@@ -14,27 +14,27 @@ void freeValue(Value *object);
 
 // Konstruktory Value...
 static inline Value newValueUndefined(){ 
-	return (Value){ .type=typeUndefined };
+  return (Value){ .type=typeUndefined };
 }
 
 static inline Value newValueNil(){
-	return (Value){ .type=typeNil };
+  return (Value){ .type=typeNil };
 }
 
 static inline Value newValueBoolean(bool value){ 
-	return (Value){ .type=typeBoolean, .data.boolean=value };
+  return (Value){ .type=typeBoolean, .data.boolean=value };
 }
 
 static inline Value newValueNumeric(double value){ 
-	return (Value){ .type=typeNumeric, .data.numeric=value };
+  return (Value){ .type=typeNumeric, .data.numeric=value };
 }
 
 static inline Value newValueFunction( struct SFunction *value){ 
-	return (Value){ .type=typeFunction, .data.function=value };
+  return (Value){ .type=typeFunction, .data.function=value };
 }
 
 static inline Value newValueString( RCString value){ 
-	return (Value){ .type=typeString, .data.string = copyRCString( &value ) };
+  return (Value){ .type=typeString, .data.string = copyRCString( &value ) };
 }
 
 static inline Value newValueCString( const char* str)
@@ -84,7 +84,7 @@ Value multiplyValue( Value* a, Value* b );
 Value divideValue( Value* a, Value* b );
 
 static inline int typeOfValue(Value *object){
-	return (int)object->type;
+  return (int)object->type;
 }
 
 #endif

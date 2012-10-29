@@ -27,22 +27,21 @@ Token expectTok( Scanner* scanner, TokenType tok )
 {
     Token current = testTok( scanner, tok );
     consumeTok( scanner );
+    return current;
 }
 
 Token testTok( Scanner* scanner, TokenType tok )
 {
-    if( getTok( scanner ).type & tok )
-    {
-        Token theRealToken = getTok( scanner );
-        return theRealToken;
-    }
-    else
+    if( ! ( getTok( scanner ).type & tok ) )
     {
         throw( UnexpectedToken, ((UnexpectedTokenException){ 
             .expected = tok, 
             .got = getTok( scanner ).type 
         }));
     }
+    
+    Token theRealToken = getTok( scanner );
+        return theRealToken;
 }
 
 void expectKeyw( Scanner* scanner, KeyWord keyw )

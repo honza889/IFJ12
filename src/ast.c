@@ -7,8 +7,8 @@
 
 typedef struct
 {
-	bool returned;
-	Value ret;
+  bool returned;
+  Value ret;
 } ReturnData;
 
 Value evalUnaryOp( UnaryOp* op, Context* context );
@@ -37,19 +37,19 @@ static inline void setVariable( Variable* var, Context* context, Value value )
 
 static inline Value evalConstant( Constant* constant )
 {
-	return copyValue( constant );
+  return copyValue( constant );
 }
 
 static inline Value evalVariable( Variable* var, Context* context )
 {
-	return copyValue( symbol( *var, context ) );
+  return copyValue( symbol( *var, context ) );
 }
 
 
 Value evalUnaryOp( UnaryOp* op, Context* context )
 {
-	// TODO
-	return newValueUndefined();
+  // TODO
+  return newValueUndefined();
 }
 
 Value evalBinaryOp( BinaryOp* op, Context* context )
@@ -80,35 +80,35 @@ Value evalBinaryOp( BinaryOp* op, Context* context )
 
 Value evalOperator( Operator* op, Context* context )
 {
-	switch( op->type )
-	{
-		case BINARYOP: return evalBinaryOp( &op->value.binary, context );
-		case UNARYOP: return evalUnaryOp( &op->value.unary, context );
-		default: return newValueUndefined();
-	}
+  switch( op->type )
+  {
+    case BINARYOP: return evalBinaryOp( &op->value.binary, context );
+    case UNARYOP: return evalUnaryOp( &op->value.unary, context );
+    default: return newValueUndefined();
+  }
 }
 
 Value evalFunctionCall( FunctionCall* func, Context* context )
 {
-	// TODO
-	return newValueUndefined();
+  // TODO
+  return newValueUndefined();
 }
 
 Value evalExpression( Expression* expr, Context* context )
 {
-	switch( expr->type )
-	{
-		case CONSTANT: 
-			return evalConstant( &expr->value.constant );
-		case VARIABLE:
-			return evalVariable( &expr->value.variable, context ); 
-		case OPERATOR:
-			return evalOperator( &expr->value.operator, context );
-		case FUNCTION_CALL:
-			return evalFunctionCall( &expr->value.functionCall, context );
-		default:
-			return newValueUndefined();
-	}
+  switch( expr->type )
+  {
+    case CONSTANT: 
+      return evalConstant( &expr->value.constant );
+    case VARIABLE:
+      return evalVariable( &expr->value.variable, context ); 
+    case OPERATOR:
+      return evalOperator( &expr->value.operator, context );
+    case FUNCTION_CALL:
+      return evalFunctionCall( &expr->value.functionCall, context );
+    default:
+      return newValueUndefined();
+  }
 }
 
 void evalAssignment( Assignment* assgn, Context* context )
@@ -167,7 +167,7 @@ ReturnData evalCondition( Condition* condition, Context* context )
 
 ReturnData evalReturn( Return* ret, Context* context )
 {
-	return (ReturnData){ true, evalExpression( ret, context ) };
+  return (ReturnData){ true, evalExpression( ret, context ) };
 }
 
 ReturnData evalStatement( Statement* statement, Context* context )
