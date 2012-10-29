@@ -5,37 +5,87 @@
 #include "rcstring.h"
 #include "exceptions.h"
 
+typedef enum {
+    tokId = 0x0001,	/** Typ tokenu: identifikátor (promenna) */
+    tokLiteral = 0x0002,	/** Typ tokenu: libovolný literál 
+                                (číslo, řetězec, bool, nil) */
+    tokOp = 0x0008,	/** Typ tokenu: operátor (+, <, ...) */
+    tokKeyW = 0x0010,	/** Typ tokenu: klíčové slovo (if) */
+    tokAssign = 0x0020,	/** Typ tokenu: přiřazení (=) */
+    tokLParen = 0x0040,	/** Typ tokenu: levá závorka ( */
+    tokRParen = 0x0080,	/** Typ tokenu: pravá závorka ) */
+    tokLBracket = 0x0100,	/** Typ tokenu: levá hranatá závorka [ */
+    tokRBracket = 0x0200,	/** Typ tokenu: pravá hranatá závorka ] */
+    tokColon = 0x0400,	/** Typ tokenu: dvojtečka : */
+    tokComma = 0x0800,	/** Typ tokenu: čárka , */
+    tokEndOfLine = 0x1000,	/** Typ tokenu: konec řádku (\n) */
+    tokEndOfFile = 0x2000	/** Typ tokenu: konec souboru */
+} TokenType;
+
+typedef enum {		/** Klíčová slova */
+      kElse = 0x0001, 
+      kEnd = 0x0002,
+      kFunction = 0x0004, 
+      kIf = 0x0008, 
+      kReturn = 0x0010, 
+      kWhile = 0x0020, NOTKEYW = -1
+} KeyWord;
+
 typedef struct {
-  enum {
-    tokId,	/** Typ tokenu: identifikátor (promenna) */
-    tokString,	/** Typ tokenu: řetězec ("hello") */
-    tokNum,	/** Typ tokenu: číslo (1.5) */
-    tokOp,	/** Typ tokenu: operátor (+, <, ...) */
-    tokKeyW,	/** Typ tokenu: klíčové slovo (if) */
-    tokAssign,	/** Typ tokenu: přiřazení (=) */
-    tokLParen,	/** Typ tokenu: levá závorka ( */
-    tokRParen,	/** Typ tokenu: pravá závorka ) */
-    tokLBracket,	/** Typ tokenu: levá hranatá závorka [ */
-    tokRBracket,	/** Typ tokenu: pravá hranatá závorka ] */
-    tokColon,	/** Typ tokenu: dvojtečka : */
-    tokComma,	/** Typ tokenu: konec řádku (enter) */
-    tokEndOfLine,	/** Typ tokenu: konec řádku (\n) */
-    tokEndOfFile	/** Typ tokenu: konec souboru */
-  } type;
+    TokenType type;
   union {
     RCString id;	/** Název symbolu */
-    RCString string;	/** Řetězec zapsaný ve zdrojáku */
     Value val;		/** Hodnota zapsaná ve zdrojáku */
     enum {		/** Unárni nebo binární operátor */
       opPlus, opMinus, opMultiple, opDivide, opPower,
       opLT, opGT, opLE, opGE, opNE, opEQ
     } op;
-    enum {		/** Klíčová slova */
-      kElse, kEnd, kFunction, kIf, kReturn, kWhile, NOTKEYW = -1
-    } keyw;
+    KeyWord keyw;
   } data;
 }  Token;
 
+typedef struct {
+    Token current;
+    FILE* file;
+} Scanner;
+
+/**
+ * Inicializuje objekt scanneru.
+ */
+void initScanner( Scanner* scanner, FILE* file );
+
+/**
+ * Vrati posledni nacteny token
+ */
+Token getTok( Scanner* scanner );
+
+/**
+ * Nacte dalsi token
+ */
+void consumeTok( Scanner* scanner );
+
+/**
+ * Zjisti, zda je aktualni token roven typu \a tok.
+ * Pokud ano, tak ho zkonzumuje.
+ * Pokud ne, haze vyjimku UnexpectedToken.
+ */
+Token expectTok( Scanner* scanner, TokenType tok );
+
+/**
+ * Jako expectTok, ale bez konzumace,
+ */
+Token testTok( Scanner* scanner, TokenType tok );
+
+/**
+ * Zjisti, zda je aktualni token keyword \a keyw.
+ * Pokud ne, haze vyjimku UnexpectedKeyWord.
+ */
+void expectKeyw( Scanner* scanner, KeyWord keyw );
+
+/**
+ * ExpectKeyw bez konzumace.
+ */
+void testKeyw( Scanner* scanner, KeyWord keyw );
 
 /**
  * Načte lexém, zpracuje a vrátí token.
@@ -48,7 +98,7 @@ typedef struct {
  * @param[in]	f	Ukazatel na otevřený soubor.
  * @return Vrací token.
  */
-Token scanner(FILE *f);
+Token scan(FILE *f);
 
 /**
  * Vrátí text chybové hlášky pro danou vyjímku

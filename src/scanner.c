@@ -7,6 +7,71 @@
 #include "scanner.h"
 #include "exceptions.h"
 
+void initScanner( Scanner* scanner, FILE* file )
+{
+    scanner->file = file;
+    scanner->current = scan( file );
+}
+
+Token getTok( Scanner* scanner )
+{
+    return scanner->current;
+}
+
+void consumeTok( Scanner* scanner )
+{
+    scanner->current = scan( scanner->file );
+}
+
+Token expectTok( Scanner* scanner, TokenType tok )
+{
+    Token current = testTok( scanner, tok );
+    consumeTok( scanner );
+}
+
+Token testTok( Scanner* scanner, TokenType tok )
+{
+    if( getTok( scanner ).type & tok )
+    {
+        Token theRealToken = getTok( scanner );
+        return theRealToken;
+    }
+    else
+    {
+        throw( UnexpectedToken, ((UnexpectedTokenException){ 
+            .expected = tok, 
+            .got = getTok( scanner ).type 
+        }));
+    }
+}
+
+void expectKeyw( Scanner* scanner, KeyWord keyw )
+{
+    testKeyw( scanner, keyw );
+    consumeTok( scanner );
+}
+
+void testKeyw( Scanner* scanner, KeyWord keyw )
+{
+    if( getTok( scanner ).type == tokKeyW )
+    {
+        if( getTok( scanner ).data.keyw != keyw )
+        {
+            throw( UnexpectedKeyWord, ((UnexpectedKeyWordException){ 
+                .expected = keyw, 
+                .got = getTok( scanner ).data.keyw 
+            }));
+        }
+    }
+    else
+    {
+        throw( UnexpectedToken, ((UnexpectedTokenException){
+            .expected = tokKeyW, 
+            .got = getTok( scanner ).type 
+        }));
+    }
+}
+
 /**
  * Funkce má za cíl detekovat, zda-li last_letter je znak oprerátoru, pokud ne, pak detekuje a
  * přeskočí komentář, detekuje token přiřazení (=) a závorky ('(',')','[',']').
@@ -300,8 +365,9 @@ bool add_char(FILE *f, char *last_letter, RCString *lexeme)
  * @param[in]	f	Ukazatel na otevřený soubor.
  * @return Vrací token.
  */
-Token scanner(FILE *f)
+Token scan(FILE *f)
 {
+    // TODO: přidat podporu true, false a nil
   Token token;
   RCString lexeme = makeEmptyRCString();	/** Načtený lexém. */
   static char last_letter = '\t';		/** Poslední načtený znak ze zdrojového kódu. */
@@ -363,9 +429,8 @@ Token scanner(FILE *f)
     
       conv_num = strtod(RCStringGetBuffer(&lexeme), &endptr);
       if (errno == 0 && *endptr == '\0') {
-        token.type = tokNum;
-        token.data.val.type = typeNumeric;
-        token.data.val.data.numeric = conv_num;
+        token.type = tokLiteral;
+        token.data.val = newValueNumeric( conv_num );
       }
       else {
         deleteRCString(&lexeme);
@@ -400,8 +465,8 @@ Token scanner(FILE *f)
       }
       
       // Řetězec se uloží do tokenu.
-      token.type = tokString;
-      token.data.string = copyRCString(&lexeme);
+      token.type = tokLiteral;
+      token.data.val = newValueString(lexeme);
       last_letter = getc(f);
     }
     else {

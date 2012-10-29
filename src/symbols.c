@@ -2,6 +2,11 @@
 
 #include <string.h>
 
+void setNewSymbol( RCString name, SymbolTable *localTable )
+{
+    // TODO
+}
+
 /**
  * Vyhledani uzlu (uzel=root/greater/lesser)
  * Vstupem ukazatel na ukazatel na vrchol stromu (Symbol**)

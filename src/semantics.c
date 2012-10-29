@@ -50,8 +50,8 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
 					newExp->parent = old;
 				}
 			break;
-			case tokNum:
-				printf("ctuNum\n");
+			case tokLiteral:
+				printf("ctuLiteral\n");
 				newExp = new( Expression );
 				*newExp = (Expression){ .type=CONSTANT, .value.constant=t.data.val };
 				if(pt.type==tokEndOfFile){

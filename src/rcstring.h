@@ -58,12 +58,14 @@ RCString makeRCString( const char* str );
  *   }
  * \endcode
  * Pripadne:
+ * \code
  *   void funkce( RCString* str )
  *   {
  *     RCString str2 = copyRCString( str );
  *     ...prace se str2...
  *     deleteRCString( &str2 );
  *   }
+ * \endcode
  */
 RCString copyRCString( RCString* str );
 

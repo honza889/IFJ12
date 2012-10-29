@@ -9,8 +9,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "global.h"
-#include "symbols.h"
-#include "value.h"
+#include "rcstring.h"
 
 /**
  * Symbol (prvek stromu symbolu)
@@ -28,15 +27,16 @@ typedef struct {
  int count;
 } SymbolTable;
 
+/** Prida symbol \a name do \a localTable. Pokud tento symbol jiz 
+ * existuje, tak hodi nejakou vyjimku.
+ */
+void setNewSymbol( RCString name, SymbolTable *localTable );
+
 /** Vrati index symbolu daneho jmena, pokud neexistuje, vytvori ho */
 int getSymbol(RCString name, SymbolTable *globalTable, SymbolTable *localTable);
 
 /** Uvolnuje symboly stromu symbolu (pocet prvku zachova) */
 void freeSymbolTable(SymbolTable *st);
-
-static inline Value* symbol(int index,Context* context){
- return (index>=0?&(context->locals)[index]:&(context->globals)[-index-1]);
-}
 
 static inline SymbolTable newSymbolTable(){
 	return (SymbolTable){ .root=NULL, .count=0 };

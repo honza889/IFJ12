@@ -12,6 +12,8 @@ typedef enum
 
 	/* Syntakticka analyza */
 	SyntaxError, // exit 2
+    UnexpectedToken,
+    UnexpectedKeyWord,
 
 	/* Lexikalni analyza */
 	UndefinedVariable, // exit 3
@@ -46,6 +48,18 @@ typedef struct {
   } type;
 } SyntaxErrorException;
 
+typedef struct
+{
+    int expected;
+    int got;
+} UnexpectedTokenException;
+
+typedef struct
+{
+    int expected;
+    int got;
+} UnexpectedKeyWordException;
+
 typedef int UndefinedVariableException;
 typedef bool IncompatibleComparisonException;
 typedef Value InvalidConversionException;
@@ -68,6 +82,8 @@ typedef struct
 		EXCEPTION( BadArgumentType );
 		EXCEPTION( IndexOutOfBounds );
 		EXCEPTION( SyntaxError );
+        EXCEPTION( UnexpectedToken );
+        EXCEPTION( UnexpectedKeyWord );
         EXCEPTION( OutOfMemory );
 	} value;
 } Exception;
