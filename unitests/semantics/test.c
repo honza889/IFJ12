@@ -14,10 +14,10 @@ BEGIN_TEST
   Function mainFunc = semantics(0,f,&globalSymbolTable);
 
   // compareOperators() jen zletma
-  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } ) == false )
-  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } ) == false )
-  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } ) == false )
-  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } ) == true )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=ADD } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=ADD } } ) == false )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=MULTIPLY } } ) == false )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=ADD } } ) == false )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=ADD } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=MULTIPLY } } ) == true )
 
   TEST( mainFunc.value.userDefined.statements.count >= 4 )
 
