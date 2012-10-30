@@ -308,34 +308,45 @@ bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned *li
 /**
  * Funkce má za cíl detekovat, zda-li řetězec uložený v lexeme je klíčové slovo.
  * @param[in]	lexeme	RCString obsahující řetězec pro porovnání.
- * @return Vrací chybový kód.
+ * @param[out]	token	Ukazatel na strukturu Token.
+ * @return Vrací (bool) true, když uspěje (detekuje klíčové slovo a uloží do \a token), jinak false.
  */
-int cmp_key_words(RCString lexeme)
+bool det_key_word(RCString lexeme, Token *token)
 {
   RCString cmp_lexeme = copyRCString(&lexeme);
   RCStringAppendChar(&cmp_lexeme, '\0');	// Přidán znak '\0' na konec RCStringu pro fci strcmp().
-  enum {					/** Klíčová slova */
-    kElse, kEnd, kFunction, kIf,
-    kReturn, kWhile, NOTKEYW = -1
-  } keyw;
+  bool result = true;				// Proměnná s návratovou hodnotou.
+  
+  token->type = tokKeyW;	// Nejprve zjistím jestli je token z výčtu klíčových slov.
   
   if (! strcmp("else", RCStringGetBuffer(&cmp_lexeme)))
-    keyw = kElse;
+    token->data.keyw = kElse;
   else if (! strcmp("end", RCStringGetBuffer(&cmp_lexeme)))
-    keyw = kEnd;
+    token->data.keyw = kEnd;
   else if (! strcmp("function", RCStringGetBuffer(&cmp_lexeme)))
-    keyw = kFunction;
+    token->data.keyw = kFunction;
   else if (! strcmp("if", RCStringGetBuffer(&cmp_lexeme)))
-    keyw = kIf;
+    token->data.keyw = kIf;
   else if (! strcmp("return", RCStringGetBuffer(&cmp_lexeme)))
-    keyw = kReturn;
+    token->data.keyw = kReturn;
   else if (! strcmp("while", RCStringGetBuffer(&cmp_lexeme)))
-    keyw = kWhile;
-  else
-    keyw = NOTKEYW;
+    token->data.keyw = kWhile;
+  else {
+    
+    token->type = tokLiteral;	// Poté se dívám na klíčová slova mimo výčet.
+    
+    if (! strcmp("true", RCStringGetBuffer(&cmp_lexeme)))
+      token->data.val = newValueBoolean(true);
+    else if (! strcmp("false", RCStringGetBuffer(&cmp_lexeme)))
+      token->data.val = newValueBoolean(false);
+    else if (! strcmp("nil", RCStringGetBuffer(&cmp_lexeme)))
+      token->data.val = newValueNil();
+    else
+      result = false;
+  }
   
   deleteRCString(&cmp_lexeme);
-  return keyw;
+  return result;
 }
 
 /**
@@ -366,7 +377,6 @@ bool add_char(FILE *f, char *last_letter, RCString *lexeme)
  */
 Token scan(FILE *f)
 {
-    // TODO: přidat podporu true, false a nil
   Token token;
   RCString lexeme = makeEmptyRCString();	/** Načtený lexém. */
   static char last_letter = '\t';		/** Poslední načtený znak ze zdrojového kódu. */
@@ -404,11 +414,8 @@ Token scan(FILE *f)
         add_char(f, &last_letter, &lexeme);
       } while (isalnum(last_letter));
       
-      if ((keyw = cmp_key_words(lexeme)) != NOTKEYW) {
-        token.type = tokKeyW;
-        token.data.keyw = keyw;
-      }
-      else {
+      // Pokud se nedetekuje (a neuloží do tokenu) klíčové slovo, pak je to identifikátor.
+      if (! det_key_word(lexeme, &token)) {
         token.type = tokId;
         token.data.id = copyRCString(&lexeme);
       }
