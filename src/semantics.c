@@ -34,10 +34,9 @@ void freeStatementList(StatementList *list){
  * @return Jestli je 1. vice prioritní než 2.
  */
 bool compareOperators(Operator op1, Operator op2){
-    // unární jsou prioritnější
+    // unární operátory jsou prioritnější
     if(op2.type==UNARYOP) return true;
     if(op1.type==UNARYOP) return false;
-    
     // jinak je prioritnejší operátor s vyšší hodnotou prvních 4 bitů
     return ( (op1.value.binary.type & 0xF0) > (op2.value.binary.type & 0xF0) );
 }
@@ -54,6 +53,9 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
         switch(t.type){
             case tokId:
                 printf("ctuId\n");
+                if(pt.type==tokLParen){ // operand je hned za (pravou!) zavorkou - chyba
+                  throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd}));
+                }
                 newExp = new( Expression );
                 *newExp = (Expression){ .type=VARIABLE, .value.variable=getSymbol(t.data.id,global,local) };
                 if(pt.type==tokEndOfFile){
@@ -84,10 +86,6 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
             break;
             case tokOp:
                 printf("ctuOperator\n");
-                if(pt.type==tokOp){
-                  // pred timto operatorem je dalsi operator - nepripustne
-                  throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther}));
-                }
                 newExp = new( Expression );
                 *newExp = (Expression){ .type=OPERATOR };
                 if(pt.type==tokEndOfFile){ // prvnim tokenem vyrazu?
@@ -100,6 +98,11 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
                         throw(SyntaxError,((SyntaxErrorException){.type=BinaryOperatorAtBegin}));
                     }
                 }else{ // ve vyrazu jiz je promenna/konstanta
+                    
+                    if(pt.type==tokOp){ // pred timto operatorem je dalsi operator - nepripustne
+                        throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther}));
+                    }
+                    
                     newExp->value.operator.type = BINARYOP;
                     switch(t.data.op){
                         case opPlus:     newExp->value.operator.value.binary.type = ADD; break;
@@ -120,10 +123,7 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
                     
                     while(
                       oldExp->parent!=NULL &&
-                      compareOperators(
-                        oldExp->parent->value.operator,
-                        newExp->value.operator
-                      )
+                      compareOperators(oldExp->parent->value.operator, newExp->value.operator)
                     ){
                       printf("lezuVys\n");
                       oldExp = oldExp->parent;
@@ -179,6 +179,9 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
             break;
             case tokRParen: case tokComma: case tokEndOfLine:
                 printf("konecVyrazu\n");
+                if(pt.type==tokOp){ // na konci vyrazu nesmi byt operator
+                  throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd}));
+                }
                 if(lastToken) *lastToken = t;
                 return wholeExpression;
             break;

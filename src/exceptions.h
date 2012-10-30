@@ -37,14 +37,16 @@ typedef struct {
   unsigned line_num;
 } ScannerErrorException;
 
+/** Vyjimka syntakticke analyzy */
 typedef struct {
   enum {
-    BinaryOperatorAtBegin,
     BadTokenInExpression,
     BadTokenAtBeginOfStatement,
     AssignWithoutAssignOperator,
     StrangeSyntax,
-    TwoOperatorsNextToEachOther
+    BinaryOperatorAtBegin,
+    OperatorAtTheEnd,
+    TwoOperatorsNextToEachOther,
   } type;
 } SyntaxErrorException;
 
