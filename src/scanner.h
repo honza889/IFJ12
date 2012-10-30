@@ -28,7 +28,7 @@ typedef enum {		/** Klíčová slova */
       kFunction = 0x0004, 
       kIf = 0x0008, 
       kReturn = 0x0010, 
-      kWhile = 0x0020, NOTKEYW = -1
+      kWhile = 0x0020
 } KeyWord;
 
 typedef struct {
@@ -101,8 +101,8 @@ void testKeyw( Scanner* scanner, KeyWord keyw );
 Token scan(FILE *f);
 
 /**
- * Vrátí text chybové hlášky pro danou vyjímku
- * @param Vyjimka vracena scannerem
+ * Vrátí text chybové hlášky pro danou výjimku.
+ * @param[in] e Výjimka vrácena scannerem.
  */
 void scannerErrorPrint(ScannerErrorException e);
 
