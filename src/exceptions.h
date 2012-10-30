@@ -105,21 +105,19 @@ void exceptions_impl_throw( Exception e );
  * Definuje blok, ve kterém může nastat výjimka.
  */
 #define try \
-    if( !setjmp( *exceptions_pushBuffer() ) ) for \
-    ( \
-        exceptions_impl_loopHack = 1; \
-        exceptions_impl_loopHack != 0; \
-        exceptions_popBuffer(), exceptions_impl_loopHack = 0 \
-    )
+    if( !setjmp( *exceptions_pushBuffer() ) ) \
+    {
 
 /**
  * Definuje blok handlerů výjimek
  */
 #define catch \
-  else for \
-  ( \
-    exceptions_impl_loopHack = 1; \
-    exceptions_impl_loopHack != 0; \
+        exceptions_popBuffer(); \
+    }   \
+    else for \
+    ( \
+        exceptions_popBuffer(), exceptions_impl_loopHack = 1; \
+        exceptions_impl_loopHack != 0; \
     exceptions_endCatchBlock(), exceptions_impl_loopHack = 0 \
   )
 
