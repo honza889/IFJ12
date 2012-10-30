@@ -97,17 +97,17 @@ struct SBinaryOp
 {
   enum // prvni 4 bity urcuji prioritu operatoru
   {
-    ADD=0x00,
-    SUBTRACT=0x01,
-    MULTIPLY=0x10,
-    DIVIDE=0x11,
-    /* ROW ROW FIGHT THE */ POWER=0x20,
-    EQUALS=0x30,
-    NOTEQUALS=0x31,
-    LESS=0x32,
-    GREATER=0x33,
-    LEQUAL=0x34,
-    GEQUAL=0x35
+    ADD=0x11,
+    SUBTRACT=0x12,
+    MULTIPLY=0x21,
+    DIVIDE=0x22,
+    /* ROW ROW FIGHT THE */ POWER=0x31,
+    EQUALS=0x51,
+    NOTEQUALS=0x52,
+    LESS=0x53,
+    GREATER=0x54,
+    LEQUAL=0x55,
+    GEQUAL=0x56
   } type;
   
   Expression* left;

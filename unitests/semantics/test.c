@@ -28,7 +28,7 @@ void printTreeExpression( Expression *root, int level )
   if ( root->type != OPERATOR ) {
     padding ( '\t', level );
     if (root->type == CONSTANT && root->value.constant.type == typeNumeric)
-      printf ( "%e\n", root->value.constant.data.numeric );
+      printf ( "[%e]\n", root->value.constant.data.numeric );
     else
       puts ( "~" );
   }
@@ -36,7 +36,7 @@ void printTreeExpression( Expression *root, int level )
     if (root->value.operator.type == BINARYOP) {
       printTreeExpression ( root->value.operator.value.binary.right, level + 1 );
       padding ( '\t', level );
-      printf ( "%x\n", root->value.operator.value.binary.type );
+      printf ( "(%x)\n", root->value.operator.value.binary.type );
       printTreeExpression ( root->value.operator.value.binary.left, level + 1 );
     }
     else {
@@ -59,8 +59,8 @@ BEGIN_TEST
   // compareOperators() jen zletma
   TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=ADD } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=ADD } } ) == false )
   TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=MULTIPLY } } ) == false )
-  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=ADD } } ) == false )
-  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=ADD } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=MULTIPLY } } ) == true )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=ADD } } ) == true )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=ADD } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=MULTIPLY } } ) == false )
 
   TEST( mainFunc.value.userDefined.statements.count >= 4 )
 
@@ -74,7 +74,7 @@ BEGIN_TEST
   TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->value.operator.value.binary.left->type == CONSTANT )
   TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->value.operator.value.binary.right->type == VARIABLE )
 
-  printTreeExpression(&mainFunc.value.userDefined.statements.item[3].value.ret, 0);
+  //printTreeExpression(&mainFunc.value.userDefined.statements.item[3].value.ret, 0);
   
   freeSymbolTable(&globalSymbolTable);
   fclose(f);
