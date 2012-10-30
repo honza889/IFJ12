@@ -138,12 +138,10 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
                     
                     // Je-li operace mene prioritni nez predchozi, misto predchozi operace
                     // pujdeme na misto jeste predchodnejsi (parentnejsi) operace
-                    // TODO: Zprovoznit!
-                    //while( oldExp!=NULL && compareOperators(oldExp->value.operator, newExp->value.operator) ){
-                    //  printf("lezuVys\n");
-                    //  oldExp = oldExp->parent;
-                    //}
-                    //printf("vylezeno-%d\n",oldExp->type);
+                    while( oldExp->parent!=NULL && compareOperators(oldExp->value.operator, newExp->value.operator) ){
+                      printf("lezuVys\n");
+                      oldExp = oldExp->parent;
+                    }
                     // nyni musi oldExp ukazovat na prvek, na jehoz misto nastoupi novy
                     
                     newExp->parent = oldExp->parent;
