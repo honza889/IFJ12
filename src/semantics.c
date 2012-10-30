@@ -72,12 +72,22 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
                     wholeExpression = newExp; // do korene (je prvnim prvkem vyrazu)
                     newExp->parent = NULL;
                 }else if(pt.type==tokOp){
-                    oldExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
-                    newExp->parent = oldExp;
+                    // pripojit za nejnovejsi operator
+                    if(oldExp->value.operator.type==BINARYOP){
+                        oldExp->value.operator.value.binary.right = newExp;
+                        newExp->parent = oldExp;
+                    }else{
+                        oldExp->value.operator.value.unary.operand = newExp;
+                        newExp->parent = oldExp;
+                    }
                 }
             break;
             case tokOp:
                 printf("ctuOperator\n");
+                if(pt.type==tokOp){
+                  // pred timto operatorem je dalsi operator - nepripustne
+                  throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther}));
+                }
                 newExp = new( Expression );
                 *newExp = (Expression){ .type=OPERATOR };
                 if(pt.type==tokEndOfFile){ // prvnim tokenem vyrazu?
