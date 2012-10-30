@@ -48,8 +48,15 @@ static inline Value evalVariable( Variable* var, Context* context )
 
 Value evalUnaryOp( UnaryOp* op, Context* context )
 {
-  // TODO
-  return newValueUndefined();
+    Value ret = newValueUndefined();
+    Value zero = newValueNumeric( 0.0 );
+    Value number = evalExpression( op->operand, context );
+    switch( op->type )
+    {
+        // nejlepsi switch ever
+        case MINUS: ret = subtractValue( &zero, &number ); break;
+    }
+    return ret;
 }
 
 Value evalBinaryOp( BinaryOp* op, Context* context )
