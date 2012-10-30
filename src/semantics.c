@@ -30,47 +30,16 @@ void freeStatementList(StatementList *list){
 
 /**
  * Porovná prioritu operátorů
- * (Používá se při sestavování Expression - Nechť první je existující
- *  a druhý je nový. Vrátí-li true, musím o patro výše.)
- * @return true je-li 1. mene prioritní než 2, jinak false
+ * (Používá se při sestavování Expression - je-li druhý operátor méně prioritní (patří výše), vrátí true)
+ * @return Jestli je 1. vice prioritní než 2.
  */
 bool compareOperators(Operator op1, Operator op2){
     // unární jsou prioritnější
     if(op2.type==UNARYOP) return true;
     if(op1.type==UNARYOP) return false;
     
-    // porovnávací operátory mají přednost
-    if((
-        op2.value.binary.type==EQUALS ||
-        op2.value.binary.type==NOTEQUALS ||
-        op2.value.binary.type==LESS ||
-        op2.value.binary.type==GREATER ||
-        op2.value.binary.type==LEQUAL ||
-        op2.value.binary.type==GEQUAL
-    ) && (
-        op1.value.binary.type!=EQUALS &&
-        op1.value.binary.type!=NOTEQUALS &&
-        op1.value.binary.type!=LESS &&
-        op1.value.binary.type!=GREATER &&
-        op1.value.binary.type!=LEQUAL &&
-        op1.value.binary.type!=GEQUAL
-    )) return true;
-    // umocňování má přednost
-    if((
-        op2.value.binary.type==POWER
-    ) && (
-        op1.value.binary.type!=POWER
-    )) return true;
-    // násobení a dělení má přednost
-    if((
-        op2.value.binary.type==MULTIPLY ||
-        op2.value.binary.type==DIVIDE
-    ) && (
-        op1.value.binary.type!=MULTIPLY &&
-        op1.value.binary.type!=DIVIDE
-    )) return true;
-    
-    return false;
+    // jinak je prioritnejší operátor s vyšší hodnotou prvních 4 bitů
+    return ( (op1.value.binary.type & 0xF0) > (op2.value.binary.type & 0xF0) );
 }
 
 /**
@@ -138,30 +107,36 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
                     
                     // Je-li operace mene prioritni nez predchozi, misto predchozi operace
                     // pujdeme na misto jeste predchodnejsi (parentnejsi) operace
-                    // TODO: Zprovoznit!
-                    //while( oldExp!=NULL && compareOperators(oldExp->value.operator, newExp->value.operator) ){
-                    //  printf("lezuVys\n");
-                    //  oldExp = oldExp->parent;
-                    //}
-                    //printf("vylezeno-%d\n",oldExp->type);
-                    // nyni musi oldExp ukazovat na prvek, na jehoz misto nastoupi novy
+                    
+                    while(
+                      oldExp->parent!=NULL &&
+                      compareOperators(
+                        oldExp->parent->value.operator,
+                        newExp->value.operator
+                      )
+                    ){
+                      printf("lezuVys\n");
+                      oldExp = oldExp->parent;
+                    }
                     
                     newExp->parent = oldExp->parent;
+                    if(oldExp->parent==NULL){
+                      printf("je novym korenem\n");
+                      wholeExpression = newExp;
+                    }else{
+                      if(newExp->parent->value.operator.type==BINARYOP){
+                        printf("nahrazuje binarni\n");
+                        newExp->parent->value.operator.value.binary.right = newExp;
+                      }else{
+                        printf("nahrazuje unarni\n");
+                        newExp->parent->value.operator.value.unary.operand = newExp;
+                      }
+                    }
                     oldExp->parent = newExp;
-                    newExp->value.operator.value.binary.left = oldExp;
-                    newExp->value.operator.value.binary.right = NULL;
-                    if(newExp->parent==NULL){ // je-li exitujici promenna/konstanta korenem
-                        wholeExpression = newExp; // bude novy operator novym korenem
-                    }else{ // neni-li korenem
-                        if(newExp->parent->type!=OPERATOR){
-                            ERROR("Interni chyba interpretru pri sestavovani AST: Rodicem prvku ve vyrazu neni operator ani NULL!");
-                            exit(99);
-                        }
-                        if(newExp->parent->value.operator.type==BINARYOP){
-                            newExp->parent->value.operator.value.binary.right = newExp;
-                        }else{
-                            newExp->parent->value.operator.value.unary.operand = newExp;
-                        }
+                    if(newExp->value.operator.type==BINARYOP){
+                      newExp->value.operator.value.binary.left = oldExp;
+                    }else{
+                      printf("nebinarni operator uprostred!\n");
                     }
                 }
             break;

@@ -4,6 +4,49 @@
 #include "ast.h"
 #include "../test.h"
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// from http://www.daniweb.com/software-development/c/threads/146112/printing-a-binary-tree
+/////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Zarovnání - využívá fce printTreeExpression().
+ */
+void padding( char ch, int n )
+{
+  int i;
+
+  for ( i = 0; i < n; i++ )
+    putchar ( ch );
+}
+
+/**
+ * Vytiskne strom výrazu.
+ * @param[in] root	Kořen stromu.
+ * @param[in] level	Odsazení kořenu zleva (většinou 0).
+ */
+void printTreeExpression( Expression *root, int level )
+{
+  if ( root->type != OPERATOR ) {
+    padding ( '\t', level );
+    if (root->type == CONSTANT && root->value.constant.type == typeNumeric)
+      printf ( "[%e]\n", root->value.constant.data.numeric );
+    else
+      puts ( "~" );
+  }
+  else {
+    if (root->value.operator.type == BINARYOP) {
+      printTreeExpression ( root->value.operator.value.binary.right, level + 1 );
+      padding ( '\t', level );
+      printf ( "(%x)\n", root->value.operator.value.binary.type );
+      printTreeExpression ( root->value.operator.value.binary.left, level + 1 );
+    }
+    else {
+      padding ( '\t', level );
+      puts ( "-" );
+    }
+  }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 BEGIN_TEST
   FILE* f=fopen("unitests/semantics/input.txt","r");
   if(f==NULL) ERROR("Nepodarilo se otevrit soubor!");
@@ -14,10 +57,10 @@ BEGIN_TEST
   Function mainFunc = semantics(0,f,&globalSymbolTable);
 
   // compareOperators() jen zletma
-  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } ) == false )
-  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } ) == false )
-  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } ) == false )
-  TEST( compareOperators( (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=ADD } } , (Operator){ .type=BINARYOP, .value=(BinaryOp){ .type=MULTIPLY } } ) == true )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=ADD } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=ADD } } ) == false )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=MULTIPLY } } ) == false )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=MULTIPLY } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=ADD } } ) == true )
+  TEST( compareOperators( (Operator){ .type=BINARYOP, .value.binary={ .type=ADD } } , (Operator){ .type=BINARYOP, .value.binary=(BinaryOp){ .type=MULTIPLY } } ) == false )
 
   TEST( mainFunc.value.userDefined.statements.count >= 4 )
 
@@ -31,6 +74,8 @@ BEGIN_TEST
   TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->value.operator.value.binary.left->type == CONSTANT )
   TEST( mainFunc.value.userDefined.statements.item[1].value.assignment.source.value.operator.value.binary.right->value.operator.value.binary.right->type == VARIABLE )
 
+  //printTreeExpression(&mainFunc.value.userDefined.statements.item[3].value.ret, 0);
+  
   freeSymbolTable(&globalSymbolTable);
   fclose(f);
 
