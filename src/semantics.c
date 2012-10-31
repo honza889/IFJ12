@@ -46,7 +46,7 @@ bool compareOperators(Operator op1, Operator op2){
  */
 Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *local, Token *lastToken){
     Expression *wholeExpression = NULL;
-    Expression *newExp, *oldExp, *tmp;
+    Expression *newExp, *oldExp, *subExp, *tmp;
     Token t; // aktualni token
     Token pt = {.type=tokEndOfFile}; // predchazejici token
     while((t=syntax(f)).type!=tokEndOfFile){
@@ -146,7 +146,7 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
                     if(newExp->value.operator.type==BINARYOP){
                       newExp->value.operator.value.binary.left = oldExp;
                     }else{
-                      printf("nebinarni operator uprostred!\n");
+                      throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
                     }
                 }
             break;
@@ -161,18 +161,24 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
                     oldExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
                     newExp->parent = oldExp;
                 }else if(pt.type==tokId){ // zavorka volani funkce
-                    // čeká na standardizaci ExpressionListu
-                    //FunctionCall call={.params={NULL,0}, .function=getSymbol(pt.data.id,global,NULL) };
+                    printf("jeToVolaniFunkce\n");
+                    FunctionCall call=(FunctionCall){.params={NULL,0}, .function=getSymbol(pt.data.id,global,NULL) };
                     Token previousToken;
-                    int paramsCount=0;
+                    ExpressionList params = {NULL,0};
                     do{
-                        newExp = semanticOfExpression(f,global,local,&previousToken);
-                        if(newExp == NULL) break;
-                        printf("ctuParametr\n");
-                        paramsCount++;
+                        printf("ctuParametr(%d)\n",params.count);
+                        subExp = semanticOfExpression(f,global,local,&previousToken);
+                        if(subExp == NULL) break;
+                        // TODO: pridavani parametru do ExpressionListu params
+                        params.count++;
                     }while(previousToken.type==tokComma);
-                    printf("docteno=%d\n",paramsCount);
                     
+                    oldExp->type = FUNCTION_CALL;
+                    oldExp->value.functionCall = (FunctionCall){
+                        .params=params,
+                        .function=getSymbol(pt.data.id,global,NULL)
+                    };
+                    newExp = oldExp; // nevznikla nova expression, jen jsme doplnili id na functionCall
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
                 }
