@@ -5,6 +5,7 @@
 #include "exceptions.h"
 #include "alloc.h"
 
+
 /**
  * Přidá položku do StatementListu
  */
@@ -20,13 +21,26 @@ void AddToStatementList(StatementList *list, Statement newSt){
 }
 
 /**
- * Uvolní StatementList
+ * Přidá položku do ExpressionListu
  */
-void freeStatementList(StatementList *list){
+void AddToExpressionList(ExpressionList *list, Expression newExp){
+    if(list->expressions==NULL){ // novy seznam
+        list->count=1;
+        list->expressions = new( Expression );
+    }else{ // pridani do neprazdneho seznamu
+        list->count++;
+        list->expressions = resizeArray( list->expressions, Expression, list->count );
+    }
+    memcpy(&list->expressions[list->count-1],&newExp,sizeof(Expression));
+}
+
+
+static inline void freeStatementList(StatementList *list){
     free(list->item);
     list->item=NULL;
     list->count=0;
 }
+
 
 /**
  * Porovná prioritu operátorů
@@ -162,23 +176,22 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
                     newExp->parent = oldExp;
                 }else if(pt.type==tokId){ // zavorka volani funkce
                     printf("jeToVolaniFunkce\n");
-                    FunctionCall call=(FunctionCall){.params={NULL,0}, .function=getSymbol(pt.data.id,global,NULL) };
                     Token previousToken;
+                    // priprava seznamu parametru
                     ExpressionList params = {NULL,0};
                     do{
                         printf("ctuParametr(%d)\n",params.count);
                         subExp = semanticOfExpression(f,global,local,&previousToken);
                         if(subExp == NULL) break;
-                        // TODO: pridavani parametru do ExpressionListu params
-                        params.count++;
+                        AddToExpressionList(&params,*subExp);
                     }while(previousToken.type==tokComma);
-                    
+                    // sestaveni FunctionCall
                     oldExp->type = FUNCTION_CALL;
                     oldExp->value.functionCall = (FunctionCall){
                         .params=params,
                         .function=getSymbol(pt.data.id,global,NULL)
                     };
-                    newExp = oldExp; // nevznikla nova expression, jen jsme doplnili id na functionCall
+                    newExp = oldExp; // nevznikla nova expression, jen jsme zmenili VARIABLE na FUNCTION_CALL
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
                 }
@@ -197,7 +210,7 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
         pt = t;
         oldExp = newExp;
     }
-    return wholeExpression;
+    return wholeExpression; // jen pro kompilator, skutecny return je vyse!
 }
 
 /**
