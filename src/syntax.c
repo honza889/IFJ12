@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdbool.h>
 #include "global.h"
 #include "syntax.h"
@@ -7,9 +8,9 @@
 #include "alloc.h"
 
 Token syntax(FILE *f){
-	// TODO: Kontrola syntaxe - pokud selze, vyjimka
-	//throw(SyntaxError,15);
-	return scan(f);
+        // TODO: Kontrola syntaxe - pokud selze, vyjimka
+        //throw(SyntaxError,15);
+        return scan(f);
 }
 
 void addFunctionToAst( Ast* ast, Function* function );
@@ -20,7 +21,9 @@ void parseExpression( Scanner* s, Expression* expr );
 void parseWhile( Scanner* s, StatementList* sl );
 void parseIf( Scanner* s, StatementList* sl );
 void parseReturn( Scanner* s, StatementList* sl );
+void detectAssignment( Scanner* s, StatementList* sl );
 void parseAssignment( Scanner* s, StatementList* sl );
+void parseSubstring( Scanner* s, StatementList* sl );
 void parseStatement( Scanner* s, StatementList* sl );
 void parseFunction( Scanner* s, Function* func );
 void parseFunctionParameters( Scanner* s, Function* func );
@@ -137,7 +140,7 @@ void parseStatement( Scanner* s, StatementList* sl )
     testTok( s, tokId | tokKeyW | tokEndOfLine );
     if( getTok( s ).type == tokId )
     {
-        parseAssignment( s, sl );
+        detectAssignment( s, sl );
     }
     else if( getTok( s ).type == tokKeyW ) 
     {
@@ -159,6 +162,7 @@ void parseStatement( Scanner* s, StatementList* sl )
 
 void parseReturn( Scanner* s, StatementList* sl )
 {
+    // BUG: Na co je StatementList, když se očividně nepoužívá?
     Statement stmt;
     stmt.type = RETURN;
     
@@ -167,9 +171,32 @@ void parseReturn( Scanner* s, StatementList* sl )
     expectTok( s, tokEndOfLine );    
 }
 
+void detectAssignment( Scanner* s, StatementList* sl )
+{
+    assert(getTokN(s, 0).type == tokId);
+    expectNextTok(s, tokAssign);
+    testTokN(s, tokId, 1);
+    if (getTokN(s, 2).type == tokLBracket)
+      parseSubstring(s, sl);
+    else
+      parseAssignment(s, sl);
+}
+
 void parseAssignment( Scanner* s, StatementList* sl )
 {
-    //TODO
+    Assignment ass;
+//     ass.destination = ; // TODO: Jak se implementuje? Jak index do pole proměnných (podle symbols.h)?
+//     ass.source;
+//     parseExpression(s, ); // TODO: Jak tam mám naládovat výraz?
+}
+
+void parseSubstring( Scanner* s, StatementList* sl )
+{
+    Substring substr;	// TODO
+//     substr.destination = ;
+//     substr.source;
+//     substr.offset;
+//     substr.length;
 }
 
 void parseIf( Scanner* s, StatementList* sl )

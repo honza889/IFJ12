@@ -5,6 +5,8 @@
 #include "rcstring.h"
 #include "exceptions.h"
 
+#define SCAN_BUF_CAP 4
+
 typedef enum {
     tokId = 0x0001,	/** Typ tokenu: identifikátor (promenna) */
     tokLiteral = 0x0002,	/** Typ tokenu: libovolný literál 
@@ -45,8 +47,10 @@ typedef struct {
 }  Token;
 
 typedef struct {
-    Token current;
-    FILE* file;
+    unsigned first;			/** Index na první prvek bufferu. */
+    unsigned count;			/** Počet prvků v bufferu. */
+    Token current[SCAN_BUF_CAP];	/** Buffer do kterého se načítají tokeny. */
+    FILE* file;				/** Ukazatel na otevřený soubor. */
 } Scanner;
 
 /**
@@ -54,25 +58,31 @@ typedef struct {
  */
 void initScanner( Scanner* scanner, FILE* file );
 
+/* Následují funkce nad frontou tokenů. */
+/*
+ * Buffer a fronta je zde to samé pole. Funkce nad frontou berou zepředu
+ * a fce nad bufferem můžou přistupovat přímo k prvkům na určitém indexu.
+ * Buffer má ve struktuře Scanner proměnné pro práci s ním.
+ */
 /**
- * Vrati posledni nacteny token
+ * Vrátí první token ve frontě.
  */
 Token getTok( Scanner* scanner );
 
 /**
- * Nacte dalsi token
+ * Zkonzumuje aktuální token a načte další.
  */
 void consumeTok( Scanner* scanner );
 
 /**
  * Zjisti, zda je aktualni token roven typu \a tok.
- * Pokud ano, tak ho zkonzumuje.
+ * Pokud ano, tak ho zkonzumuje. \see consumeTok
  * Pokud ne, haze vyjimku UnexpectedToken.
  */
 Token expectTok( Scanner* scanner, TokenType tok );
 
 /**
- * Jako expectTok, ale bez konzumace,
+ * Jako expectTok, ale bez konzumace.
  */
 Token testTok( Scanner* scanner, TokenType tok );
 
@@ -87,6 +97,33 @@ void expectKeyw( Scanner* scanner, KeyWord keyw );
  */
 void testKeyw( Scanner* scanner, KeyWord keyw );
 
+/* Následují funkce nad bufferem. */
+/**
+ * Vrátí token načtený do bufferu na daném indexu
+ */
+Token getTokN( Scanner* scanner, unsigned index );
+
+/**
+ * Zkonzumuje \a N tokenů.
+ */
+void consumeTokN( Scanner* scanner, unsigned N );
+
+/**
+ * Zjisti, zda je následující token roven typu \a tok.
+ * Pokud ano, tak ho zkonzumuje.
+ * Pokud ne, háže výjimku UnexpectedToken.
+ * @return Vrací token, který zkonzumoval.
+ */
+Token expectNextTok( Scanner* scanner, TokenType tok );
+
+/**
+ * Jako expectTokN, ale bez konzumace.
+ */
+Token testTokN( Scanner* scanner, TokenType tok, unsigned index );
+
+/******************/
+/* Hlavní funkce. */
+/******************/
 /**
  * Načte lexém, zpracuje a vrátí token.
  * Může vracet tyto vyjímky:

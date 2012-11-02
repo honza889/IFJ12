@@ -49,5 +49,5 @@ debug: $(addprefix obj/dbg/,$(addsuffix .o,$(SOURCES)))
 	gcc -o ifj12-dbg $^ $(CFLAGS) $(LDB)
 
 clean:
-	rm -f obj/*.o obj/dbg/*.o dep/*.d ./ifj12 ./ifj12-dbg unitests/*/test unitests/*/test.o unitests/*/out
+	rm -f obj/*.o obj/dbg/*.o dep/*.d dep/dbg/*.d ./ifj12 ./ifj12-dbg unitests/*/test unitests/*/test.o unitests/*/out
 

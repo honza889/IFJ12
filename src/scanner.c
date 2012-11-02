@@ -9,22 +9,35 @@
 
 void initScanner( Scanner* scanner, FILE* file )
 {
+    scanner->first = 0;
+    scanner->count = 1;
     scanner->file = file;
-    scanner->current = scan( file );
+    scanner->current[scanner->first] = scan( file );
 }
 
+/*       _\|/_
+         (o o)
+ +----oOO-{_}-OOo------------------------------------------+
+ | Následují funkce nad bufferem o velikosti SCAN_BUF_CAP. |
+ +--------------------------------------------------------*/
+
+/*********************************/
+/* Fce nad prvním prvkem fronty. */
+/*********************************/
 Token getTok( Scanner* scanner )
 {
-    return scanner->current;
+    assert(scanner->count > 0);
+    return scanner->current[scanner->first];
 }
 
 void consumeTok( Scanner* scanner )
 {
-    scanner->current = scan( scanner->file );
+    consumeTokN(scanner, 1);
 }
 
 Token expectTok( Scanner* scanner, TokenType tok )
 {
+    assert(scanner->count > 0);
     Token current = testTok( scanner, tok );
     consumeTok( scanner );
     return current;
@@ -32,8 +45,10 @@ Token expectTok( Scanner* scanner, TokenType tok )
 
 Token testTok( Scanner* scanner, TokenType tok )
 {
+    assert(scanner->count > 0);
     if( ! ( getTok( scanner ).type & tok ) )
     {
+        // BUG: Může způsobit leak!
         throw( UnexpectedToken, ((UnexpectedTokenException){ 
             .expected = tok, 
             .got = getTok( scanner ).type 
@@ -64,6 +79,7 @@ void testKeyw( Scanner* scanner, KeyWord keyw )
     }
     else
     {
+        // BUG: Může způsobit leak!
         throw( UnexpectedToken, ((UnexpectedTokenException){
             .expected = tokKeyW, 
             .got = getTok( scanner ).type 
@@ -71,6 +87,74 @@ void testKeyw( Scanner* scanner, KeyWord keyw )
     }
 }
 
+/**********************************************/
+/* Fce nad bufferem o velikosti SCAN_BUF_CAP. */
+/**********************************************/
+Token getTokN( Scanner* scanner, unsigned index )
+{
+    assert(scanner->count > 0);
+    // Pokud je prvek o daném indexu již načten, tak se jen vrátí token.
+    if (index+1 <= scanner->count) {
+        index = (scanner->first + index) % SCAN_BUF_CAP;
+    }
+    // Jinak se prvek o daném indexu načte, pokud to kapacita bufferu dovolí.
+    else {
+        assert(index < SCAN_BUF_CAP);
+        while (scanner->count <= index) {	// Načti do bufferu prvky od posledního po index (včetně).
+          scanner->current[scanner->count++] = scan( scanner->file );
+        }
+        index = (scanner->first + index) % SCAN_BUF_CAP;
+    }
+    
+    return scanner->current[index];
+}
+
+void consumeTokN( Scanner* scanner, unsigned N )
+{
+    // Počet prvků, které chci zkonzumovat, musí být větší nule a menší nebo rovno počtu načtených prvků.
+    assert(N > 0 && N <= scanner->count);
+    scanner->first += N;
+    scanner->count -= N;
+    // Musím zajistit aby operace nad tokeny měli připravený další token.
+    // Aneb kdo sní poslední kousek kupuje další :-D
+    if (scanner->count == 0) {
+        scanner->count++;
+        scanner->current[scanner->first] = scan( scanner->file );
+    }
+}
+
+Token expectNextTok( Scanner* scanner, TokenType tok )
+{
+    assert(scanner->count > 0);
+    // Načtu nový token za poslední token v bufferu.
+    Token current = testTokN( scanner, tok, scanner->count );
+    // Zkonzumuju onen nový token.
+    scanner->count--;
+    return current;
+}
+
+Token testTokN( Scanner* scanner, TokenType tok, unsigned index )
+{
+    assert(scanner->count > 0);
+    Token current = getTokN( scanner, index );
+    
+    if( ! ( current.type & tok ) )
+    {
+        // BUG: Může způsobit leak!
+        throw( UnexpectedToken, ((UnexpectedTokenException){ 
+            .expected = tok, 
+            .got = current.type 
+        }));
+    }
+    
+    return current;
+}
+
+/*       _\|/_
+         (o o)
+ +----oOO-{_}-OOo--------------+
+ | Následují skenovací funkce. |
+ +----------------------------*/
 /**
  * Funkce má za cíl detekovat, zda-li last_letter je znak oprerátoru, pokud ne, pak detekuje a
  * přeskočí komentář, detekuje token přiřazení (=) a závorky ('(',')','[',']').
