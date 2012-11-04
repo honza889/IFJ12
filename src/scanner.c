@@ -391,11 +391,12 @@ bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned *li
 
 /**
  * Funkce má za cíl detekovat, zda-li řetězec uložený v lexeme je klíčové slovo.
- * @param[in]	lexeme	RCString obsahující řetězec pro porovnání.
- * @param[out]	token	Ukazatel na strukturu Token.
+ * @param[in]	lexeme		RCString obsahující řetězec pro porovnání.
+ * @param[out]	token		Ukazatel na strukturu Token.
+ * @param[in]	line_num	Hodnota aktuálního řádku vstupního zdrojového kódu pro vyhození výjimky.
  * @return Vrací (bool) true, když uspěje (detekuje klíčové slovo a uloží do \a token), jinak false.
  */
-bool det_key_word(RCString lexeme, Token *token)
+bool det_key_word(RCString lexeme, Token *token, unsigned line_num)
 {
   RCString cmp_lexeme = copyRCString(&lexeme);
   RCStringAppendChar(&cmp_lexeme, '\0');	// Přidán znak '\0' na konec RCStringu pro fci strcmp().
@@ -425,8 +426,22 @@ bool det_key_word(RCString lexeme, Token *token)
       token->data.val = newValueBoolean(false);
     else if (! strcmp("nil", RCStringGetBuffer(&cmp_lexeme)))
       token->data.val = newValueNil();
-    else
+    else {
+      if (! strcmp("as", RCStringGetBuffer(&cmp_lexeme))	||
+	  ! strcmp("def", RCStringGetBuffer(&cmp_lexeme))	||
+	  ! strcmp("directive", RCStringGetBuffer(&cmp_lexeme))	||
+	  ! strcmp("export", RCStringGetBuffer(&cmp_lexeme))	||
+	  ! strcmp("from", RCStringGetBuffer(&cmp_lexeme))	||
+	  ! strcmp("import", RCStringGetBuffer(&cmp_lexeme))	||
+	  ! strcmp("launch", RCStringGetBuffer(&cmp_lexeme))	||
+	  ! strcmp("load", RCStringGetBuffer(&cmp_lexeme))	||
+	  ! strcmp("macro", RCStringGetBuffer(&cmp_lexeme))	)
+      {
+	deleteRCString(&cmp_lexeme);
+	throw(ScannerError,((ScannerErrorException){.type=UndefinedKeyword, .line_num=line_num}));
+      }
       result = false;
+    }
   }
   
   deleteRCString(&cmp_lexeme);
@@ -453,6 +468,62 @@ bool add_char(FILE *f, char *last_letter, RCString *lexeme)
   
   return true;
 }
+/**
+ * Načte literál číslo podle definice ifj12.
+ * Pokud se nepodaří načíst číslo vyhodí výjimku InvalidNumericLiteral.
+ * @param[in]	f		Ukazatel na otevřený soubor.
+ * @param[out]	token		Ukazatel na strukturu Token.
+ * @param[out]	last_letter	Poslední načtený znak ze zdrojového kódu.
+ * @param[in]	line_num	Hodnota aktuálního řádku vstupního zdrojového kódu pro vyhození výjimky.
+ * @param[out]	lexeme		Ukazatel na RCString (!= NULL).
+ */
+void load_number(FILE *f, Token *token, char *last_letter, unsigned line_num, RCString *lexeme)
+{
+  assert(isdigit(*last_letter));
+  
+  double conv_num;	// proměnná do které se uloží převedené číslo
+  char *endptr = NULL;	// ukazatel na písmeno kde přestala číst funkce strtod()
+  
+  do {
+    add_char(f, last_letter, lexeme);
+    if (*last_letter == '.') {
+      add_char(f, last_letter, lexeme);
+      if (isdigit(*last_letter)) {
+	do {
+	  add_char(f, last_letter, lexeme);
+	  if (*last_letter == 'e') {
+	    do {
+	      add_char(f, last_letter, lexeme);
+	    } while (isdigit(*last_letter));
+	  }
+	} while (isdigit(*last_letter));
+      }
+      else {
+	deleteRCString(lexeme);
+	throw(ScannerError,((ScannerErrorException){.type=InvalidNumericLiteral, .line_num=line_num}));
+      }
+      break;
+    }
+    else if (*last_letter == 'e') {
+      do {
+	add_char(f, last_letter, lexeme);
+      } while (isdigit(*last_letter));
+      break;
+    }
+  } while (isdigit(*last_letter));
+
+  RCStringAppendChar(lexeme, '\0');	// Přidán znak '\0' na konec RCStringu pro fci strtod().
+
+  conv_num = strtod(RCStringGetBuffer(lexeme), &endptr);
+  if (errno == 0 && *endptr == '\0') {
+    token->type = tokLiteral;
+    token->data.val = newValueNumeric( conv_num );
+  }
+  else {
+    deleteRCString(lexeme);
+    throw(ScannerError,((ScannerErrorException){.type=InvalidNumericLiteral, .line_num=line_num}));
+  }
+}
 
 /**
  * Načte lexém, zpracuje a vrátí token.
@@ -467,9 +538,6 @@ Token scan(FILE *f)
   static unsigned line_num = 1;			/** Počítadlo řádků vstupního zdrojového kódu. */
   
   int keyw;
-  
-  double conv_num;	// proměnná do které se uloží převedené číslo
-  char *endptr = NULL;	// ukazatel na písmeno kde přestala číst funkce strtod()
   
   bool repeat;		// true pokud se má čtení restartovat, protože se nic nenačetlo (byl komentář)
   
@@ -493,39 +561,19 @@ Token scan(FILE *f)
       token.type = tokEndOfLine;
       last_letter = getc(f);
     }
-    else if (isalpha(last_letter)) {
+    else if (isalpha(last_letter) || last_letter == '_') {
       do {
         add_char(f, &last_letter, &lexeme);
-      } while (isalnum(last_letter));
+      } while (isalnum(last_letter) || last_letter == '_');
       
       // Pokud se nedetekuje (a neuloží do tokenu) klíčové slovo, pak je to identifikátor.
-      if (! det_key_word(lexeme, &token)) {
+      if (! det_key_word(lexeme, &token, line_num)) {
         token.type = tokId;
         token.data.id = copyRCString(&lexeme);
       }
     }
     else if (isdigit(last_letter)) {
-      do {
-        add_char(f, &last_letter, &lexeme);
-        if (last_letter == '.' || last_letter == 'e') {
-          do {
-            add_char(f, &last_letter, &lexeme);
-          } while (isdigit(last_letter));
-          break;
-        }
-      } while (isdigit(last_letter));
-      
-      RCStringAppendChar(&lexeme, '\0');	// Přidán znak '\0' na konec RCStringu pro fci strtod().
-    
-      conv_num = strtod(RCStringGetBuffer(&lexeme), &endptr);
-      if (errno == 0 && *endptr == '\0') {
-        token.type = tokLiteral;
-        token.data.val = newValueNumeric( conv_num );
-      }
-      else {
-        deleteRCString(&lexeme);
-        throw(ScannerError,((ScannerErrorException){.type=InvalidNumericLiteral, .line_num=line_num}));
-      }
+      load_number(f, &token, &last_letter, line_num, &lexeme);
     }
     else if (last_letter == '"') {
       unsigned start_line_num = line_num;	// Pomocná proměnná, která si pamatuje řádek s počátkem řetězce.
@@ -572,6 +620,7 @@ void scannerErrorPrint(ScannerErrorException e){
   switch(e.type){
     case InvalidNumericLiteral: fprintf(stderr,"Parse error: Chybne zadane cislo"); break;
     case InvalidToken: fprintf(stderr,"Parse error: Nesmyslny lexem"); break;
+    case UndefinedKeyword: fprintf(stderr,"Parse error: Klicove slovo s nedefinovanym vyznamem"); break;
     case UnterminatedComment: fprintf(stderr,"Parse error: Neukonceny komentar"); break;
     case UnterminatedString: fprintf(stderr,"Parse error: Neukonceny retezec"); break;
     case BadEscSequence: fprintf(stderr,"Parse error: Chybna escapovaci sekvence v retezci"); break;

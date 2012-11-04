@@ -30,6 +30,7 @@ typedef struct {
   enum {
     InvalidNumericLiteral,
     InvalidToken,
+    UndefinedKeyword,
     UnterminatedComment,
     UnterminatedString,
     BadEscSequence
