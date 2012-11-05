@@ -177,8 +177,8 @@ struct SSubstring
 {
   Variable destination;
   Expression source;
-  int offset;
-  int length;
+  Expression offset;
+  Expression length;
 };
 
 struct SLoop

@@ -129,7 +129,7 @@ void evalSubstring( Substring* substring, Context* context )
     RCString r = getValueString( &val );
     freeValue( &val );
     
-    RCStringSubstring( &r, substring->offset, substring->length );
+//     RCStringSubstring( &r, substring->offset, substring->length );	// TODO: Proměnné substring->offset a substring->length jsou nyní typu Expression.
     setVariable( &substring->destination, context, newValueString( r ) );
     deleteRCString( &r );
 }

@@ -196,7 +196,10 @@ void parseAssignment( Scanner* s, StatementList* sl )
 {
     Assignment ass;
     ass.destination = getSymbol(getTok(s).data.id,NULL,NULL); // TODO: stromy symbolů!
+    consumeTok(s);
     parseExpression(s, &ass.source);
+    expectTok(s, tokEndOfLine);
+    
     Statement* statement = new(Statement);
     *statement = (Statement){ .type=ASSIGNMENT, .value.assignment=ass };
     addStatementToStatementList(sl,statement);
@@ -206,9 +209,44 @@ void parseSubstring( Scanner* s, StatementList* sl )
 {
     Substring substr;	// TODO
     substr.destination = getSymbol(getTok(s).data.id,NULL,NULL); // TODO: stromy symbolů!
-    //substr.source;
-    //substr.offset;
-    //substr.length;
+    consumeTok(s);
+    
+    if (getTok(s).type == tokLiteral)
+        substr.source = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
+//     else
+//         substr.source = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,global,local) };
+    consumeTok(s);
+    
+    assert(getTok(s).type == tokLBracket);	// V kontextu s detectAssignment().
+    consumeTok(s);
+    
+    if (getTok(s).type & (tokId | tokLiteral)) {
+        if (getTok(s).type == tokLiteral)
+            substr.offset = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
+//         else
+//             substr.offset = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,global,local) };
+        consumeTok(s);
+    }
+    else if (getTok(s).type == tokColon) {
+        substr.offset = (Expression){ .type=CONSTANT, .value.constant=newValueUndefined() };
+    }
+    
+    expectTok(s, tokColon);
+    
+    if (getTok(s).type & (tokId | tokLiteral)) {
+        if (getTok(s).type == tokLiteral)
+            substr.length = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
+//         else
+//             substr.length = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,global,local) };
+        consumeTok(s);
+    }
+    else if (getTok(s).type == tokRBracket) {
+        substr.length = (Expression){ .type=CONSTANT, .value.constant=newValueUndefined() };
+    }
+    
+    expectTok(s, tokRBracket);
+    expectTok(s, tokEndOfLine);
+    
     Statement* statement = new(Statement);
     *statement = (Statement){ .type=SUBSTRING, .value.substring=substr };
     addStatementToStatementList(sl,statement);
