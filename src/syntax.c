@@ -38,20 +38,21 @@ void addFunctionToAst( Ast* ast, Function* function )
         ast->functions.capacity += 8;
         ast->functions.functions = resizeArray( ast->functions.functions, Function, ast->functions.capacity );
     }
+    ast->functions.functions[ast->functions.count-1] = *function;
 }
 
 void addStatementToStatementList( StatementList* sl, Statement* statement )
 {
     sl->count++;
     sl->item = resizeArray( sl->item, Statement, sl->count );
-    // TODO
+    sl->item[sl->count-1] = *statement;
 }
 
 void addExpressionToExpressionList( ExpressionList* el, Expression* expression )
 {
     el->count++;
     el->expressions = resizeArray( el->expressions, Expression, el->count );
-    // TODO
+    el->expressions[el->count-1] = *expression;
 }
 
 Ast parseProgram( Scanner* s )
@@ -183,28 +184,34 @@ void detectAssignment( Scanner* s, StatementList* sl )
 {
     assert(getTokN(s, 0).type == tokId);
     expectNextTok(s, tokAssign);
-    testTokN(s, tokId, 1);
-    if (getTokN(s, 2).type == tokLBracket)
+    if (getTokN(s, 2).type == tokLBracket){
+      testTokN(s, tokId | tokLiteral, 1);
       parseSubstring(s, sl);
-    else
+    }else{
       parseAssignment(s, sl);
+    }
 }
 
 void parseAssignment( Scanner* s, StatementList* sl )
 {
     Assignment ass;
-//     ass.destination = ; // TODO: Jak se implementuje? Jak index do pole proměnných (podle symbols.h)?
-//     ass.source;
-//     parseExpression(s, ); // TODO: Jak tam mám naládovat výraz?
+    ass.destination = getSymbol(getTok(s).data.id,NULL,NULL); // TODO: stromy symbolů!
+    parseExpression(s, &ass.source);
+    Statement* statement = new(Statement);
+    *statement = (Statement){ .type=ASSIGNMENT, .value.assignment=ass };
+    addStatementToStatementList(sl,statement);
 }
 
 void parseSubstring( Scanner* s, StatementList* sl )
 {
     Substring substr;	// TODO
-//     substr.destination = ;
-//     substr.source;
-//     substr.offset;
-//     substr.length;
+    substr.destination = getSymbol(getTok(s).data.id,NULL,NULL); // TODO: stromy symbolů!
+    //substr.source;
+    //substr.offset;
+    //substr.length;
+    Statement* statement = new(Statement);
+    *statement = (Statement){ .type=SUBSTRING, .value.substring=substr };
+    addStatementToStatementList(sl,statement);
 }
 
 void parseIf( Scanner* s, StatementList* sl )
@@ -419,6 +426,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression )
             break;
         } // endswitch
         prevExp = newExp;
+        consumeTok(s);
     } // endwhile
 }
 
