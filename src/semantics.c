@@ -47,6 +47,7 @@ static inline void freeStatementList(StatementList *list){
  * (Používá se při sestavování Expression - je-li druhý operátor méně prioritní (patří výše), vrátí true)
  * @return Jestli je 1. vice prioritní než 2.
  */
+/*
 bool compareOperators(Operator op1, Operator op2){
     // unární operátory jsou prioritnější
     if(op2.type==UNARYOP) return true;
@@ -54,10 +55,12 @@ bool compareOperators(Operator op1, Operator op2){
     // jinak je prioritnejší operátor s vyšší hodnotou prvních 4 bitů
     return ( (op1.value.binary.type & 0xF0) > (op2.value.binary.type & 0xF0) );
 }
+*/
 
 /**
  * Čte Tokeny až sestaví Expression
  */
+/*
 Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *local, Token *lastToken){
     Expression *wholeExpression = NULL;
     Expression *newExp, *oldExp, *subExp, *tmp;
@@ -212,12 +215,14 @@ Expression* semanticOfExpression(FILE *f, SymbolTable *global, SymbolTable *loca
     }
     return wholeExpression; // jen pro kompilator, skutecny return je vyse!
 }
+*/
 
 /**
  * Čte Tokeny až sestaví Function
  * Volána na začátku souboru (pro načtení main) nebo
  * po vstupu do definice funkce (pro načtení této funkce)
  */
+/*
 Function semantics(int paramCount,FILE *f,SymbolTable *global){
     Token t;
     StatementList list = newStatementList();
@@ -229,7 +234,7 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
     while(wasntEnd && (t=syntax(f)).type!=tokEndOfFile){
         
         switch(t.type){
-            /* Statement začíná Id - zřejmě id = ... */
+            // Statement začíná Id - zřejmě id = ...
             case tokId:
                 id = t.data.id; // t bude prepsano tokAssignem
                 if((t=syntax(f)).type!=tokAssign){ // musi nasledovat operator prirazeni
@@ -279,4 +284,5 @@ Function semantics(int paramCount,FILE *f,SymbolTable *global){
         .paramCount=paramCount
     };
 }
+*/
 

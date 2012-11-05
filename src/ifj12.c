@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "value.h"
 #include "symbols.h"
-#include "semantics.h"
 #include "exceptions.h"
 #include "global.h"
 
@@ -23,7 +22,7 @@ int main(int argc, char**argv)
   try{
     
     SymbolTable globalSymbolTable = {NULL,0};
-    semantics(0,f,&globalSymbolTable);
+    //semantics(0,f,&globalSymbolTable);
     
   }catch{
     on(SyntaxError,row){
