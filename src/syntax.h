@@ -13,4 +13,6 @@
  */
 Token syntax(FILE *f);
 
+Ast parseProgram( Scanner* s );
+
 #endif
