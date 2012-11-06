@@ -97,8 +97,10 @@ Value evalOperator( Operator* op, Context* context )
 
 Value evalFunctionCall( FunctionCall* func, Context* context )
 {
-  // TODO
-  return newValueUndefined();
+    Value funcVar = evalVariable( &func->function, context );
+    Function* funcPtr = getValueFunction( &funcVar );
+    freeValue( &funcVar );
+    return evalFunction( funcPtr, func->params, context );
 }
 
 Value evalExpression( Expression* expr, Context* context )
