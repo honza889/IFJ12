@@ -15,9 +15,9 @@ BEGIN_TEST
         .globalSymbols = &globalSymbols,
         .localSymbols = &localSymbols,
         .functions = NULL,
-    };
-    Function mainFunction;
-  //ast = parseProgram(&s, &ctx, &main); // zpusobi zacykleni
+  };
+  Function mainFunction;
+  //parseProgram(&s, &ctx, &mainFunction); // zpusobi zacykleni
   
   //TEST(  )
   

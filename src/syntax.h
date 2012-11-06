@@ -8,12 +8,6 @@
 #include "scanner.h"
 #include "ast.h"
 
-/**
- * Získá token od scanner(), zkontroluje syntaxi a vrátí funkci semantics()
- * @return Token
- */
-Token syntax(FILE *f);
-
 typedef struct{
     SymbolTable* localSymbols;
     SymbolTable* globalSymbols;

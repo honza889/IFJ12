@@ -8,12 +8,6 @@
 #include "alloc.h"
 #include "symbols.h"
 
-Token syntax(FILE *f){
-        // TODO: Kontrola syntaxe - pokud selze, vyjimka
-        //throw(SyntaxError,15);
-        return scan(f);
-}
-
 void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function );
 void addStatementToStatementList( StatementList* sl, Statement* statement );
 void addExpressionToExpressionList( ExpressionList* sl, Expression* statement );
@@ -170,7 +164,6 @@ void parseStatement( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 
 void parseReturn( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
-    // BUG: Na co je StatementList, když se očividně nepoužívá?
     Statement stmt;
     stmt.type = RETURN;
     
@@ -208,14 +201,14 @@ void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 
 void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
-    Substring substr;	// TODO
-    substr.destination = getSymbol(getTok(s).data.id,ctx->globalSymbols, ctx->localSymbols ); // 
+    Substring substr;
+    substr.destination = getSymbol(getTok(s).data.id,ctx->globalSymbols, ctx->localSymbols );
     consumeTok(s);
     
     if (getTok(s).type == tokLiteral)
         substr.source = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
-//     else
-//         substr.source = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,global,local) };
+    else
+         substr.source = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
     consumeTok(s);
     
     assert(getTok(s).type == tokLBracket);	// V kontextu s detectAssignment().
@@ -224,8 +217,8 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     if (getTok(s).type & (tokId | tokLiteral)) {
         if (getTok(s).type == tokLiteral)
             substr.offset = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
-//         else
-//             substr.offset = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,global,local) };
+        else
+             substr.offset = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
         consumeTok(s);
     }
     else if (getTok(s).type == tokColon) {
@@ -237,8 +230,8 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     if (getTok(s).type & (tokId | tokLiteral)) {
         if (getTok(s).type == tokLiteral)
             substr.length = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
-//         else
-//             substr.length = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,global,local) };
+        else
+            substr.length = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
         consumeTok(s);
     }
     else if (getTok(s).type == tokRBracket) {
@@ -322,8 +315,10 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                   throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
                 }
                 newExp = new(Expression);
-                // TODO: Co kdybych se nejak mohl dostat ke globalnimu a lokalnimu stromu symbolu? :D
-                //*newExp = (Expression){ .type=VARIABLE, .value.variable=getSymbol(current.data.id,global,local) };
+                *newExp = (Expression){
+                    .type=VARIABLE,
+                    .value.variable=getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols)
+                };
                 if(past==wasStart){
                     wholeExpression = newExp; // do korene (je prvnim prvkem vyrazu)
                     newExp->parent = NULL;
@@ -424,14 +419,14 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
             case tokLParen:
                 printf("ctuZavorku\n");
                 if(past==wasStart){
-                    //newExp = semanticOfExpression(f,global,local,NULL); // TODO
+                    parseExpression(s,newExp,ctx);
                     if(getTok(s).type!=tokRParen){
                       throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses}));
                     }
                     wholeExpression = newExp; // do korene (je prvnim prvkem vyrazu)
                     newExp->parent = NULL;
                 }else if(past==wasOperator){
-                    //newExp = semanticOfExpression(f,global,local,NULL); // TODO
+                    parseExpression(s,newExp,ctx);
                     if(getTok(s).type!=tokRParen){
                       throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses}));
                     }
@@ -444,7 +439,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     ExpressionList params = {NULL,0};
                     do{
                         printf("ctuParametr(%d)\n",params.count);
-                        //subExp = semanticOfExpression(f,global,local,&previousToken); // TODO
+                        parseExpression(s,subExp,ctx);
                         if(subExp == NULL) break;
                         addExpressionToExpressionList(&params,subExp);
                     }while(previousToken.type==tokComma);
@@ -452,7 +447,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     prevExp->type = FUNCTION_CALL;
                     prevExp->value.functionCall = (FunctionCall){
                         .params=params,
-                        //.function=getSymbol(pt.data.id,global,NULL) // TODO
+                        //.function=getSymbol(pt.data.id,ctx->globalSymbols,NULL) // TODO: kvuli tomuto to bude muset do id
                     };
                     newExp = prevExp; // nevznikla nova expression, jen jsme zmenili VARIABLE na FUNCTION_CALL
                 }else{
