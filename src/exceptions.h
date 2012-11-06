@@ -48,6 +48,7 @@ typedef struct {
     BinaryOperatorAtBegin,
     OperatorAtTheEnd,
     TwoOperatorsNextToEachOther,
+    UnterminatedParentheses,
   } type;
 } SyntaxErrorException;
 

@@ -424,10 +424,16 @@ void parseExpression( Scanner* s, Expression* wholeExpression )
                 printf("ctuZavorku\n");
                 if(past==wasStart){
                     //newExp = semanticOfExpression(f,global,local,NULL); // TODO
+                    if(getTok(s).type!=tokRParen){
+                      throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses}));
+                    }
                     wholeExpression = newExp; // do korene (je prvnim prvkem vyrazu)
                     newExp->parent = NULL;
                 }else if(past==wasOperator){
                     //newExp = semanticOfExpression(f,global,local,NULL); // TODO
+                    if(getTok(s).type!=tokRParen){
+                      throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses}));
+                    }
                     prevExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
                     newExp->parent = prevExp;
                 }else if(past==wasId){ // zavorka volani funkce
@@ -457,7 +463,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression )
                 if(past==wasOperator){ // na konci vyrazu nesmi byt operator
                   throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd}));
                 }
-                return; // jediny korektni konec parsovani expression
+                return; // konec parsovani expression
             break;
             default:
                 throw(SyntaxError,((SyntaxErrorException){.type=BadTokenInExpression}));
@@ -466,6 +472,11 @@ void parseExpression( Scanner* s, Expression* wholeExpression )
         prevExp = newExp;
         consumeTok(s);
     } // endwhile
+    printf("konecVyrazuAsouboruZaroven\n");
+    if(past==wasOperator){ // na konci vyrazu nesmi byt operator
+        throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd}));
+    }
+    return; // konec parsovani expression a souboru zaroven
 }
 
 void parseIdentifier( Scanner* s, RCString* id )
