@@ -115,7 +115,7 @@ void consumeTokN( Scanner* scanner, unsigned N )
     assert(N > 0 && N <= scanner->count);
     scanner->first += N;
     scanner->count -= N;
-    // Musím zajistit aby operace nad tokeny měli připravený další token.
+    // Musím zajistit aby operace nad tokeny měly připravený další token.
     // Aneb kdo sní poslední kousek kupuje další :-D
     if (scanner->count == 0) {
         scanner->count++;

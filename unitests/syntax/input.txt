@@ -1,3 +1,4 @@
+1*2+3
 // Testovaci zdrojak
 x = 5
 

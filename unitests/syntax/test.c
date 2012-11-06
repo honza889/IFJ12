@@ -17,8 +17,8 @@ BEGIN_TEST
         .functions = NULL,
   };
   Function mainFunction;
-  parseProgram(&s, &ctx, &mainFunction); // zpusobi zacykleni
-  
+  //parseProgram(&s, &ctx, &mainFunction); // zpusobi zacykleni
+  Expression ex;parseExpression(&s,&ex,&ctx);
   //TEST(  )
   
   freeSymbolTable(&globalSymbols);

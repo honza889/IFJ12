@@ -394,14 +394,46 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                         throw(SyntaxError,((SyntaxErrorException){.type=BinaryOperatorAtBegin}));
                     }
                 }else{ // ve vyrazu jiz je promenna/konstanta
-                    // TODO: sakra sakra sakra sakra!
-                    newExp = new(Expression);
-                    *newExp = (Expression){ .type=OPERATOR };
-
+                    
                     if(past==wasOperator){ // pred timto operatorem je dalsi operator - nepripustne
                         throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther}));
                     }
+                    
+                    // Je-li operace mene prioritni nez predchozi, misto predchozi operace
+                    // pujdeme na misto jeste predchodnejsi (parentnejsi) operace
+                    while(
+                      prevExp->parent!=NULL &&
+                      compareOperators(prevExp->parent->value.operator, newExp->value.operator)
+                    ){
+                      printf("lezuVys\n");
+                      prevExp = prevExp->parent;
+                    }
+                    
+                    newExp->parent = prevExp->parent;
+                    if(prevExp->parent==NULL){
+                      printf("je novym korenem\n");
+                      subExp = new(Expression);
+                      *subExp = *wholeExpression;
+                      if(subExp->value.operator.value.binary.left)
+                          subExp->value.operator.value.binary.left->parent = subExp;
+                      if(subExp->value.operator.value.binary.right)
+                          subExp->value.operator.value.binary.right->parent = subExp;
+                      prevExp = subExp;
+                      newExp = wholeExpression;
+                    }else{
+                      newExp = new(Expression);
+                      if(newExp->parent->value.operator.type==BINARYOP){
+                        printf("nahrazuje binarni\n");
+                        newExp->parent->value.operator.value.binary.right = newExp;
+                      }else{
+                        printf("nahrazuje unarni\n");
+                        newExp->parent->value.operator.value.unary.operand = newExp;
+                      }
+                    }
+                    prevExp->parent = newExp;
+                    newExp->type = OPERATOR;
                     newExp->value.operator.type = BINARYOP;
+                    newExp->value.operator.value.binary.left = prevExp;
                     switch(current.data.op){
                         case opPlus:     newExp->value.operator.value.binary.type = ADD; break;
                         case opMinus:    newExp->value.operator.value.binary.type = SUBTRACT; break;
@@ -415,58 +447,24 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                         case opLE:       newExp->value.operator.value.binary.type = LEQUAL; break;
                         case opGE:       newExp->value.operator.value.binary.type = GEQUAL; break;
                     }
-                    
-                    // Je-li operace mene prioritni nez predchozi, misto predchozi operace
-                    // pujdeme na misto jeste predchodnejsi (parentnejsi) operace
-                    
-                    while(
-                      prevExp->parent!=NULL &&
-                      compareOperators(prevExp->parent->value.operator, newExp->value.operator)
-                    ){
-                      printf("lezuVys\n");
-                      prevExp = prevExp->parent;
-                    }
-                    
-                    newExp->parent = prevExp->parent;
-                    if(prevExp->parent==NULL){
-                      printf("je novym korenem\n");
-                      wholeExpression = newExp;
-                    }else{
-                      if(newExp->parent->value.operator.type==BINARYOP){
-                        printf("nahrazuje binarni\n");
-                        newExp->parent->value.operator.value.binary.right = newExp;
-                      }else{
-                        printf("nahrazuje unarni\n");
-                        newExp->parent->value.operator.value.unary.operand = newExp;
-                      }
-                    }
-                    prevExp->parent = newExp;
-                    if(newExp->value.operator.type==BINARYOP){
-                      newExp->value.operator.value.binary.left = prevExp;
-                    }else{
-                      throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
-                    }
                 }
                 past = wasOperator;
             break;
             case tokLParen:
                 printf("ctuZavorku\n");
                 if(past==wasStart){
-                    parseExpression(s,newExp,ctx);
-                    if(getTok(s).type!=tokRParen){
-                      throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses}));
-                    }
-                    wholeExpression = newExp; // do korene (je prvnim prvkem vyrazu)
+                    newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
                     newExp->parent = NULL;
                 }else if(past==wasOperator){
-                    parseExpression(s,newExp,ctx);
-                    if(getTok(s).type!=tokRParen){
-                      throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses}));
-                    }
+                    newExp = new(Expression);
                     prevExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
                     newExp->parent = prevExp;
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
+                }
+                parseExpression(s,newExp,ctx);
+                if(getTok(s).type!=tokRParen){
+                    throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses}));
                 }
             break;
             case tokRParen: case tokComma: case tokEndOfLine:
@@ -474,20 +472,21 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 if(past==wasOperator){ // na konci vyrazu nesmi byt operator
                   throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd}));
                 }
-                return; // konec parsovani expression
+                return; // konec parsovani expression, schvalne nekonzumuji!
             break;
             default:
                 throw(SyntaxError,((SyntaxErrorException){.type=BadTokenInExpression}));
             break;
         } // endswitch
         prevExp = newExp;
+        printf("token(%d)\n",getTokN(s,0).type);
         consumeTok(s);
     } // endwhile
     printf("konecVyrazuAsouboruZaroven\n");
     if(past==wasOperator){ // na konci vyrazu nesmi byt operator
         throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd}));
     }
-    return; // konec parsovani expression a souboru zaroven
+    return; // konec parsovani expression a souboru zaroven, nekonzumuji!
 }
 
 void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx )
