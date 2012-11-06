@@ -2,11 +2,6 @@
 
 #include <string.h>
 
-void setNewSymbol( RCString name, SymbolTable *localTable )
-{
-    // TODO
-}
-
 /**
  * Vyhledani uzlu (uzel=root/greater/lesser)
  * Vstupem ukazatel na ukazatel na vrchol stromu (Symbol**)
@@ -27,6 +22,40 @@ Symbol** searchSymbol(Symbol **destination, RCString name, bool *exist){
  return destination;
 }
 
+/**
+ * Vytvoreni uzlu v zadane tabulce
+ */
+void setNewSymbol( RCString name, SymbolTable *localTable )
+{
+ bool exist=false;
+ Symbol **destination; // ukazatel na promennou v budoucim rodici
+ 
+ // Prohledame zda uz v tabulce je
+ if(localTable!=NULL && !exist){
+  destination = searchSymbol(&(localTable->root),name,&exist);
+ }
+ 
+ // Vytvoreni symbolu, pokud nejde o prepis exitujiciho
+ if(!exist){
+  // destination nyni ukazuje na NULL ukazatel (volny uzel)
+  
+  Symbol *newSymbol = malloc(sizeof(Symbol));
+  MALLCHECK(newSymbol);
+  
+  // Kopie nazvu promenne
+  newSymbol->name=copyRCString(&name);
+  
+  // Navyseni poctu prvku v tabulce
+  localTable->count++;
+  
+  newSymbol->lesser = NULL;
+  newSymbol->greater = NULL;
+  newSymbol->index = localTable->count;
+  *destination = newSymbol;
+  
+ }
+}
+
 
 /**
  * Vrati index symbolu daneho jmena, pokud neexistuje, vytvori ho
@@ -37,7 +66,7 @@ int getSymbol(RCString name, SymbolTable *globalTable, SymbolTable *localTable){
  bool inLocal=false;
  bool exist=false;
  int index;
- Symbol **destination;
+ Symbol **destination; // ukazatel na promennou v budoucim rodici
  
  // Nejprve bude prohledana globalni tabulka
  destination = searchSymbol(&(globalTable->root),name,&exist);
@@ -50,7 +79,6 @@ int getSymbol(RCString name, SymbolTable *globalTable, SymbolTable *localTable){
  
  // Vytvoreni symbolu, pokud nejde o prepis exitujiciho
  if(!exist){
-  
   // destination nyni ukazuje na NULL ukazatel (volny uzel)
   
   Symbol *newSymbol = malloc(sizeof(Symbol));
