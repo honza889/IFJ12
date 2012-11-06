@@ -77,7 +77,7 @@ void ensureUniqueRCString( RCString* str )
 //BACHA! nejedná se o nulou zakončený string a hlavně to neudrží referenci
 const char* RCStringGetBuffer( const RCString* str )
 {
-  return str->buffer->string;
+  return str->buffer->string + str->offset;
 }
 
 char RCStringGet( const RCString* str, int index )
