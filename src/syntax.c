@@ -159,6 +159,8 @@ void parseStatement( Scanner* s, StatementList* sl, SyntaxContext* ctx )
         {
             parseReturn( s, sl, ctx );
         }
+    }else{
+        throw(SyntaxError,((SyntaxErrorException){.type=BadStartOfStatement}));
     }
 }       
 
@@ -297,7 +299,6 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
 {
     Token current;
     Expression *newExp, *prevExp=NULL, *subExp=NULL;
-    
     enum {
         wasStart,
         wasParentheses,
@@ -314,30 +315,58 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 if(past==wasParentheses){ // operand je hned za (pravou!) zavorkou - chyba
                   throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
                 }
-                newExp = new(Expression);
-                *newExp = (Expression){
-                    .type=VARIABLE,
-                    .value.variable=getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols)
-                };
                 if(past==wasStart){
-                    wholeExpression = newExp; // do korene (je prvnim prvkem vyrazu)
+                    newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
                     newExp->parent = NULL;
                 }else if(past==wasOperator){
-                    prevExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
+                    newExp = new(Expression);
+                    // pripojit za nejnovejsi operator
+                    if(prevExp->value.operator.type==BINARYOP){
+                        prevExp->value.operator.value.binary.right = newExp;
+                        newExp->parent = prevExp;
+                    }else{
+                        prevExp->value.operator.value.unary.operand = newExp;
+                        newExp->parent = prevExp;
+                    }
                     newExp->parent = prevExp;
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
                 }
+                // TODO: az aspon trochu pojede, implementovat volani funkce ctenim budoucnosti
+/*
+                }else if(past==wasId){ // zavorka volani funkce
+                    printf("jeToVolaniFunkce\n");
+                    Token previousToken;
+                    // priprava seznamu parametru
+                    ExpressionList params = {NULL,0};
+                    do{
+                        consumeTok(s); // zkonzumovat (
+                        printf("ctuParametr(%d)\n",params.count);
+                        parseExpression(s,subExp,ctx);
+                        addExpressionToExpressionList(&params,subExp);
+                    }while(getTok(s).type==tokComma);
+                    // sestaveni FunctionCall
+                    prevExp->type = FUNCTION_CALL;
+                    prevExp->value.functionCall = (FunctionCall){
+                        .params=params,
+                        //.function=getSymbol(pt.data.id,ctx->globalSymbols,NULL) // TODO: kvuli tomuto to bude muset do id
+                    };
+                    newExp = prevExp; // nevznikla nova expression, jen jsme zmenili VARIABLE na FUNCTION_CALL
+*/
+
+                *newExp = (Expression){
+                    .type=VARIABLE,
+                    .value.variable=getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols)
+                };
                 past = wasId;
             break;
             case tokLiteral:
                 printf("ctuLiteral\n");
-                newExp = new(Expression);
-                *newExp = (Expression){ .type=CONSTANT, .value.constant=current.data.val };
                 if(past==wasStart){
-                    wholeExpression = newExp; // do korene (je prvnim prvkem vyrazu)
+                    newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
                     newExp->parent = NULL;
                 }else if(past==wasOperator){
+                    newExp = new(Expression);
                     // pripojit za nejnovejsi operator
                     if(prevExp->value.operator.type==BINARYOP){
                         prevExp->value.operator.value.binary.right = newExp;
@@ -349,22 +378,26 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
                 }
+                *newExp = (Expression){ .type=CONSTANT, .value.constant=current.data.val };
                 past = wasLiteral;
             break;
             case tokOp:
                 printf("ctuOperator\n");
-                newExp = new(Expression);
-                *newExp = (Expression){ .type=OPERATOR };
                 if(past==wasStart){ // prvnim tokenem vyrazu?
                     if(current.data.op==opMinus){
+                        newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu - unarni minus)
+                        *newExp = (Expression){ .type=OPERATOR };
                         newExp->value.operator.type = UNARYOP;
                         newExp->value.operator.value.unary.type = MINUS;
-                        wholeExpression = newExp; // do korene (je prvnim prvkem vyrazu - unarni minus)
                         newExp->parent = NULL;
                     }else{
                         throw(SyntaxError,((SyntaxErrorException){.type=BinaryOperatorAtBegin}));
                     }
                 }else{ // ve vyrazu jiz je promenna/konstanta
+                    // TODO: sakra sakra sakra sakra!
+                    newExp = new(Expression);
+                    *newExp = (Expression){ .type=OPERATOR };
+
                     if(past==wasOperator){ // pred timto operatorem je dalsi operator - nepripustne
                         throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther}));
                     }
@@ -432,24 +465,6 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     }
                     prevExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
                     newExp->parent = prevExp;
-                }else if(past==wasId){ // zavorka volani funkce
-                    printf("jeToVolaniFunkce\n");
-                    Token previousToken;
-                    // priprava seznamu parametru
-                    ExpressionList params = {NULL,0};
-                    do{
-                        printf("ctuParametr(%d)\n",params.count);
-                        parseExpression(s,subExp,ctx);
-                        if(subExp == NULL) break;
-                        addExpressionToExpressionList(&params,subExp);
-                    }while(previousToken.type==tokComma);
-                    // sestaveni FunctionCall
-                    prevExp->type = FUNCTION_CALL;
-                    prevExp->value.functionCall = (FunctionCall){
-                        .params=params,
-                        //.function=getSymbol(pt.data.id,ctx->globalSymbols,NULL) // TODO: kvuli tomuto to bude muset do id
-                    };
-                    newExp = prevExp; // nevznikla nova expression, jen jsme zmenili VARIABLE na FUNCTION_CALL
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
                 }

@@ -50,6 +50,7 @@ typedef struct {
     OperatorAtTheEnd,
     TwoOperatorsNextToEachOther,
     UnterminatedParentheses,
+    BadStartOfStatement,
   } type;
 } SyntaxErrorException;
 
