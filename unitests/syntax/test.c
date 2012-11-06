@@ -6,15 +6,22 @@
 
 BEGIN_TEST
   Scanner s;
-  Ast ast;
   FILE* f=fopen("unitests/syntax/input.txt","r");
   if(f==NULL) ERROR("Nepodarilo se otevrit soubor!");
   initScanner(&s,f);
   SymbolTable globalSymbols = newSymbolTable();
-  //ast = parseProgram(&s); // zpusobi zacykleni
+  SymbolTable localSymbols = newSymbolTable();
+  SyntaxContext ctx = {
+        .globalSymbols = &globalSymbols,
+        .localSymbols = &localSymbols,
+        .functions = NULL,
+    };
+    Function mainFunction;
+  //ast = parseProgram(&s, &ctx, &main); // zpusobi zacykleni
   
   //TEST(  )
   
   freeSymbolTable(&globalSymbols);
+  freeSymbolTable(&localSymbols);
   fclose(f);
 END_TEST

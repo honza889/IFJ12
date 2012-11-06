@@ -51,6 +51,9 @@ BEGIN_TEST
     if(ret.data.numeric != 0){
         printf("%s", "TEST ial.c - find cislo 5\n");
         printf("'Ocekavana hodnota = '0'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
+        RCString str = getValueString( &ret );
+        RCStringPrint( &str, stdout );
+        deleteRCString( &str );
     }
 
 

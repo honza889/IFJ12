@@ -14,7 +14,8 @@ typedef enum
     SyntaxError, // exit 2
     UnexpectedToken,
     UnexpectedKeyWord,
-
+    MultipleFunctionDefinitions,
+    
     /* Lexikalni analyza */
     UndefinedVariable, // exit 3
     IncompatibleComparison, // exit 1
@@ -70,6 +71,7 @@ typedef Value InvalidConversionException;
 typedef const char* BadArgumentTypeException;
 typedef int IndexOutOfBoundsException;
 typedef const char* OutOfMemoryException;
+typedef RCString MultipleFunctionDefinitionsException;
 
 #define EXCEPTION( name ) name##Exception name##ExceptionValue
 
@@ -89,6 +91,7 @@ typedef struct
         EXCEPTION( UnexpectedToken );
         EXCEPTION( UnexpectedKeyWord );
         EXCEPTION( OutOfMemory );
+        EXCEPTION( MultipleFunctionDefinitions );
     } value;
 } Exception;
 

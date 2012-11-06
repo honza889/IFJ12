@@ -7,7 +7,6 @@
 
 typedef struct SValue Value;
 typedef struct SFunction Function;
-typedef struct SAst Ast;
 
 typedef int Variable; // index do pole proměnných (podle symbols.h)
 typedef Value Constant;
@@ -26,12 +25,6 @@ typedef Expression Return;
 typedef struct SStatement Statement;
 
 typedef struct SContext Context;
-
-typedef struct {
-    Function* functions;
-    int count; /// kolik je pouzitych polozek ve \a functions
-    int capacity; /// kolik je alokovano pro \a functions
-} FunctionList;
 
 typedef struct {
     Statement* item;
@@ -89,8 +82,6 @@ struct SFunction
     } value;
 
     int paramCount; // zaporne cislo znamena volitelny pocet argumentu
-    RCString name;
-    SymbolTable symTable;
 };
 
 struct SBinaryOp
@@ -220,13 +211,6 @@ struct SContext
   Value* globals;
   Value* locals;
 };
-
-struct SAst
-{
-    Function main;
-    FunctionList functions;
-};
-
 
 static inline StatementList newStatementList(){
   return (StatementList){ .item=NULL, .count=0 };

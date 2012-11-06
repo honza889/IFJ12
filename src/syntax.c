@@ -6,6 +6,7 @@
 #include "scanner.h"
 #include "ast.h"
 #include "alloc.h"
+#include "symbols.h"
 
 Token syntax(FILE *f){
         // TODO: Kontrola syntaxe - pokud selze, vyjimka
@@ -13,32 +14,23 @@ Token syntax(FILE *f){
         return scan(f);
 }
 
-void addFunctionToAst( Ast* ast, Function* function );
+void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function );
 void addStatementToStatementList( StatementList* sl, Statement* statement );
 void addExpressionToExpressionList( ExpressionList* sl, Expression* statement );
 
-void parseIdentifier( Scanner* s, RCString* id );
-void parseExpression( Scanner* s, Expression* expr );
-void parseWhile( Scanner* s, StatementList* sl );
-void parseIf( Scanner* s, StatementList* sl );
-void parseReturn( Scanner* s, StatementList* sl );
-void detectAssignment( Scanner* s, StatementList* sl );
-void parseAssignment( Scanner* s, StatementList* sl );
-void parseSubstring( Scanner* s, StatementList* sl );
-void parseStatement( Scanner* s, StatementList* sl );
-void parseFunction( Scanner* s, Function* func );
-void parseFunctionParameters( Scanner* s, Function* func );
-Ast parseProgram( Scanner* s );
-
-void addFunctionToAst( Ast* ast, Function* function )
+void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function )
 {
-    ast->functions.count++;
-    if( ast->functions.count >= ast->functions.capacity )
+    // asi to chce jeste trochu predelat symboly...
+    int id = getSymbol( *name, ctx->globalSymbols, ctx->globalSymbols );
+    if( id < ctx->globalSymbols->count )
     {
-        ast->functions.capacity += 8;
-        ast->functions.functions = resizeArray( ast->functions.functions, Function, ast->functions.capacity );
+        throw( MultipleFunctionDefinitions, copyRCString( name ) );
     }
-    ast->functions.functions[ast->functions.count-1] = *function;
+    else
+    {
+        ctx->functions = resizeArray( ctx->functions, Value, ctx->globalSymbols->count );
+        ctx->functions[ ctx->globalSymbols->count - 1 ] = newValueFunction( function );
+    }
 }
 
 void addStatementToStatementList( StatementList* sl, Statement* statement )
@@ -55,17 +47,15 @@ void addExpressionToExpressionList( ExpressionList* el, Expression* expression )
     el->expressions[el->count-1] = *expression;
 }
 
-Ast parseProgram( Scanner* s )
+void parseProgram( Scanner* s, SyntaxContext* ctx, Function* main )
 {
-    Ast ast = {
-        .functions = {.functions = NULL, .capacity = 0, .count = 0},
-        .main = { 
-            .type = USER_DEFINED, 
-            .value.userDefined = { 
-                .statements = {
-                    .item = NULL,
-                    .count = 0
-                }
+
+    *main = (Function){ 
+        .type = USER_DEFINED, 
+        .value.userDefined = { 
+            .statements = {
+                .item = NULL,
+                .count = 0
             }
         }
     };
@@ -75,37 +65,24 @@ Ast parseProgram( Scanner* s )
         Token tok = getTok(s);
         if( tok.type == tokKeyW && tok.data.keyw == kFunction )
         {
-            Function func = {
-                .type = USER_DEFINED,
-                .value.userDefined = {
-                    .statements = {
-                        .item = NULL,
-                        .count = 0
-                    }
-                }
-            };
-            parseFunction( s, &func );
-            addFunctionToAst( &ast, &func );
+            parseFunction( s, ctx );
         }
         else
         {
-            parseStatement( s, &ast.main.value.userDefined.statements );
+            parseStatement( s, &main->value.userDefined.statements, ctx );
         }
     }
-    
-    return ast;
 }
 
-void parseFunctionParameters( Scanner* s, Function* func )
+void parseFunctionParameters( Scanner* s, Function* func, SyntaxContext* ctx )
 {
     testTok( s, tokId | tokRParen );
     switch( getTok( s ).type )
     {
         case tokId: 
         {
-            RCString param;
-            parseIdentifier( s, &param );
-            setNewSymbol( param, &func->symTable );
+            Variable param;
+            parseIdentifier( s, &param, ctx ); // tady to chce asi delat neco vic
             func->paramCount++;
             
             testTok( s, tokComma | tokRParen );
@@ -113,7 +90,7 @@ void parseFunctionParameters( Scanner* s, Function* func )
             if( getTok( s ).type == tokComma )
             {
                 consumeTok( s );
-                parseFunctionParameters( s, func );
+                parseFunctionParameters( s, func, ctx );
             }
             else
             {
@@ -127,77 +104,101 @@ void parseFunctionParameters( Scanner* s, Function* func )
     }
 }
 
-void parseFunction( Scanner* s, Function* func )
+void parseFunction( Scanner* s, SyntaxContext* ctx )
 {
-    func->paramCount = 0;
+    Function func = {
+        .type = USER_DEFINED,
+        .value.userDefined = {
+            .statements = {
+                .item = NULL,
+                .count = 0
+            },
+            .variableCount = 0
+        },
+        .paramCount = 0
+    };
+    
+    SymbolTable localSymbols = newSymbolTable();
+    
+    SyntaxContext newCtx = {
+        .globalSymbols = ctx->globalSymbols,
+        .localSymbols = &localSymbols,
+        .functions = ctx->functions,
+    };
+    
     expectKeyw( s, kFunction );
-    parseIdentifier( s, &func->name );
+    Variable name;
+    parseIdentifier( s, &name, &newCtx); // tady to chce taky delat vic
     expectTok( s, tokLParen );
-    parseFunctionParameters( s, func );
+    parseFunctionParameters( s, &func, &newCtx );
     expectTok( s, tokRParen );
     expectTok( s, tokEndOfLine );
     while( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd )
     {
-        parseStatement( s, &func->value.userDefined.statements );
+        parseStatement( s, &func.value.userDefined.statements, &newCtx );
     }
     consumeTok( s );
     expectTok( s, tokEndOfLine );
+    
+    freeSymbolTable( &localSymbols );
 }
 
-void parseStatement( Scanner* s, StatementList* sl )
+void parseStatement( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     testTok( s, tokId | tokKeyW | tokEndOfLine );
     if( getTok( s ).type == tokId )
     {
-        detectAssignment( s, sl );
+        detectAssignment( s, sl, ctx );
     }
     else if( getTok( s ).type == tokKeyW ) 
     {
         testKeyw( s, kIf | kWhile | kReturn );
         if( getTok( s ).data.keyw == kIf )
         {
-            parseIf( s, sl );
+            parseIf( s, sl, ctx );
         }
         else if( getTok( s ).data.keyw == kWhile )
         {
-            parseWhile( s, sl );
+            parseWhile( s, sl, ctx );
         }
         else
         {
-            parseReturn( s, sl );
+            parseReturn( s, sl, ctx );
         }
     }
 }       
 
-void parseReturn( Scanner* s, StatementList* sl )
+void parseReturn( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     // BUG: Na co je StatementList, když se očividně nepoužívá?
     Statement stmt;
     stmt.type = RETURN;
     
     expectKeyw( s, kReturn );
-    parseExpression( s, &stmt.value.ret );
-    expectTok( s, tokEndOfLine );    
+    parseExpression( s, &stmt.value.ret, ctx );
+    expectTok( s, tokEndOfLine );  
+    
+    addStatementToStatementList( sl, &stmt );
 }
 
-void detectAssignment( Scanner* s, StatementList* sl )
+void detectAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     assert(getTokN(s, 0).type == tokId);
     expectNextTok(s, tokAssign);
     if (getTokN(s, 2).type == tokLBracket){
       testTokN(s, tokId | tokLiteral, 1);
-      parseSubstring(s, sl);
+      parseSubstring(s, sl, ctx);
     }else{
-      parseAssignment(s, sl);
+      parseAssignment(s, sl, ctx);
     }
 }
 
-void parseAssignment( Scanner* s, StatementList* sl )
+void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Assignment ass;
-    ass.destination = getSymbol(getTok(s).data.id,NULL,NULL); // TODO: stromy symbolů!
+    ass.destination = getSymbol(getTok(s).data.id,ctx->globalSymbols, ctx->localSymbols ); 
     consumeTok(s);
-    parseExpression(s, &ass.source);
+    parseExpression(s, &ass.source, ctx);
     expectTok(s, tokEndOfLine);
     
     Statement* statement = new(Statement);
@@ -205,10 +206,10 @@ void parseAssignment( Scanner* s, StatementList* sl )
     addStatementToStatementList(sl,statement);
 }
 
-void parseSubstring( Scanner* s, StatementList* sl )
+void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Substring substr;	// TODO
-    substr.destination = getSymbol(getTok(s).data.id,NULL,NULL); // TODO: stromy symbolů!
+    substr.destination = getSymbol(getTok(s).data.id,ctx->globalSymbols, ctx->localSymbols ); // 
     consumeTok(s);
     
     if (getTok(s).type == tokLiteral)
@@ -252,40 +253,40 @@ void parseSubstring( Scanner* s, StatementList* sl )
     addStatementToStatementList(sl,statement);
 }
 
-void parseIf( Scanner* s, StatementList* sl )
+void parseIf( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Statement stmt;
     stmt.type = CONDITION;
     
     expectKeyw( s, kIf );
-    parseExpression( s, &stmt.value.condition.condition );
+    parseExpression( s, &stmt.value.condition.condition, ctx );
     expectTok( s, tokEndOfLine );
     while( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kElse )
     {
-        parseStatement( s, &stmt.value.condition.ifTrue );
+        parseStatement( s, &stmt.value.condition.ifTrue, ctx );
     }
     expectKeyw( s, kElse );
     expectTok( s, tokEndOfLine );
     while( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kElse )
     {
-        parseStatement( s, &stmt.value.condition.ifFalse );
+        parseStatement( s, &stmt.value.condition.ifFalse, ctx);
     }
     expectKeyw( s, kElse );
     expectTok( s, tokEndOfLine );
     addStatementToStatementList( sl, &stmt );
 }
 
-void parseWhile( Scanner* s, StatementList* sl )
+void parseWhile( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Statement stmt;
     stmt.type = LOOP;
     
     expectKeyw( s, kWhile );
-    parseExpression( s, &stmt.value.loop.condition );
+    parseExpression( s, &stmt.value.loop.condition, ctx );
     expectTok( s, tokEndOfLine );
     while( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd )
     {
-        parseStatement( s, &stmt.value.loop.statements );
+        parseStatement( s, &stmt.value.loop.statements, ctx );
     }
     expectKeyw( s, kEnd );
     expectTok( s, tokEndOfLine );
@@ -299,7 +300,7 @@ bool compareOperators(Operator op1, Operator op2){
     return ( (op1.value.binary.type & 0xF0) > (op2.value.binary.type & 0xF0) );
 }
 
-void parseExpression( Scanner* s, Expression* wholeExpression )
+void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ctx )
 {
     Token current;
     Expression *newExp, *prevExp=NULL, *subExp=NULL;
@@ -479,9 +480,11 @@ void parseExpression( Scanner* s, Expression* wholeExpression )
     return; // konec parsovani expression a souboru zaroven
 }
 
-void parseIdentifier( Scanner* s, RCString* id )
+void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx )
 {
     testTok( s, tokId );
-    *id = getTok( s ).data.id;
+    RCString name = getTok( s ).data.id;
+    *id = getSymbol( name, ctx->globalSymbols, ctx->localSymbols );
+    deleteRCString( &name );
     consumeTok( s );
 }
