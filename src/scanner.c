@@ -92,21 +92,24 @@ void testKeyw( Scanner* scanner, KeyWord keyw )
 /**********************************************/
 Token getTokN( Scanner* scanner, unsigned index )
 {
+    unsigned new_index = index;
     assert(scanner->count > 0);
     // Pokud je prvek o daném indexu již načten, tak se jen vrátí token.
     if (index+1 <= scanner->count) {
-        index = (scanner->first + index) % SCAN_BUF_CAP;
+        new_index = (scanner->first + index) % SCAN_BUF_CAP;
     }
     // Jinak se prvek o daném indexu načte, pokud to kapacita bufferu dovolí.
     else {
         assert(index < SCAN_BUF_CAP);
+        new_index = scanner->count;
         while (scanner->count <= index) {	// Načti do bufferu prvky od posledního po index (včetně).
-          scanner->current[scanner->count++] = scan( scanner->file );
+          new_index = (scanner->first + new_index) % SCAN_BUF_CAP;
+          scanner->current[new_index] = scan( scanner->file );
+          scanner->count++;
         }
-        index = (scanner->first + index) % SCAN_BUF_CAP;
     }
     
-    return scanner->current[index];
+    return scanner->current[new_index];
 }
 
 void consumeTokN( Scanner* scanner, unsigned N )

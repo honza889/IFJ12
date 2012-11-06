@@ -98,6 +98,7 @@ void parseFunctionParameters( Scanner* s, Function* func, SyntaxContext* ctx )
     }
 }
 
+// Konzumuje token.
 void parseFunction( Scanner* s, SyntaxContext* ctx )
 {
     Function func = {
@@ -137,6 +138,7 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
     freeSymbolTable( &localSymbols );
 }
 
+// Konzumuje token.
 void parseStatement( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     testTok( s, tokId | tokKeyW | tokEndOfLine );
@@ -159,11 +161,13 @@ void parseStatement( Scanner* s, StatementList* sl, SyntaxContext* ctx )
         {
             parseReturn( s, sl, ctx );
         }
-    }else{
-        throw(SyntaxError,((SyntaxErrorException){.type=BadStartOfStatement}));
+    }
+    else{
+        consumeTok(s);
     }
 }       
 
+// Konzumuje token.
 void parseReturn( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Statement stmt;
@@ -188,6 +192,7 @@ void detectAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     }
 }
 
+// Konzumuje token.
 void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Assignment ass;
@@ -201,6 +206,7 @@ void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     addStatementToStatementList(sl,statement);
 }
 
+// Konzumuje token.
 void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Substring substr;
@@ -210,7 +216,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     if (getTok(s).type == tokLiteral)
         substr.source = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
     else
-         substr.source = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
+        substr.source = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
     consumeTok(s);
     
     assert(getTok(s).type == tokLBracket);	// V kontextu s detectAssignment().
@@ -220,7 +226,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
         if (getTok(s).type == tokLiteral)
             substr.offset = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
         else
-             substr.offset = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
+            substr.offset = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
         consumeTok(s);
     }
     else if (getTok(s).type == tokColon) {
@@ -248,6 +254,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     addStatementToStatementList(sl,statement);
 }
 
+// Konzumuje token.
 void parseIf( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Statement stmt;
@@ -271,6 +278,7 @@ void parseIf( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     addStatementToStatementList( sl, &stmt );
 }
 
+// Konzumuje token.
 void parseWhile( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Statement stmt;
