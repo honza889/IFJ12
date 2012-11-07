@@ -378,15 +378,17 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     // pripojit za nejnovejsi operator
                     if(prevExp->value.operator.type==BINARYOP){
                         prevExp->value.operator.value.binary.right = newExp;
-                        newExp->parent = prevExp;
                     }else{
                         prevExp->value.operator.value.unary.operand = newExp;
-                        newExp->parent = prevExp;
                     }
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
-                *newExp = (Expression){ .type=CONSTANT, .value.constant=current.data.val };
+                *newExp = (Expression){
+                    .type=CONSTANT,
+                    .value.constant=current.data.val,
+                    .parent=prevExp
+                };
                 past = wasLiteral;
             break;
             case tokOp:
@@ -442,6 +444,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     newExp->type = OPERATOR;
                     newExp->value.operator.type = BINARYOP;
                     newExp->value.operator.value.binary.left = prevExp;
+                    newExp->value.operator.value.binary.right = NULL;
                     switch(current.data.op){
                         case opPlus:     newExp->value.operator.value.binary.type = ADD; break;
                         case opMinus:    newExp->value.operator.value.binary.type = SUBTRACT; break;
@@ -480,6 +483,9 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 if(past==wasOperator){ // na konci vyrazu nesmi byt operator
                   throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd, .line_num=current.line_num}));
                 }
+                if(past==wasStart){ // vyraz nesmi byt prazdny/bez otviraci zavorky
+                  throw(SyntaxError,((SyntaxErrorException){.type=BlankExpression, .line_num=current.line_num}));
+                }
                 return; // konec parsovani expression, schvalne nekonzumuji!
             break;
             default:
@@ -517,6 +523,7 @@ void syntaxErrorPrint(SyntaxErrorException e) {
     case TwoOperatorsNextToEachOther:	fprintf(stderr,"Parse error: TwoOperatorsNextToEachOther"); break;
     case UnterminatedParentheses:	fprintf(stderr,"Parse error: UnterminatedParentheses"); break;
     case BadStartOfStatement:		fprintf(stderr,"Parse error: BadStartOfStatement"); break;
+    case BlankExpression:		fprintf(stderr,"Parse error: BlankExpression"); break;
   }
   fprintf(stderr," na radku %d.\n",e.line_num);
 }

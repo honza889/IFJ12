@@ -51,6 +51,7 @@ typedef struct {
     TwoOperatorsNextToEachOther,
     UnterminatedParentheses,
     BadStartOfStatement,
+    BlankExpression,
   } type;
   unsigned line_num;
 } SyntaxErrorException;
