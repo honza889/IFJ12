@@ -119,7 +119,7 @@ void consumeTokN( Scanner* scanner, unsigned N )
 {
     // Počet prvků, které chci zkonzumovat, musí být větší nule a menší nebo rovno počtu načtených prvků.
     assert(N > 0 && N <= scanner->count);
-    scanner->first += N;
+    scanner->first = (scanner->first + N) % SCAN_BUF_CAP;
     scanner->count -= N;
     // Musím zajistit aby operace nad tokeny měly připravený další token.
     // Aneb kdo sní poslední kousek kupuje další :-D
