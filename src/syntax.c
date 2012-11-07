@@ -213,9 +213,8 @@ void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     parseExpression(s, &ass.source, ctx);
     expectTok(s, tokEndOfLine);
     
-    Statement* statement = new(Statement);
-    *statement = (Statement){ .type=ASSIGNMENT, .value.assignment=ass };
-    addStatementToStatementList(sl,statement);
+    Statement statement = { .type=ASSIGNMENT, .value.assignment=ass };
+    addStatementToStatementList(sl,&statement);
 }
 
 // Konzumuje token.
@@ -261,9 +260,8 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     expectTok(s, tokRBracket);
     expectTok(s, tokEndOfLine);
     
-    Statement* statement = new(Statement);
-    *statement = (Statement){ .type=SUBSTRING, .value.substring=substr };
-    addStatementToStatementList(sl,statement);
+    Statement statement = { .type=SUBSTRING, .value.substring=substr };
+    addStatementToStatementList(sl,&statement);
 }
 
 // Konzumuje token.
@@ -328,7 +326,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
         
     } past=wasStart;
     
-    while((current=getTok(s)).type!=tokEndOfFile){
+    while((current=getTok(s)).type!=tokEndOfFile){ // BUG: parent ukazatele ukazuji spatne!
         switch(current.type){
             case tokId:
                 printf("ctuId\n");
@@ -425,16 +423,22 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     }
                     
                     newExp->parent = prevExp->parent;
-                    if(prevExp->parent==NULL){
+                    if(prevExp->parent==NULL){ // je novym korenem
                       printf("je novym korenem\n");
+                      // subExp je nove umisteni byvaleho korene (wholeExpression)
                       subExp = new(Expression);
-                      *subExp = *wholeExpression; // subExp je nove umisteni byvaleho korene
+                      *subExp = *wholeExpression;
+                      // pokud byl byvaly koren operator, opravime odkazy z jeho potomku
                       if(subExp->type==OPERATOR){
-                          if(subExp->value.operator.value.binary.left){
-                              subExp->value.operator.value.binary.left->parent = subExp;
-                          }
-                          if(subExp->value.operator.value.binary.right){
-                              subExp->value.operator.value.binary.right->parent = subExp;
+                          if(subExp->value.operator.type==BINARYOP){ // binarni
+                              if(subExp->value.operator.value.binary.left!=NULL){
+                                  subExp->value.operator.value.binary.left->parent = subExp;
+                              }
+                              if(subExp->value.operator.value.binary.right!=NULL){
+                                  subExp->value.operator.value.binary.right->parent = subExp;
+                              }
+                          }else{ // unarni
+                              subExp->value.operator.value.unary.operand->parent = subExp;
                           }
                       }
                       prevExp = subExp;
@@ -449,10 +453,10 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                         newExp->parent->value.operator.value.unary.operand = newExp;
                       }
                     }
-                    prevExp->parent = newExp;
                     newExp->type = OPERATOR;
                     newExp->value.operator.type = BINARYOP;
                     newExp->value.operator.value.binary.left = prevExp;
+                    prevExp->parent = newExp;
                     newExp->value.operator.value.binary.right = NULL;
                     switch(current.data.op){
                         case opPlus:     newExp->value.operator.value.binary.type = ADD; break;

@@ -39,9 +39,6 @@ typedef Value* ValueList;
 
 typedef Value( *BuiltinFunction )( ValueList, int );
 
-Value evalFunction( Function* func, ExpressionList params, Context* context );
-void deleteStatementList( StatementList func );
-
 /**
  * Hodnota promenne generickeho datoveho typu
  */
@@ -218,5 +215,13 @@ static inline StatementList newStatementList(){
 
 static inline Value* symbol(int index,Context* context){
  return (index>=0?&(context->locals)[index]:&(context->globals)[-index-1]);
+}
+
+Value evalFunction( Function* func, ExpressionList params, Context* context );
+
+void deleteStatementList( StatementList );
+
+static void inline deleteFunction( Function func ){
+    deleteStatementList(func.value.userDefined.statements);
 }
 #endif

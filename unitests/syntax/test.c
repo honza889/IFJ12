@@ -19,6 +19,7 @@ BEGIN_TEST
   Function mainFunction;
   try{
     parseProgram(&s, &ctx, &mainFunction);
+    deleteFunction( mainFunction );
   }
   catch{
     on(ScannerError, e){
