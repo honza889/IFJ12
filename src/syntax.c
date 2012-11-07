@@ -29,16 +29,28 @@ void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* functio
 
 void addStatementToStatementList( StatementList* sl, Statement* statement )
 {
-    sl->count++;
-    sl->item = resizeArray( sl->item, Statement, sl->count );
-    sl->item[sl->count-1] = *statement;
+    if(sl->item==NULL){
+        sl->count=1;
+        sl->item = newArray( Statement, sl->count );
+        sl->item[0] = *statement;
+    }else{
+        sl->count++;
+        sl->item = resizeArray( sl->item, Statement, sl->count );
+        sl->item[sl->count-1] = *statement;
+    }
 }
 
 void addExpressionToExpressionList( ExpressionList* el, Expression* expression )
 {
-    el->count++;
-    el->expressions = resizeArray( el->expressions, Expression, el->count );
-    el->expressions[el->count-1] = *expression;
+    if(el->expressions==NULL){
+        el->count=1;
+        el->expressions = newArray( Statement, el->count );
+        el->expressions[0] = *expression;
+    }else{
+        el->count++;
+        el->expressions = resizeArray( el->expressions, Expression, el->count );
+        el->expressions[el->count-1] = *expression;
+    }
 }
 
 void parseProgram( Scanner* s, SyntaxContext* ctx, Function* main )
@@ -490,7 +502,6 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
             break;
         } // endswitch
         prevExp = newExp;
-        printf("token(%d)\n",getTokN(s,0).type);
         consumeTok(s);
     } // endwhile
     printf("konecVyrazuAsouboruZaroven\n");
