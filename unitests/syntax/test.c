@@ -17,7 +17,36 @@ BEGIN_TEST
         .functions = NULL,
   };
   Function mainFunction;
-  parseProgram(&s, &ctx, &mainFunction); // zpusobi zacykleni
+  try{
+    parseProgram(&s, &ctx, &mainFunction);
+  }
+  catch{
+    on(ScannerError, e){
+      scannerErrorPrint(*e);
+      fclose( f );
+      exit(1);
+    }
+    on(SyntaxError, e){
+      syntaxErrorPrint(*e);
+      fclose( f );
+      exit(2);
+    }
+    on(UnexpectedToken, e){
+      UnexpectedTokenPrint(*e);
+      fclose( f );
+      exit(2);
+    }
+    on(UnexpectedKeyWord, e){
+      UnexpectedKeyWordPrint(*e);
+      fclose( f );
+      exit(2);
+    }
+    on(OutOfMemory, typename){
+      fprintf(stderr, "Nebylo mozne alokovat pamet pro typ '%s'", *typename );
+      fclose( f );
+      exit(99);
+    }
+  }
 //   Expression ex;parseExpression(&s,&ex,&ctx);
   //TEST(  )
   

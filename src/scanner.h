@@ -25,26 +25,29 @@ typedef enum {
 } TokenType;
 
 typedef enum {		/** Klíčová slova */
-      kElse = 0x0001, 
-      kEnd = 0x0002,
-      kFunction = 0x0004, 
-      kIf = 0x0008, 
-      kReturn = 0x0010, 
-      kWhile = 0x0020
+    kElse = 0x0001, 
+    kEnd = 0x0002,
+    kFunction = 0x0004, 
+    kIf = 0x0008, 
+    kReturn = 0x0010, 
+    kWhile = 0x0020
 } KeyWord;
 
 typedef struct {
-    TokenType type;
-  union {
-    RCString id;	/** Název symbolu */
-    Value val;		/** Hodnota zapsaná ve zdrojáku */
-    enum {		/** Unárni nebo binární operátor */
-      opPlus, opMinus, opMultiple, opDivide, opPower,
-      opLT, opGT, opLE, opGE, opNE, opEQ
-    } op;
-    KeyWord keyw;
-  } data;
-}  Token;
+    TokenType type;	/** Typ tokenu */
+  
+    union {
+        RCString id;	/** Název symbolu */
+        Value val;	/** Hodnota zapsaná ve zdrojáku */
+        enum {		/** Unárni nebo binární operátor */
+            opPlus, opMinus, opMultiple, opDivide, opPower,
+            opLT, opGT, opLE, opGE, opNE, opEQ
+        } op;
+        KeyWord keyw;	/** Klíčová slova */
+    } data;
+  
+    unsigned line_num;	/** Číslo řádku, na kterém se token nachází (pro výjimky) */
+} Token;
 
 typedef struct {
     unsigned first;			/** Index na první prvek bufferu. */
@@ -138,9 +141,21 @@ Token testTokN( Scanner* scanner, TokenType tok, unsigned index );
 Token scan(FILE *f);
 
 /**
- * Vrátí text chybové hlášky pro danou výjimku.
+ * Vytiskne na stderr text chybové hlášky pro danou výjimku.
  * @param[in] e Výjimka vrácena scannerem.
  */
 void scannerErrorPrint(ScannerErrorException e);
+
+/**
+ * Vytiskne na stderr text chybové hlášky pro danou výjimku.
+ * @param[in] e Výjimka vrácena testTok().
+ */
+void UnexpectedTokenPrint(UnexpectedTokenException e);
+
+/**
+ * Vytiskne na stderr text chybové hlášky pro danou výjimku.
+ * @param[in] e Výjimka vrácena testKeyw().
+ */
+void UnexpectedKeyWordPrint(UnexpectedKeyWordException e);
 
 #endif

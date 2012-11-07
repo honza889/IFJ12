@@ -308,10 +308,11 @@ BEGIN_TEST
 
   }
   catch{
-   on(ScannerError,e){
-    scannerErrorPrint(*e);
-    exit(1);
-   }
+    on(ScannerError, e){
+      scannerErrorPrint(*e);
+      fclose( f );
+      exit(1);
+    }
   }
 
   fclose(f);

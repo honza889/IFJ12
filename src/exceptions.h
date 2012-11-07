@@ -52,18 +52,21 @@ typedef struct {
     UnterminatedParentheses,
     BadStartOfStatement,
   } type;
+  unsigned line_num;
 } SyntaxErrorException;
 
 typedef struct
 {
     int expected;
     int got;
+    unsigned line_num;
 } UnexpectedTokenException;
 
 typedef struct
 {
     int expected;
     int got;
+    unsigned line_num;
 } UnexpectedKeyWordException;
 
 typedef int UndefinedVariableException;

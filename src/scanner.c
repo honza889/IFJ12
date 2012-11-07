@@ -51,7 +51,8 @@ Token testTok( Scanner* scanner, TokenType tok )
         // BUG: Může způsobit leak!
         throw( UnexpectedToken, ((UnexpectedTokenException){ 
             .expected = tok, 
-            .got = getTok( scanner ).type 
+            .got = getTok( scanner ).type,
+            .line_num = getTok( scanner ).line_num
         }));
     }
     
@@ -69,11 +70,12 @@ void testKeyw( Scanner* scanner, KeyWord keyw )
 {
     if( getTok( scanner ).type == tokKeyW )
     {
-        if( getTok( scanner ).data.keyw != keyw )
+        if( ! ( getTok( scanner ).data.keyw & keyw ) )
         {
             throw( UnexpectedKeyWord, ((UnexpectedKeyWordException){ 
                 .expected = keyw, 
-                .got = getTok( scanner ).data.keyw 
+                .got = getTok( scanner ).data.keyw,
+                .line_num = getTok( scanner ).line_num
             }));
         }
     }
@@ -82,7 +84,8 @@ void testKeyw( Scanner* scanner, KeyWord keyw )
         // BUG: Může způsobit leak!
         throw( UnexpectedToken, ((UnexpectedTokenException){
             .expected = tokKeyW, 
-            .got = getTok( scanner ).type 
+            .got = getTok( scanner ).type,
+            .line_num = getTok( scanner ).line_num
         }));
     }
 }
@@ -146,11 +149,74 @@ Token testTokN( Scanner* scanner, TokenType tok, unsigned index )
         // BUG: Může způsobit leak!
         throw( UnexpectedToken, ((UnexpectedTokenException){ 
             .expected = tok, 
-            .got = current.type 
+            .got = current.type,
+            .line_num = current.line_num
         }));
     }
     
     return current;
+}
+
+void UnexpectedTokenPrint(UnexpectedTokenException e) {
+  fprintf(stderr,"Parse error: Predpokladany token je ");
+  for (int i=1, j=1; i <= tokEndOfFile; i<<=1) {
+    switch (e.expected & i) {
+      case tokId:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"identifikator"); break;
+      case tokLiteral:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"literal"); break;
+      case tokOp:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"operator"); break;
+      case tokKeyW:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"klicove slovo"); break;
+      case tokAssign:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"znak prirazeni '='"); break;
+      case tokLParen:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"leva zavorka '('"); break;
+      case tokRParen:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"prava zavorka ')'"); break;
+      case tokLBracket:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"leva hranata zavorka '['"); break;
+      case tokRBracket:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"prava hranata zavorka ']'"); break;
+      case tokColon:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"dvojtecka ':'"); break;
+      case tokComma:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"carka ','"); break;
+      case tokEndOfLine:	if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"konec radku '\\n'"); break;
+      case tokEndOfFile:	if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"konec souboru (EOF)"); break;
+    }
+  }
+  fprintf(stderr,", ale ziskany token je ");
+  switch (e.got) {
+    case tokId:		fprintf(stderr,"identifikator"); break;
+    case tokLiteral:	fprintf(stderr,"literal"); break;
+    case tokOp:		fprintf(stderr,"operator"); break;
+    case tokKeyW:	fprintf(stderr,"klicove slovo"); break;
+    case tokAssign:	fprintf(stderr,"znak prirazeni '='"); break;
+    case tokLParen:	fprintf(stderr,"leva zavorka '('"); break;
+    case tokRParen:	fprintf(stderr,"prava zavorka ')'"); break;
+    case tokLBracket:	fprintf(stderr,"leva hranata zavorka '['"); break;
+    case tokRBracket:	fprintf(stderr,"prava hranata zavorka ']'"); break;
+    case tokColon:	fprintf(stderr,"dvojtecka ':'"); break;
+    case tokComma:	fprintf(stderr,"carka ','"); break;
+    case tokEndOfLine:	fprintf(stderr,"konec radku '\\n'"); break;
+    case tokEndOfFile:	fprintf(stderr,"necekany konec souboru (EOF)"); break;
+  }
+  fprintf(stderr," na radku %d.\n", e.line_num);
+}
+
+void UnexpectedKeyWordPrint(UnexpectedKeyWordException e) {
+  fprintf(stderr,"Parse error: Predpokladane klicove slovo je ");
+  for (int i=1, j=1; i <= kWhile; i<<=1) {
+    switch (e.expected & i) {
+      case kElse:	if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"\"else\""); break;
+      case kEnd:	if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"\"end\""); break;
+      case kFunction:	if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"\"function\""); break;
+      case kIf:		if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"\"if\""); break;
+      case kReturn:	if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"\"return\""); break;
+      case kWhile:	if (j++>1) {fprintf(stderr," nebo ");} fprintf(stderr,"\"while\""); break;
+    }
+  }
+  fprintf(stderr,", ale ziskane klicove slovo je ");
+  switch (e.got) {
+    case kElse:		fprintf(stderr,"\"else\""); break;
+    case kEnd:		fprintf(stderr,"\"end\""); break;
+    case kFunction:	fprintf(stderr,"\"function\""); break;
+    case kIf:		fprintf(stderr,"\"if\""); break;
+    case kReturn:	fprintf(stderr,"\"return\""); break;
+    case kWhile:	fprintf(stderr,"\"while\""); break;
+  }
+  fprintf(stderr," na radku %d.\n", e.line_num);
 }
 
 /*       _\|/_
@@ -203,6 +269,7 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
       {
         token->type = tokOp;
         token->data.op = opDivide;
+        token->line_num = *line_num;
       }
       break;
       
@@ -212,24 +279,28 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
       {
         token->type = tokOp;
         token->data.op = opPower;
+        token->line_num = *line_num;
         *last_letter = getc(f);
       }
       else
       {
         token->type = tokOp;
         token->data.op = opMultiple;
+        token->line_num = *line_num;
       }
       break;
       
     case '+':
       token->type = tokOp;
       token->data.op = opPlus;
+      token->line_num = *line_num;
       *last_letter = getc(f);
       break;
       
     case '-':
       token->type = tokOp;
       token->data.op = opMinus;
+      token->line_num = *line_num;
       *last_letter = getc(f);
       break;
       
@@ -239,12 +310,14 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
       {
         token->type = tokOp;
         token->data.op = opLE;
+        token->line_num = *line_num;
         *last_letter = getc(f);
       }
       else
       {
         token->type = tokOp;
         token->data.op = opLT;
+        token->line_num = *line_num;
       }
       break;
       
@@ -254,12 +327,14 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
       {
         token->type = tokOp;
         token->data.op = opGE;
+        token->line_num = *line_num;
         *last_letter = getc(f);
       }
       else
       {
         token->type = tokOp;
         token->data.op = opGT;
+        token->line_num = *line_num;
       }
       break;
       
@@ -269,6 +344,7 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
       {
         token->type = tokOp;
         token->data.op = opNE;
+        token->line_num = *line_num;
         *last_letter = getc(f);
       }
       else
@@ -284,41 +360,49 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
       {
         token->type = tokOp;
         token->data.op = opEQ;
+        token->line_num = *line_num;
         *last_letter = getc(f);
       }
       else
       {
         token->type = tokAssign;
+        token->line_num = *line_num;
       }
       break;
       
     case '(':
       token->type = tokLParen;
+      token->line_num = *line_num;
       *last_letter = getc(f);
       break;
       
     case ')':
       token->type = tokRParen;
+      token->line_num = *line_num;
       *last_letter = getc(f);
       break;
       
     case '[':
       token->type = tokLBracket;
+      token->line_num = *line_num;
       *last_letter = getc(f);
       break;
       
     case ']':
       token->type = tokRBracket;
+      token->line_num = *line_num;
       *last_letter = getc(f);
       break;
       
     case ':':
       token->type = tokColon;
+      token->line_num = *line_num;
       *last_letter = getc(f);
       break;
       
     case ',':
       token->type = tokComma;
+      token->line_num = *line_num;
       *last_letter = getc(f);
       break;
       
@@ -334,10 +418,10 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
  * @param[in]	f		Ukazatel na otevřený soubor.
  * @param[out]	last_letter	Poslední načtený znak ze zdrojového kódu.
  * @param[out]	lexeme		Ukazatel na RCString (!= NULL).
- * @param[out]	line_num	Ukazatel na počítadlo řádků vstupního zdrojového kódu.
+ * @param[in]	line_num	Hodnota aktuálního řádku vstupního zdrojového kódu pro vyhození výjimky.
  * @return Vrací (bool) true, když uspěje (přidá písmeno do \a lexeme), jinak false.
  */
-bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned *line_num)
+bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned line_num)
 {
   assert(lexeme != NULL);
   assert(UCHAR_MAX >= 0xFF);	// V této fci předpokládám, že char má min. 8 bitů.
@@ -366,7 +450,7 @@ bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned *li
       for (int i=0; (i < LEN_HEX_CHAR-1); i++) {
         if ((*last_letter = getc(f)) == EOF) {
           deleteRCString(lexeme);
-          throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=*line_num}));
+          throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=line_num}));
         }
         hex_char[i] = *last_letter;
       }
@@ -376,14 +460,14 @@ bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned *li
       conv_num = strtol(hex_char, &endptr, 16);	// Předpokládám, že char má min. 8 bitů (viz assert() výše).
       if (errno != 0 || *endptr != '\0') {
         deleteRCString(lexeme);
-        throw(ScannerError,((ScannerErrorException){.type=InvalidNumericLiteral, .line_num=*line_num}));
+        throw(ScannerError,((ScannerErrorException){.type=InvalidNumericLiteral, .line_num=line_num}));
       }
       RCStringAppendChar(lexeme, conv_num);
       break;
     case EOF:
       deleteRCString(lexeme);
       // error: missing terminating " character
-      throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=*line_num}));
+      throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=line_num}));
       break;
     default:
       return false;
@@ -431,21 +515,22 @@ bool det_key_word(RCString lexeme, Token *token, unsigned line_num)
       token->data.val = newValueNil();
     else {
       if (! strcmp("as", RCStringGetBuffer(&cmp_lexeme))	||
-	  ! strcmp("def", RCStringGetBuffer(&cmp_lexeme))	||
-	  ! strcmp("directive", RCStringGetBuffer(&cmp_lexeme))	||
-	  ! strcmp("export", RCStringGetBuffer(&cmp_lexeme))	||
-	  ! strcmp("from", RCStringGetBuffer(&cmp_lexeme))	||
-	  ! strcmp("import", RCStringGetBuffer(&cmp_lexeme))	||
-	  ! strcmp("launch", RCStringGetBuffer(&cmp_lexeme))	||
-	  ! strcmp("load", RCStringGetBuffer(&cmp_lexeme))	||
-	  ! strcmp("macro", RCStringGetBuffer(&cmp_lexeme))	)
+          ! strcmp("def", RCStringGetBuffer(&cmp_lexeme))	||
+          ! strcmp("directive", RCStringGetBuffer(&cmp_lexeme))	||
+          ! strcmp("export", RCStringGetBuffer(&cmp_lexeme))	||
+          ! strcmp("from", RCStringGetBuffer(&cmp_lexeme))	||
+          ! strcmp("import", RCStringGetBuffer(&cmp_lexeme))	||
+          ! strcmp("launch", RCStringGetBuffer(&cmp_lexeme))	||
+          ! strcmp("load", RCStringGetBuffer(&cmp_lexeme))	||
+          ! strcmp("macro", RCStringGetBuffer(&cmp_lexeme))	)
       {
-	deleteRCString(&cmp_lexeme);
-	throw(ScannerError,((ScannerErrorException){.type=UndefinedKeyword, .line_num=line_num}));
+        deleteRCString(&cmp_lexeme);
+        throw(ScannerError,((ScannerErrorException){.type=UndefinedKeyword, .line_num=line_num}));
       }
       result = false;
     }
   }
+  token->line_num = line_num;
   
   deleteRCString(&cmp_lexeme);
   return result;
@@ -492,24 +577,24 @@ void load_number(FILE *f, Token *token, char *last_letter, unsigned line_num, RC
     if (*last_letter == '.') {
       add_char(f, last_letter, lexeme);
       if (isdigit(*last_letter)) {
-	do {
-	  add_char(f, last_letter, lexeme);
-	  if (*last_letter == 'e') {
-	    do {
-	      add_char(f, last_letter, lexeme);
-	    } while (isdigit(*last_letter));
-	  }
-	} while (isdigit(*last_letter));
+        do {
+          add_char(f, last_letter, lexeme);
+          if (*last_letter == 'e') {
+            do {
+              add_char(f, last_letter, lexeme);
+            } while (isdigit(*last_letter));
+          }
+        } while (isdigit(*last_letter));
       }
       else {
-	deleteRCString(lexeme);
-	throw(ScannerError,((ScannerErrorException){.type=InvalidNumericLiteral, .line_num=line_num}));
+        deleteRCString(lexeme);
+        throw(ScannerError,((ScannerErrorException){.type=InvalidNumericLiteral, .line_num=line_num}));
       }
       break;
     }
     else if (*last_letter == 'e') {
       do {
-	add_char(f, last_letter, lexeme);
+        add_char(f, last_letter, lexeme);
       } while (isdigit(*last_letter));
       break;
     }
@@ -521,6 +606,7 @@ void load_number(FILE *f, Token *token, char *last_letter, unsigned line_num, RC
   if (errno == 0 && *endptr == '\0') {
     token->type = tokLiteral;
     token->data.val = newValueNumeric( conv_num );
+    token->line_num = line_num;
   }
   else {
     deleteRCString(lexeme);
@@ -558,10 +644,11 @@ Token scan(FILE *f)
     // následuje dlouhý přepínač if-else
     if (last_letter == EOF) {
       token.type = tokEndOfFile;
+      token.line_num = line_num;
     }
     else if (last_letter == '\n'){
-      line_num++;
       token.type = tokEndOfLine;
+      token.line_num = line_num++;
       last_letter = getc(f);
     }
     else if (isalpha(last_letter) || last_letter == '_') {
@@ -573,6 +660,7 @@ Token scan(FILE *f)
       if (! det_key_word(lexeme, &token, line_num)) {
         token.type = tokId;
         token.data.id = copyRCString(&lexeme);
+        token.line_num = line_num;
       }
     }
     else if (isdigit(last_letter)) {
@@ -597,7 +685,7 @@ Token scan(FILE *f)
         // Pokud je načtené písmeno escape sekvence převede se na ní reprezentující znak.
         if (last_letter == '\\') {
           // Pokud det_esc_sequence neuspěje narazilo se na špatnou escape sekvenci.
-          if (! det_esc_sequence(f, &last_letter, &lexeme, &line_num)) {
+          if (! det_esc_sequence(f, &last_letter, &lexeme, line_num)) {
             deleteRCString(&lexeme);
             // .line_num zde obsahuje počátek neukončeného řetězce
             throw(ScannerError,((ScannerErrorException){.type=BadEscSequence, .line_num=start_line_num}));
@@ -608,6 +696,7 @@ Token scan(FILE *f)
       // Řetězec se uloží do tokenu.
       token.type = tokLiteral;
       token.data.val = newValueString(lexeme);
+      token.line_num = line_num;
       last_letter = getc(f);
     }
     else {
@@ -619,14 +708,14 @@ Token scan(FILE *f)
   return token;
 }
 
-void scannerErrorPrint(ScannerErrorException e){
-  switch(e.type){
-    case InvalidNumericLiteral: fprintf(stderr,"Parse error: Chybne zadane cislo"); break;
-    case InvalidToken: fprintf(stderr,"Parse error: Nesmyslny lexem"); break;
-    case UndefinedKeyword: fprintf(stderr,"Parse error: Klicove slovo s nedefinovanym vyznamem"); break;
-    case UnterminatedComment: fprintf(stderr,"Parse error: Neukonceny komentar"); break;
-    case UnterminatedString: fprintf(stderr,"Parse error: Neukonceny retezec"); break;
-    case BadEscSequence: fprintf(stderr,"Parse error: Chybna escapovaci sekvence v retezci"); break;
+void scannerErrorPrint(ScannerErrorException e) {
+  switch (e.type) {
+    case InvalidNumericLiteral:	fprintf(stderr,"Scan error: Chybne zadane cislo"); break;
+    case InvalidToken:		fprintf(stderr,"Scan error: Nesmyslny lexem"); break;
+    case UndefinedKeyword:	fprintf(stderr,"Scan error: Klicove slovo s nedefinovanym vyznamem"); break;
+    case UnterminatedComment:	fprintf(stderr,"Scan error: Neukonceny komentar"); break;
+    case UnterminatedString:	fprintf(stderr,"Scan error: Neukonceny retezec"); break;
+    case BadEscSequence:	fprintf(stderr,"Scan error: Chybna escapovaci sekvence v retezci"); break;
   }
-  fprintf(stderr," na radku %d\n",e.line_num);
+  fprintf(stderr," na radku %d.\n", e.line_num);
 }

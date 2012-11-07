@@ -261,7 +261,7 @@ void parseIf( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     stmt.type = CONDITION;
     
     expectKeyw( s, kIf );
-    parseExpression( s, &stmt.value.condition.condition, ctx );
+    parseExpression( s, &stmt.value.condition.condition, ctx );	// BUG: Jak to, že projde parseExpression(), když je expression prázdný?
     expectTok( s, tokEndOfLine );
     while( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kElse )
     {
@@ -321,7 +321,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
             case tokId:
                 printf("ctuId\n");
                 if(past==wasParentheses){ // operand je hned za (pravou!) zavorkou - chyba
-                  throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
+                  throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
                 if(past==wasStart){
                     newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
@@ -338,7 +338,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     }
                     newExp->parent = prevExp;
                 }else{
-                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
+                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
                 // TODO: az aspon trochu pojede, implementovat volani funkce ctenim budoucnosti
 /*
@@ -384,7 +384,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                         newExp->parent = prevExp;
                     }
                 }else{
-                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
+                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
                 *newExp = (Expression){ .type=CONSTANT, .value.constant=current.data.val };
                 past = wasLiteral;
@@ -399,12 +399,12 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                         newExp->value.operator.value.unary.type = MINUS;
                         newExp->parent = NULL;
                     }else{
-                        throw(SyntaxError,((SyntaxErrorException){.type=BinaryOperatorAtBegin}));
+                        throw(SyntaxError,((SyntaxErrorException){.type=BinaryOperatorAtBegin, .line_num=current.line_num}));
                     }
                 }else{ // ve vyrazu jiz je promenna/konstanta
                     
                     if(past==wasOperator){ // pred timto operatorem je dalsi operator - nepripustne
-                        throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther}));
+                        throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther, .line_num=current.line_num}));
                     }
                     
                     // Je-li operace mene prioritni nez predchozi, misto predchozi operace
@@ -468,22 +468,22 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     prevExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
                     newExp->parent = prevExp;
                 }else{
-                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax}));
+                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
                 parseExpression(s,newExp,ctx);
                 if(getTok(s).type!=tokRParen){
-                    throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses}));
+                    throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses, .line_num=current.line_num}));
                 }
             break;
             case tokRParen: case tokComma: case tokEndOfLine:
                 printf("konecVyrazu\n");
                 if(past==wasOperator){ // na konci vyrazu nesmi byt operator
-                  throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd}));
+                  throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd, .line_num=current.line_num}));
                 }
                 return; // konec parsovani expression, schvalne nekonzumuji!
             break;
             default:
-                throw(SyntaxError,((SyntaxErrorException){.type=BadTokenInExpression}));
+                throw(SyntaxError,((SyntaxErrorException){.type=BadTokenInExpression, .line_num=current.line_num}));
             break;
         } // endswitch
         prevExp = newExp;
@@ -492,7 +492,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
     } // endwhile
     printf("konecVyrazuAsouboruZaroven\n");
     if(past==wasOperator){ // na konci vyrazu nesmi byt operator
-        throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd}));
+        throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd, .line_num=current.line_num}));
     }
     return; // konec parsovani expression a souboru zaroven, nekonzumuji!
 }
@@ -504,4 +504,19 @@ void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx )
     *id = getSymbol( name, ctx->globalSymbols, ctx->localSymbols );
     deleteRCString( &name );
     consumeTok( s );
+}
+
+void syntaxErrorPrint(SyntaxErrorException e) {
+  switch (e.type) {	// TODO: Dát tam nějaké hlášky!
+    case BadTokenInExpression:		fprintf(stderr,"Parse error: BadTokenInExpression"); break;
+    case BadTokenAtBeginOfStatement:	fprintf(stderr,"Parse error: BadTokenAtBeginOfStatement"); break;
+    case AssignWithoutAssignOperator:	fprintf(stderr,"Parse error: AssignWithoutAssignOperator"); break;
+    case StrangeSyntax:			fprintf(stderr,"Parse error: StrangeSyntax"); break;
+    case BinaryOperatorAtBegin:		fprintf(stderr,"Parse error: BinaryOperatorAtBegin"); break;
+    case OperatorAtTheEnd:		fprintf(stderr,"Parse error: OperatorAtTheEnd"); break;
+    case TwoOperatorsNextToEachOther:	fprintf(stderr,"Parse error: TwoOperatorsNextToEachOther"); break;
+    case UnterminatedParentheses:	fprintf(stderr,"Parse error: UnterminatedParentheses"); break;
+    case BadStartOfStatement:		fprintf(stderr,"Parse error: BadStartOfStatement"); break;
+  }
+  fprintf(stderr," na radku %d.\n",e.line_num);
 }

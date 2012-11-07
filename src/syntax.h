@@ -45,4 +45,10 @@ void parseFunction( Scanner* s, SyntaxContext* ctx );
 
 void parseFunctionParameters( Scanner* s, Function* func, SyntaxContext* ctx );
 
+/**
+ * Vytiskne na stderr text chybové hlášky pro danou výjimku.
+ * @param[in] e Výjimka vrácena syntaktickým analyzátorem.
+ */
+void syntaxErrorPrint(SyntaxErrorException e);
+
 #endif
