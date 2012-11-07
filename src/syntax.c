@@ -325,16 +325,13 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 }
                 if(past==wasStart){
                     newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
-                    newExp->parent = NULL;
                 }else if(past==wasOperator){
                     newExp = new(Expression);
                     // pripojit za nejnovejsi operator
                     if(prevExp->value.operator.type==BINARYOP){
                         prevExp->value.operator.value.binary.right = newExp;
-                        newExp->parent = prevExp;
                     }else{
                         prevExp->value.operator.value.unary.operand = newExp;
-                        newExp->parent = prevExp;
                     }
                     newExp->parent = prevExp;
                 }else{
@@ -362,17 +359,15 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     newExp = prevExp; // nevznikla nova expression, jen jsme zmenili VARIABLE na FUNCTION_CALL
 */
 
-                *newExp = (Expression){
-                    .type=VARIABLE,
-                    .value.variable=getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols)
-                };
+                newExp->type=VARIABLE;
+                newExp->value.variable=getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols);
+                newExp->parent=prevExp;
                 past = wasId;
             break;
             case tokLiteral:
                 printf("ctuLiteral\n");
                 if(past==wasStart){
                     newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
-                    newExp->parent = NULL;
                 }else if(past==wasOperator){
                     newExp = new(Expression);
                     // pripojit za nejnovejsi operator
@@ -384,11 +379,9 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
-                *newExp = (Expression){
-                    .type=CONSTANT,
-                    .value.constant=current.data.val,
-                    .parent=prevExp
-                };
+                newExp->type=CONSTANT;
+                newExp->value.constant=current.data.val;
+                newExp->parent=prevExp;
                 past = wasLiteral;
             break;
             case tokOp:
@@ -423,11 +416,15 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     if(prevExp->parent==NULL){
                       printf("je novym korenem\n");
                       subExp = new(Expression);
-                      *subExp = *wholeExpression;
-                      if(subExp->value.operator.value.binary.left)
-                          subExp->value.operator.value.binary.left->parent = subExp;
-                      if(subExp->value.operator.value.binary.right)
-                          subExp->value.operator.value.binary.right->parent = subExp;
+                      *subExp = *wholeExpression; // subExp je nove umisteni byvaleho korene
+                      if(subExp->type==OPERATOR){
+                          if(subExp->value.operator.value.binary.left){
+                              subExp->value.operator.value.binary.left->parent = subExp;
+                          }
+                          if(subExp->value.operator.value.binary.right){
+                              subExp->value.operator.value.binary.right->parent = subExp;
+                          }
+                      }
                       prevExp = subExp;
                       newExp = wholeExpression;
                     }else{
