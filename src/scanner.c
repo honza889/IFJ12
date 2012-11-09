@@ -106,7 +106,7 @@ Token getTokN( Scanner* scanner, unsigned index )
         assert(index < SCAN_BUF_CAP);
         new_index = scanner->count;
         while (scanner->count <= index) {	// Načti do bufferu prvky od posledního po index (včetně).
-          new_index = (scanner->first + new_index) % SCAN_BUF_CAP;
+          new_index = (scanner->first + scanner->count) % SCAN_BUF_CAP;
           scanner->current[new_index] = scan( scanner->file );
           scanner->count++;
         }
@@ -119,7 +119,15 @@ void consumeTokN( Scanner* scanner, unsigned N )
 {
     // Počet prvků, které chci zkonzumovat, musí být větší nule a menší nebo rovno počtu načtených prvků.
     assert(N > 0 && N <= scanner->count);
-    scanner->first = (scanner->first + N) % SCAN_BUF_CAP;
+    for (unsigned i=0; i<N; i++) {
+      Token *deletedTok = &scanner->current[scanner->first];
+      if (deletedTok->type == tokId)
+        deleteRCString( &deletedTok->data.id );
+      // TODO: Nevím proč zde nemůžu uvolnit tokLiteral typu string, ale když ho uvolním tak se něco rozbije.
+//      else if (deletedTok->type == tokLiteral && deletedTok->data.val.type == typeString)
+//        deleteRCString( &deletedTok->data.val.data.string );
+      scanner->first = (scanner->first + 1) % SCAN_BUF_CAP;
+    }
     scanner->count -= N;
     // Musím zajistit aby operace nad tokeny měly připravený další token.
     // Aneb kdo sní poslední kousek kupuje další :-D
@@ -569,36 +577,47 @@ void load_number(FILE *f, Token *token, char *last_letter, unsigned line_num, RC
 {
   assert(isdigit(*last_letter));
   
+  bool correct = false;	// pomocná proměnná pro určení zda-li je číslo správně zapsáno
   double conv_num;	// proměnná do které se uloží převedené číslo
   char *endptr = NULL;	// ukazatel na písmeno kde přestala číst funkce strtod()
   
   do {
-    add_char(f, last_letter, lexeme);
+    add_char(f, last_letter, lexeme);	// Přidám do lexému číslici 0-9.
     if (*last_letter == '.') {
-      add_char(f, last_letter, lexeme);
-      if (isdigit(*last_letter)) {
+      add_char(f, last_letter, lexeme);	// Přidám do lexému řádovou tečku.
+      if (isdigit(*last_letter)) {	// Po tečce musí následovat číslo.
+        correct = true;			// Pokud ano, zápis je správný.
         do {
-          add_char(f, last_letter, lexeme);
-          if (*last_letter == 'e') {
+          add_char(f, last_letter, lexeme);	// Přidám do desetiné části lexému číslici 0-9.
+          if (*last_letter == 'e') {		// Po desetiném čísle může následovat exponent
+            add_char(f, last_letter, lexeme);
+            // Ihned znaku 'e' se může vyskytnout číslice, znak '+' nebo '-'.
+            if (! (isdigit(*last_letter) || *last_letter == '+' || *last_letter == '-')) {
+              correct = false;		// Pokud ne, zápis je špatný.
+              break;
+            }
             do {
-              add_char(f, last_letter, lexeme);
+              add_char(f, last_letter, lexeme);	// Přidám do exponenciální části lexému číslici 0-9.
             } while (isdigit(*last_letter));
           }
         } while (isdigit(*last_letter));
       }
-      else {
-        deleteRCString(lexeme);
-        throw(ScannerError,((ScannerErrorException){.type=InvalidNumericLiteral, .line_num=line_num}));
-      }
       break;
     }
-    else if (*last_letter == 'e') {
+    else if (*last_letter == 'e') {		// Po celém čísle může následovat exponent.
+      correct = true;				// Pokud ano, zápis je správný.
       do {
-        add_char(f, last_letter, lexeme);
+        add_char(f, last_letter, lexeme);	// Přidám do exponenciální části lexému číslici 0-9.
       } while (isdigit(*last_letter));
       break;
     }
   } while (isdigit(*last_letter));
+  
+  // Pokud číslo nebylo zapsáno podle ifj12, hodím výjimku.
+  if (!correct) {
+    deleteRCString(lexeme);
+    throw(ScannerError,((ScannerErrorException){.type=InvalidNumericLiteral, .line_num=line_num}));
+  }
 
   RCStringAppendChar(lexeme, '\0');	// Přidán znak '\0' na konec RCStringu pro fci strtod().
 

@@ -1,2 +1,12 @@
-// Testovaci zdrojak
-x = 1*2+3
+///////////////////////
+// Testovaci zdrojak //
+///////////////////////
+
+// Přiřazení do proměnné
+x = "Hello world!"
+x = 1.0*2.0+3.0
+x = "Hello" + "world!"
+x = "Hello" * 2.9
+x = true
+y = x + 1.0
+//y = (x*(1.0+1.0) + 1.0)*(2.0+3.0)	// BUG: Zacyklí se!
