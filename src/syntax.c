@@ -318,19 +318,17 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
     Token current;
     Expression *newExp, *prevExp=NULL, *subExp=NULL;
     enum {
-        wasStart,
-        wasParentheses,
-        wasId,
-        wasLiteral,
-        wasOperator,
-        wasFunctionCall
+        wasStart, // zatim nebylo nic, zacatek expression
+        wasValue, // byla promenna, literal nebo zavorka (uzavrena)
+        wasOperator // byl operator (unarni nebo binarni)
     } past=wasStart;
     
-    while((current=getTok(s)).type!=tokEndOfFile){ // BUG: parent ukazatele ukazuji spatne!
+    while(true){
+        current=getTok(s);
         switch(current.type){
             case tokId:
                 printf("ctuId\n");
-                if(past==wasParentheses){ // operand je hned za (pravou!) zavorkou - chyba
+                if(past==wasValue){ // dve hodnoty hned za sebou?
                   throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
                 if(past==wasStart){
@@ -349,7 +347,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 }
                 // TODO: az aspon trochu pojede, implementovat volani funkce ctenim budoucnosti
 /*
-                }else if(past==wasId){ // zavorka volani funkce
+                }else if(past==wasValue){ // zavorka volani funkce
                     printf("jeToVolaniFunkce\n");
                     Token previousToken;
                     // priprava seznamu parametru
@@ -372,7 +370,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 newExp->type=VARIABLE;
                 newExp->value.variable=getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols);
                 newExp->parent=prevExp;
-                past = wasId;
+                past = wasValue;
             break;
             case tokLiteral:
                 printf("ctuLiteral\n");
@@ -392,7 +390,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 newExp->type=CONSTANT;
                 newExp->value.constant=current.data.val;
                 newExp->parent=prevExp;
-                past = wasLiteral;
+                past = wasValue;
             break;
             case tokOp:
                 printf("ctuOperator\n");
@@ -418,13 +416,11 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                       prevExp->parent!=NULL &&
                       compareOperators(prevExp->parent->value.operator, newExp->value.operator)
                     ){
-                      printf("lezuVys\n");
                       prevExp = prevExp->parent;
                     }
                     
                     newExp->parent = prevExp->parent;
                     if(prevExp->parent==NULL){ // je novym korenem
-                      printf("je novym korenem\n");
                       // subExp je nove umisteni byvaleho korene (wholeExpression)
                       subExp = new(Expression);
                       *subExp = *wholeExpression;
@@ -446,10 +442,8 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     }else{
                       newExp = new(Expression);
                       if(newExp->parent->value.operator.type==BINARYOP){
-                        printf("nahrazuje binarni\n");
                         newExp->parent->value.operator.value.binary.right = newExp;
                       }else{
-                        printf("nahrazuje unarni\n");
                         newExp->parent->value.operator.value.unary.operand = newExp;
                       }
                     }
@@ -488,22 +482,22 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
-                consumeTok(s); // odstrani (
+                consumeTok(s); // odstrani '('
                 parseExpression(s,newExp,ctx);
-                if(getTok(s).type!=tokRParen){
+                if(getTok(s).type!=tokRParen){ // byl exp ukoncen ')' ?
                     throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses, .line_num=current.line_num}));
                 }
-                past = wasParentheses;
+                past = wasValue;
             break;
             case tokRParen: case tokComma: case tokEndOfLine:
                 printf("konecVyrazu\n");
                 if(past==wasOperator){ // na konci vyrazu nesmi byt operator
                   throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd, .line_num=current.line_num}));
                 }
-                if(past==wasStart){ // vyraz nesmi byt prazdny/bez otviraci zavorky
+                if(past==wasStart){ // vyraz nesmi byt prazdny
                   throw(SyntaxError,((SyntaxErrorException){.type=BlankExpression, .line_num=current.line_num}));
                 }
-                return; // konec parsovani expression, schvalne nekonzumuji!
+                return; // konec parsovani expression, nekonzumuji - ukoncujici token zustane
             break;
             default:
                 throw(SyntaxError,((SyntaxErrorException){.type=BadTokenInExpression, .line_num=current.line_num}));
@@ -512,11 +506,6 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
         prevExp = newExp;
         consumeTok(s);
     } // endwhile
-    printf("konecVyrazuAsouboruZaroven\n");
-    if(past==wasOperator){ // na konci vyrazu nesmi byt operator
-        throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd, .line_num=current.line_num}));
-    }
-    return; // konec parsovani expression a souboru zaroven, nekonzumuji!
 }
 
 void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx )
