@@ -12,7 +12,7 @@ BEGIN_TEST
   initScanner(&s,f);
   SymbolTable globalSymbols = newSymbolTable();
   SymbolTable localSymbols = newSymbolTable();
-  SyntaxContext sctx = {
+  SyntaxContext syntaxcontext = {
       .globalSymbols = &globalSymbols,
       .localSymbols = &localSymbols,
       .functions = NULL
@@ -20,8 +20,7 @@ BEGIN_TEST
   Function mainFunction;
 
   try{
-    parseProgram(&s, &sctx, &mainFunction);
-    deleteFunction( mainFunction );
+    parseProgram(&s, &syntaxcontext, &mainFunction);
   }
   catch{
     on(ScannerError, e){
@@ -57,7 +56,7 @@ BEGIN_TEST
 
   fclose(f);
 
-  Context ctx = {
+  Context context = {
     .globals=initValueTable(globalSymbols.count),
     .locals=initValueTable(localSymbols.count)
   };
@@ -69,7 +68,7 @@ BEGIN_TEST
   {
 
     Value ret;
-    ret = evalFunction( &mainFunction, (ExpressionList){NULL,0}, &ctx );
+    ret = evalFunction( &mainFunction, (ExpressionList){NULL,0}, &context );
   
     TEST( ret.type == typeNumeric )
     RCString retString = getValueString(&ret);
@@ -95,5 +94,7 @@ BEGIN_TEST
       exit(2);
     }
   }
+  freeValueTable( context.globals, globalSymbols.count );
+  freeValueTable( context.locals, localSymbols.count );
 
 END_TEST

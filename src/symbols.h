@@ -22,6 +22,9 @@ struct Symbol {
  Symbol *greater; // Větev - větší prvek
 };
 
+/**
+ * Strom symbolu (pro preklad id na index do tabulky symbolu)
+ */
 typedef struct {
  Symbol *root;
  int count;
