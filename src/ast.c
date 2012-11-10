@@ -120,7 +120,7 @@ Value evalExpression( Expression* expr, Context* context )
   }
 }
 
-void evalAssignment( Assignment* assgn, Context* context )
+inline void evalAssignment( Assignment* assgn, Context* context )
 {
     setVariable( &assgn->destination, context, evalExpression( &assgn->source, context ) );
 }
@@ -181,7 +181,7 @@ ReturnData evalCondition( Condition* condition, Context* context )
     }
 }
 
-ReturnData evalReturn( Return* ret, Context* context )
+inline ReturnData evalReturn( Return* ret, Context* context )
 {
   return (ReturnData){ true, evalExpression( ret, context ) };
 }
@@ -341,30 +341,30 @@ void deleteExpression( Expression* expr )
     }
 }
 
-void deleteAssignment( Assignment* assgn )
+static inline void deleteAssignment( Assignment* assgn )
 {
     deleteExpression( &assgn->source );
 }
 
-void deleteSubstring( Substring* substring )
+static inline void deleteSubstring( Substring* substring )
 {
     deleteExpression( &substring->source );
 }
 
-void deleteLoop( Loop* loop )
+static inline void deleteLoop( Loop* loop )
 {
     deleteExpression( &loop->condition );
     deleteStatementList( loop->statements );
 }
 
-void deleteCondition( Condition* condition )
+static inline void deleteCondition( Condition* condition )
 {
     deleteExpression( &condition->condition );
     deleteStatementList( condition->ifTrue );
     deleteStatementList( condition->ifFalse );
 }
 
-void deleteReturn( Return* ret )
+static inline void deleteReturn( Return* ret )
 {
     deleteExpression( ret );
 }
