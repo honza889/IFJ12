@@ -74,7 +74,7 @@ Value evalBinaryOp( BinaryOp* op, Context* context )
         case DIVIDE: ret = divideValue( &left, &right ); break;
         case POWER: break; 
         case EQUALS: ret = newValueBoolean( equalValue( &left, &right ) ); break;
-        case NOTEQUALS: ret = newValueBoolean( !equalValue( &left, &right ) ); break;
+        case NOTEQUALS: ret = newValueBoolean( notEqualValue( &left, &right ) ); break;
         case LESS: ret = newValueBoolean( lesserValue( &left, &right ) ); break;
         case GREATER: ret = newValueBoolean( greaterValue( &left, &right ) ); break;
         case LEQUAL: ret = newValueBoolean( lesserEqualValue( &left, &right ) ); break;

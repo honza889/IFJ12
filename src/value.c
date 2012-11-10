@@ -384,6 +384,10 @@ Value addValue( Value* a, Value* b )
         deleteRCString( &bs );
         return ret;
     }
+    else if( a->type == typeUndefined || b->type == typeUndefined )
+    {
+        throw( UndefinedVariable, 0 );
+    } 
     else
     {
         throw( BadArgumentType, "operator +" );
@@ -396,6 +400,10 @@ Value subtractValue( Value* a, Value* b )
     if( a->type == typeNumeric && b->type == typeNumeric )
     {
         return newValueNumeric( getValueNumeric( a ) - getValueNumeric( b ) );
+    }
+    else if( a->type == typeUndefined || b->type == typeUndefined )
+    {
+        throw( UndefinedVariable, 0 );
     }
     else
     {
@@ -424,6 +432,10 @@ Value multiplyValue( Value* a, Value* b )
         deleteRCString( &result );
         return ret;
     }
+    else if( a->type == typeUndefined || b->type == typeUndefined )
+    {
+        throw( UndefinedVariable, 0 );
+    }
     else
     {
         throw( BadArgumentType, "operator *" );
@@ -436,6 +448,10 @@ Value divideValue( Value* a, Value* b )
     if( a->type == typeNumeric && b->type == typeNumeric )
     {
         return newValueNumeric( getValueNumeric( a ) / getValueNumeric( b ) );
+    }
+    else if( a->type == typeUndefined || b->type == typeUndefined )
+    {
+        throw( UndefinedVariable, 0 );
     }
     else
     {

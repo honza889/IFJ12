@@ -5,33 +5,71 @@
 #include "../test.h"
 
 BEGIN_TEST
+
   Scanner s;
   FILE* f=fopen("unitests/interpret/input.txt","r");
   if(f==NULL) ERROR("Nepodarilo se otevrit soubor!");
   initScanner(&s,f);
   SymbolTable globalSymbols = newSymbolTable();
   SymbolTable localSymbols = newSymbolTable();
-  SyntaxContext syntaXctx = {
-        .globalSymbols = &globalSymbols,
-        .localSymbols = &localSymbols,
-        .functions = NULL,
-    };
-    Function mainFunction;
-  //ast = parseProgram(&s, &syntaxCtx, &mainFunction); // zpusobi zacykleni
-  
-  freeSymbolTable(&globalSymbols);
+  SyntaxContext sctx = {
+      .globalSymbols = &globalSymbols,
+      .localSymbols = &localSymbols,
+      .functions = NULL
+  };
+  Function mainFunction;
+
+  try{
+    parseProgram(&s, &sctx, &mainFunction);
+    deleteFunction( mainFunction );
+  }
+  catch{
+    on(ScannerError, e){
+      scannerErrorPrint(*e);
+      fclose( f );
+      exit(1);
+    }
+    on(SyntaxError, e){
+      syntaxErrorPrint(*e);
+      fclose( f );
+      exit(2);
+    }
+    on(UnexpectedToken, e){
+      UnexpectedTokenPrint(*e);
+      fclose( f );
+      exit(2);
+    }
+    on(UnexpectedKeyWord, e){
+      UnexpectedKeyWordPrint(*e);
+      fclose( f );
+      exit(2);
+    }
+    on(OutOfMemory, typename){
+      fprintf(stderr, "Nebylo mozne alokovat pamet pro typ '%s'", *typename );
+      fclose( f );
+      exit(99);
+    }
+    onAll{
+      fprintf(stderr,"Vyjimka v prubehu syntakticke analyzy!\n");
+      exit(2);
+    }
+  }
+
   fclose(f);
 
-  printf("\nInterpretovani:\n");
-  Value* glob = NULL;
-  Value* loc = NULL;
-    
-  Context ctx = { glob, loc };
+  Context ctx = {
+    .globals=initValueTable(globalSymbols.count),
+    .locals=initValueTable(localSymbols.count)
+  };
+
+  freeSymbolTable(&globalSymbols);
+  freeSymbolTable(&localSymbols);
+
   try
   {
-/*
+
     Value ret;
-    ret = evalFunction( &mainFunc, (ExpressionList){NULL,0}, &ctx );
+    ret = evalFunction( &mainFunction, (ExpressionList){NULL,0}, &ctx );
   
     TEST( ret.type == typeNumeric )
     RCString retString = getValueString(&ret);
@@ -40,14 +78,22 @@ BEGIN_TEST
     printf("\n\n");
 
     freeValue( &ret );
-    deleteStatementList( mainFunc.value.userDefined.statements );
-*/
+    deleteFunction( mainFunction );
   }
   catch
   {
+    on( UndefinedVariable, e )
+    {
+      fprintf( stderr, "Nedefinovana hodnota promenne\n" );
+    }
     on( BadArgumentType, e )
     {
-      fprintf( stderr, "Chyba v %s.\n", *e );
+      fprintf( stderr, "Chybny typ parametru funkce %s\n", *e );
+    }
+    onAll{
+      fprintf(stderr,"Vyjimka v prubehu interpretace!\n");
+      exit(2);
     }
   }
+
 END_TEST

@@ -48,8 +48,6 @@ BEGIN_TEST
       exit(99);
     }
   }
-//   Expression ex;parseExpression(&s,&ex,&ctx);
-  //TEST(  )
   
   freeSymbolTable(&globalSymbols);
   freeSymbolTable(&localSymbols);

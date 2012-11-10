@@ -1,3 +1,4 @@
 // Testovaci zdrojak
-x = a * 2 + 8
+x=2.0+8.0
+return x
 
