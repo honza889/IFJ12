@@ -323,7 +323,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
         wasId,
         wasLiteral,
         wasOperator,
-        
+        wasFunctionCall
     } past=wasStart;
     
     while((current=getTok(s)).type!=tokEndOfFile){ // BUG: parent ukazatele ukazuji spatne!
@@ -456,7 +456,9 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     newExp->type = OPERATOR;
                     newExp->value.operator.type = BINARYOP;
                     newExp->value.operator.value.binary.left = prevExp;
-                    prevExp->parent = newExp;
+                    if(newExp->value.operator.value.binary.left!=NULL){
+                        newExp->value.operator.value.binary.left->parent = newExp;
+                    }
                     newExp->value.operator.value.binary.right = NULL;
                     switch(current.data.op){
                         case opPlus:     newExp->value.operator.value.binary.type = ADD; break;
@@ -486,10 +488,12 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
+                consumeTok(s); // odstrani (
                 parseExpression(s,newExp,ctx);
                 if(getTok(s).type!=tokRParen){
                     throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses, .line_num=current.line_num}));
                 }
+                past = wasParentheses;
             break;
             case tokRParen: case tokComma: case tokEndOfLine:
                 printf("konecVyrazu\n");
@@ -526,16 +530,16 @@ void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx )
 
 void syntaxErrorPrint(SyntaxErrorException e) {
   switch (e.type) {	// TODO: Dát tam nějaké hlášky!
-    case BadTokenInExpression:		fprintf(stderr,"Parse error: BadTokenInExpression"); break;
-    case BadTokenAtBeginOfStatement:	fprintf(stderr,"Parse error: BadTokenAtBeginOfStatement"); break;
-    case AssignWithoutAssignOperator:	fprintf(stderr,"Parse error: AssignWithoutAssignOperator"); break;
+    case BadTokenInExpression:		fprintf(stderr,"Parse error: Bad token in expression"); break;
+    case BadTokenAtBeginOfStatement:	fprintf(stderr,"Parse error: Bad begin of statement"); break;
+    case AssignWithoutAssignOperator:	fprintf(stderr,"Parse error: Assign without assign operator"); break;
     case StrangeSyntax:			fprintf(stderr,"Parse error: StrangeSyntax"); break;
-    case BinaryOperatorAtBegin:		fprintf(stderr,"Parse error: BinaryOperatorAtBegin"); break;
-    case OperatorAtTheEnd:		fprintf(stderr,"Parse error: OperatorAtTheEnd"); break;
-    case TwoOperatorsNextToEachOther:	fprintf(stderr,"Parse error: TwoOperatorsNextToEachOther"); break;
-    case UnterminatedParentheses:	fprintf(stderr,"Parse error: UnterminatedParentheses"); break;
-    case BadStartOfStatement:		fprintf(stderr,"Parse error: BadStartOfStatement"); break;
-    case BlankExpression:		fprintf(stderr,"Parse error: BlankExpression"); break;
+    case BinaryOperatorAtBegin:		fprintf(stderr,"Parse error: Binary operator at begin of expression"); break;
+    case OperatorAtTheEnd:		fprintf(stderr,"Parse error: Operator at the end of the expression"); break;
+    case TwoOperatorsNextToEachOther:	fprintf(stderr,"Parse error: Two operators next to each other"); break;
+    case UnterminatedParentheses:	fprintf(stderr,"Parse error: Unclosed parentheses"); break;
+    case BadStartOfStatement:		fprintf(stderr,"Parse error: Bad start of statement"); break;
+    case BlankExpression:		fprintf(stderr,"Parse error: Blank expression"); break;
   }
-  fprintf(stderr," na radku %d.\n",e.line_num);
+  fprintf(stderr," on line %d\n",e.line_num);
 }
