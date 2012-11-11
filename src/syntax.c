@@ -387,7 +387,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
                 newExp->type=CONSTANT;
-                newExp->value.constant=current.data.val;
+                newExp->value.constant=copyValue(&current.data.val);
                 newExp->parent=prevExp;
                 past = wasValue;
             break;

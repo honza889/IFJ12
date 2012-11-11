@@ -123,9 +123,8 @@ void consumeTokN( Scanner* scanner, unsigned N )
       Token *deletedTok = &scanner->current[scanner->first];
       if (deletedTok->type == tokId)
         deleteRCString( &deletedTok->data.id );
-      // TODO: Nevím proč zde nemůžu uvolnit tokLiteral typu string, ale když ho uvolním tak se něco rozbije.
-//      else if (deletedTok->type == tokLiteral && deletedTok->data.val.type == typeString)
-//        deleteRCString( &deletedTok->data.val.data.string );
+      else if (deletedTok->type == tokLiteral && deletedTok->data.val.type == typeString)
+        deleteRCString( &deletedTok->data.val.data.string );
       scanner->first = (scanner->first + 1) % SCAN_BUF_CAP;
     }
     scanner->count -= N;
