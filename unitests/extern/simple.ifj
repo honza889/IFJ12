@@ -1,0 +1,14 @@
+// Jednoduchy test IFJ12
+
+  /*--------------------------------------/
+ / Víceřádkový komentář s diakritikou a  /
+/--------------------------------------*/
+
+x=print("Toto je nejjednodusi test IFJ12\n")
+
+a = (6.0 + 8.0 * 2.0) / 4.0
+
+x = print( "Vysledek pro (6+8*2)/4 = " + a + "\n" )
+
+x = print( "2*a = " + (2.0*a) + "\n" )
+
