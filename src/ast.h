@@ -219,7 +219,7 @@ static inline Value* symbol(int index,Context* context){
 
 Value evalFunction( Function* func, ExpressionList params, Context* context );
 
-void deleteStatementList( StatementList );
+void deleteStatementList( StatementList sl );
 
 static void inline deleteFunction( Function func ){
     deleteStatementList(func.value.userDefined.statements);

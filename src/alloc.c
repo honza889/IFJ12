@@ -14,7 +14,7 @@ void* allocSingle( size_t size, const char* name )
 void* reallocArray( void* ptr, size_t size, const char* name )
 {
     void* newPtr = realloc( ptr, size );
-    if( !ptr )
+    if( !newPtr )
     {
         free( ptr );
         throw( OutOfMemory, name );

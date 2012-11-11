@@ -23,6 +23,18 @@ typedef struct{
     ValueList functions;
 } SyntaxContext;
 
+/**
+ * Inicializuje výchozí SyntaxContext obsahující vestavěné funkce
+ */
+void initDefaultSyntaxContext( SyntaxContext* ctx );
+
+/**
+ * Uvolní tabulky symbolů v kontextu \a ctx, vytvořeném pomocí 
+ * initDefaultSyntaxContext.
+ * 
+ * Seznam funkcí nijak neuvolňuje.
+ */
+void destroyDefaultSyntaxContext( SyntaxContext* ctx );
 
 /**
  * Parsuje program pomocí scanneru \a s. Pouziva kontext \a ctx.

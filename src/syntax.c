@@ -7,6 +7,7 @@
 #include "ast.h"
 #include "alloc.h"
 #include "symbols.h"
+#include "bif.h"
 
 void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function );
 void addStatementToStatementList( StatementList* sl, Statement* statement );
@@ -16,7 +17,7 @@ void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* functio
 {
     // asi to chce jeste trochu predelat symboly...
     int id = getSymbol( *name, ctx->globalSymbols, ctx->globalSymbols );
-    if( id < ctx->globalSymbols->count )
+    if( id > ctx->globalSymbols->count )
     {
         throw( MultipleFunctionDefinitions, copyRCString( name ) );
     }
@@ -25,6 +26,15 @@ void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* functio
         ctx->functions = resizeArray( ctx->functions, Value, ctx->globalSymbols->count );
         ctx->functions[ ctx->globalSymbols->count - 1 ] = newValueFunction( function );
     }
+}
+
+void addBuiltinToContext( SyntaxContext* ctx, RCString name, BuiltinFunction function, int parameterCount )
+{
+    Function* funcObj = new( Function );
+    funcObj->type = BUILTIN;
+    funcObj->value.builtin = function;
+    funcObj->paramCount = parameterCount;
+    addFunctionToContext( ctx, &name, funcObj );
 }
 
 void addStatementToStatementList( StatementList* sl, Statement* statement )
@@ -53,6 +63,33 @@ void addExpressionToExpressionList( ExpressionList* el, Expression* expression )
     }
 }
 
+void initDefaultSyntaxContext( SyntaxContext* ctx )
+{
+    ctx->localSymbols = new( SymbolTable );
+    *ctx->localSymbols = newSymbolTable();
+    ctx->globalSymbols = new( SymbolTable );
+    *ctx->globalSymbols = newSymbolTable();
+    ctx->functions = NULL;
+    
+    addBuiltinToContext( ctx, makeRCString( "input" ), BIFinput, 0 );
+    addBuiltinToContext( ctx, makeRCString( "numeric" ), BIFnumeric, 1 );
+    addBuiltinToContext( ctx, makeRCString( "print" ), BIFprint, -1 );
+    addBuiltinToContext( ctx, makeRCString( "typeOf" ), BIFtypeOf, 1 );
+    addBuiltinToContext( ctx, makeRCString( "len" ), BIFlen, 1 );
+    addBuiltinToContext( ctx, makeRCString( "find" ), BIFlen, 2 );
+}
+
+void destroyDefaultSyntaxContext( SyntaxContext* ctx )
+{
+    freeSymbolTable( ctx->globalSymbols );
+    freeSymbolTable( ctx->localSymbols );
+    free( ctx->globalSymbols );
+    free( ctx->localSymbols );
+    ctx->globalSymbols = NULL;
+    ctx->localSymbols = NULL;
+}
+    
+
 void parseProgram( Scanner* s, SyntaxContext* ctx, Function* main )
 {
 
@@ -63,7 +100,8 @@ void parseProgram( Scanner* s, SyntaxContext* ctx, Function* main )
                 .item = NULL,
                 .count = 0
             }
-        }
+        },
+        .paramCount = 0
     };
     
     while( getTok( s ).type != tokEndOfFile )

@@ -29,15 +29,15 @@ test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 tests:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 	unitests/tests.sh valgrind "$?"
 
-unitests/value/test: obj/dbg/value.o obj/dbg/exceptions.o obj/dbg/alloc.o
-unitests/symbols/test: obj/dbg/symbols.o obj/dbg/value.o obj/dbg/exceptions.o obj/dbg/alloc.o
+unitests/value/test: obj/dbg/value.o obj/dbg/exceptions.o obj/dbg/alloc.o obj/dbg/ast.o
+unitests/symbols/test: obj/dbg/symbols.o obj/dbg/value.o obj/dbg/exceptions.o obj/dbg/alloc.o obj/dbg/ast.o
 unitests/ast/test: obj/dbg/value.o obj/dbg/ast.o obj/dbg/exceptions.o obj/dbg/alloc.o
 unitests/exceptions/test: obj/dbg/exceptions.o obj/dbg/alloc.o
 unitests/scanner/test: obj/dbg/scanner.o obj/dbg/rcstring.o obj/dbg/alloc.o
-unitests/syntax/test: obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o obj/dbg/alloc.o
-unitests/interpret/test: obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o obj/dbg/alloc.o
+unitests/syntax/test: obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o obj/dbg/alloc.o obj/dbg/bif.o
+unitests/interpret/test: obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o obj/dbg/alloc.o obj/dbg/bif.o
 unitests/rcstring/test: obj/dbg/rcstring.o obj/dbg/alloc.o
-unitests/ial/test: obj/dbg/ial.o obj/dbg/value.o obj/dbg/alloc.o
+unitests/ial/test: obj/dbg/ial.o obj/dbg/value.o obj/dbg/alloc.o obj/dbg/ast.o
 
 unitests/%/test: unitests/%/test.c obj/dbg/exceptions.o obj/dbg/rcstring.o unitests/test.h
 	gcc -o $@ $^ $(LDB) $(CFLAGS)
