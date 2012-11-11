@@ -182,7 +182,7 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
     parseFunctionParameters( s, &func, &newCtx );
     expectTok( s, tokRParen );
     expectTok( s, tokEndOfLine );
-    while( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd )
+    while( ! ( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd ) )
     {
         parseStatement( s, &func.value.userDefined.statements, &newCtx );
     }
