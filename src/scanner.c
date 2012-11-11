@@ -426,9 +426,10 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
  * @param[out]	last_letter	Poslední načtený znak ze zdrojového kódu.
  * @param[out]	lexeme		Ukazatel na RCString (!= NULL).
  * @param[in]	line_num	Hodnota aktuálního řádku vstupního zdrojového kódu pro vyhození výjimky.
+ * @param[in]	start_line_num	Hodnota řádku s počátkem neukončeného řetězce pro vyhození výjimky.
  * @return Vrací (bool) true, když uspěje (přidá písmeno do \a lexeme), jinak false.
  */
-bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned line_num)
+bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned line_num, unsigned start_line_num)
 {
   assert(lexeme != NULL);
   assert(UCHAR_MAX >= 0xFF);	// V této fci předpokládám, že char má min. 8 bitů.
@@ -457,7 +458,7 @@ bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned lin
       for (int i=0; (i < LEN_HEX_CHAR-1); i++) {
         if ((*last_letter = getc(f)) == EOF) {
           deleteRCString(lexeme);
-          throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=line_num}));
+          throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=start_line_num}));
         }
         hex_char[i] = *last_letter;
       }
@@ -465,16 +466,16 @@ bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned lin
       
       // Převod řetězce na hexadecimální číslo reprezentující znak.
       conv_num = strtol(hex_char, &endptr, 16);	// Předpokládám, že char má min. 8 bitů (viz assert() výše).
-      if (errno != 0 || *endptr != '\0') {
+      if (errno != 0 || *endptr != '\0' || conv_num == 0) {
         deleteRCString(lexeme);
-        throw(ScannerError,((ScannerErrorException){.type=InvalidNumericLiteral, .line_num=line_num}));
+        throw(ScannerError,((ScannerErrorException){.type=BadEscSequence, .line_num=line_num}));
       }
       RCStringAppendChar(lexeme, conv_num);
       break;
     case EOF:
       deleteRCString(lexeme);
       // error: missing terminating " character
-      throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=line_num}));
+      throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=start_line_num}));
       break;
     default:
       return false;
@@ -689,32 +690,33 @@ Token scan(FILE *f)
       
       last_letter = getc(f);
       while (last_letter != '"') {
-        // Pokud add_char neuspěje narazilo se na EOF.
-        if (! add_char(f, &last_letter, &lexeme)) {
-          deleteRCString(&lexeme);
-          // error: missing terminating " character
-          throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=line_num}));
-        }
-        
-        // Pokud je načtené písmeno '\n' inkrementuje se počítadlo řádků.
-        if (last_letter == '\n')
-          line_num++;
-        
-        // Pokud je načtené písmeno escape sekvence převede se na ní reprezentující znak.
+	// Pokud je načtené písmeno escape sekvence převede se na ní reprezentující znak.
         if (last_letter == '\\') {
           // Pokud det_esc_sequence neuspěje narazilo se na špatnou escape sekvenci.
-          if (! det_esc_sequence(f, &last_letter, &lexeme, line_num)) {
+          if (! det_esc_sequence(f, &last_letter, &lexeme, line_num, start_line_num)) {
             deleteRCString(&lexeme);
-            // .line_num zde obsahuje počátek neukončeného řetězce
-            throw(ScannerError,((ScannerErrorException){.type=BadEscSequence, .line_num=start_line_num}));
+            throw(ScannerError,((ScannerErrorException){.type=BadEscSequence, .line_num=line_num}));
           }
         }
+        
+        else {
+	  // Pokud je načtené písmeno '\n' inkrementuje se počítadlo řádků.
+	  if (last_letter == '\n')
+	    line_num++;
+	  
+	  // Pokud add_char neuspěje narazilo se na EOF.
+	  if (! add_char(f, &last_letter, &lexeme)) {
+	    deleteRCString(&lexeme);
+	    // .line_num zde obsahuje počátek neukončeného řetězce (error: missing terminating " character)
+	    throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=start_line_num}));
+	  }
+	}
       }
       
       // Řetězec se uloží do tokenu.
       token.type = tokLiteral;
       token.data.val = newValueString(lexeme);
-      token.line_num = line_num;
+      token.line_num = start_line_num;
       last_letter = getc(f);
     }
     else {

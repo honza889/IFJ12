@@ -14,7 +14,7 @@ x = print("text","text2")
 x = print("")
 
 retezec="retez"
- + " \n \t \\ \" \x01 \xFF "
+ + " \n \t \\ \" \x01 \xFF " + "\n\t\\\"\x01\xff\x34\x32\x3f"
 
 function podretezec()
  return retezec[:19.0] + retezec[0.0:1.0]

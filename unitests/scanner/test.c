@@ -281,6 +281,18 @@ BEGIN_TEST
   STRTEST( t.data.val.data.string, " \n \t \\ \" \x01 \xFF " )
   deleteRCString(&t.data.val.data.string);
 
+  // Testuji načtení řetězce s escape skvencemi (zdrcnuté).
+  // """ + "\n\t\\\"\x01\xFF" """
+  t=scan(f);
+  TEST( t.type==tokOp )
+  TEST( t.data.op==opPlus )
+
+  t=scan(f);
+  TEST( t.type==tokLiteral )
+  TEST( t.data.val.type==typeString )
+  STRTEST( t.data.val.data.string, "\n\t\\\"\x01\xff\x34\x32\x3f" )
+  deleteRCString(&t.data.val.data.string);
+
   t=scan(f);
   TEST( t.type==tokEndOfLine )
 
