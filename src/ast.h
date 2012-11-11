@@ -222,6 +222,8 @@ Value evalFunction( Function* func, ExpressionList params, Context* context );
 void deleteStatementList( StatementList sl );
 
 static void inline deleteFunction( Function func ){
-    deleteStatementList(func.value.userDefined.statements);
+    if(func.type==USER_DEFINED){
+        deleteStatementList(func.value.userDefined.statements);
+    }
 }
 #endif

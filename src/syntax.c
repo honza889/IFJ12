@@ -35,6 +35,7 @@ void addBuiltinToContext( SyntaxContext* ctx, RCString name, BuiltinFunction fun
     funcObj->value.builtin = function;
     funcObj->paramCount = parameterCount;
     addFunctionToContext( ctx, &name, funcObj );
+    deleteRCString(&name);
 }
 
 void addStatementToStatementList( StatementList* sl, Statement* statement )
@@ -83,6 +84,9 @@ void destroyDefaultSyntaxContext( SyntaxContext* ctx )
 {
     freeSymbolTable( ctx->globalSymbols );
     freeSymbolTable( ctx->localSymbols );
+    for( int i=0; i < ctx->globalSymbols->count; i++ ){
+        //deleteFunction(*ctx->functions[i].data.function); // TODO: zprovoznit uvolnovani function
+    }
     free( ctx->globalSymbols );
     free( ctx->localSymbols );
     ctx->globalSymbols = NULL;
