@@ -305,23 +305,22 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 // Konzumuje token.
 void parseIf( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
-    Statement stmt;
-    stmt.type = CONDITION;
+    Statement stmt = {.type = CONDITION};
     
     expectKeyw( s, kIf );
-    parseExpression( s, &stmt.value.condition.condition, ctx );	// BUG: Jak to, že projde parseExpression(), když je expression prázdný?
+    parseExpression( s, &stmt.value.condition.condition, ctx );
     expectTok( s, tokEndOfLine );
-    while( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kElse )
+    while( ! (getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kElse) )
     {
         parseStatement( s, &stmt.value.condition.ifTrue, ctx );
     }
     expectKeyw( s, kElse );
     expectTok( s, tokEndOfLine );
-    while( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kElse )
+    while( ! (getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd) )
     {
         parseStatement( s, &stmt.value.condition.ifFalse, ctx);
     }
-    expectKeyw( s, kElse );
+    expectKeyw( s, kEnd );
     expectTok( s, tokEndOfLine );
     addStatementToStatementList( sl, &stmt );
 }
@@ -329,13 +328,12 @@ void parseIf( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 // Konzumuje token.
 void parseWhile( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
-    Statement stmt;
-    stmt.type = LOOP;
+    Statement stmt = {.type = LOOP};
     
     expectKeyw( s, kWhile );
     parseExpression( s, &stmt.value.loop.condition, ctx );
     expectTok( s, tokEndOfLine );
-    while( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd )
+    while( ! (getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd) )
     {
         parseStatement( s, &stmt.value.loop.statements, ctx );
     }
