@@ -22,13 +22,8 @@ int main(int argc, char**argv)
     
     Scanner s;
     initScanner(&s,f);
-    SymbolTable globalSymbols = newSymbolTable(); // strom funkci
-    SymbolTable localSymbols = newSymbolTable(); // strom lokalnich promennych mainu
-    SyntaxContext syntaxcontext = {
-        .globalSymbols = &globalSymbols,
-        .localSymbols = &localSymbols,
-        .functions = NULL
-    };
+    SyntaxContext syntaxcontext;
+    initDefaultSyntaxContext(&syntaxcontext);
     Function mainFunction;
     
     /***************************** Překlad do AST *****************************/
@@ -71,14 +66,12 @@ int main(int argc, char**argv)
     /*************************** Uklid po prekladu ****************************/
     
     fclose( f );
-    freeSymbolTable( &globalSymbols ); // uvolni obsah, count zustane
-    freeSymbolTable( &localSymbols );
     
     /****************************** Interpretace ******************************/
     
     Context context = {
-        .globals=initValueTable( globalSymbols.count ),
-        .locals=initValueTable( localSymbols.count )
+        .globals=syntaxcontext.functions,
+        .locals=initValueTable(syntaxcontext.localSymbols->count)
     };
     
     try{
@@ -110,13 +103,12 @@ int main(int argc, char**argv)
     
     // Uvolneni vsech funkci
     deleteFunction( mainFunction );
-    for(int i=0;i<globalSymbols.count;i++){
-        deleteFunction( *context.globals[i].data.function );
-    }
     
     // Uvolneni hlavnich tabulek symbolu
-    freeValueTable( context.globals, globalSymbols.count );
-    freeValueTable( context.locals, localSymbols.count );
+    freeValueTable( context.globals, syntaxcontext.globalSymbols->count );
+    freeValueTable( context.locals, syntaxcontext.localSymbols->count );
+    
+    destroyDefaultSyntaxContext( &syntaxcontext );
     
     return 0;
 }
