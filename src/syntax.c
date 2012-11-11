@@ -343,6 +343,7 @@ void parseWhile( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     }
     expectKeyw( s, kEnd );
     expectTok( s, tokEndOfLine );
+    addStatementToStatementList(sl,&stmt);
 }
 
 bool compareOperators(Operator op1, Operator op2){
