@@ -321,8 +321,9 @@ void deleteFunctionCall( FunctionCall* func )
 {
     for( int i = 0; i < func->params.count; i++ )
     {
-        deleteExpression( func->params.expressions + i );
+        deleteExpression( &func->params.expressions[i] );
     }
+    free(func->params.expressions);
     deleteVariable( &func->function );
 }
 
