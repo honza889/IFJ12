@@ -10,13 +10,8 @@ BEGIN_TEST
   FILE* f=fopen("unitests/interpret/input.txt","r");
   if(f==NULL) ERROR("Nepodarilo se otevrit soubor!");
   initScanner(&s,f);
-  SymbolTable globalSymbols = newSymbolTable();
-  SymbolTable localSymbols = newSymbolTable();
-  SyntaxContext syntaxcontext = {
-      .globalSymbols = &globalSymbols,
-      .localSymbols = &localSymbols,
-      .functions = NULL
-  };
+  SyntaxContext syntaxcontext;
+  initDefaultSyntaxContext( &syntaxcontext );
   Function mainFunction;
 
   try{
@@ -57,12 +52,9 @@ BEGIN_TEST
   fclose(f);
 
   Context context = {
-    .globals=initValueTable(globalSymbols.count),
-    .locals=initValueTable(localSymbols.count)
+    .globals= syntaxcontext.functions,
+    .locals=initValueTable(syntaxcontext.localSymbols->count)
   };
-
-  freeSymbolTable(&globalSymbols);
-  freeSymbolTable(&localSymbols);
 
   try
   {
@@ -94,7 +86,9 @@ BEGIN_TEST
       exit(2);
     }
   }
-  freeValueTable( context.globals, globalSymbols.count );
-  freeValueTable( context.locals, localSymbols.count );
+  freeValueTable( context.globals, syntaxcontext.globalSymbols->count );
+  freeValueTable( context.locals, syntaxcontext.localSymbols->count );
+  
+  destroyDefaultSyntaxContext( &syntaxcontext );
 
 END_TEST

@@ -1,4 +1,6 @@
 // Testovaci zdrojak
 x=2.0+8.0
+y = print( x )
+y = print( "ONO TO FUNGUJE!!" )
 return x
 
