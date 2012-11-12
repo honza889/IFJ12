@@ -155,7 +155,9 @@ void parseFunctionParameters( Scanner* s, Function* func, SyntaxContext* ctx )
 // Konzumuje token.
 void parseFunction( Scanner* s, SyntaxContext* ctx )
 {
-    Function func = {
+    Function* func = new( Function );
+    
+    *func = (Function){
         .type = USER_DEFINED,
         .value.userDefined = {
             .statements = {
@@ -176,20 +178,27 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
     };
     
     expectKeyw( s, kFunction );
-    Variable name;
-    parseIdentifier( s, &name, &newCtx); // tady to chce taky delat vic
+    
+    testTok( s, tokId );
+    RCString funcName = getTok( s ).data.id;
+    funcName = copyRCString(&funcName);
+    consumeTok( s );
+    
     expectTok( s, tokLParen );
-    parseFunctionParameters( s, &func, &newCtx );
+    parseFunctionParameters( s, func, &newCtx );
     expectTok( s, tokRParen );
     expectTok( s, tokEndOfLine );
     while( ! ( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd ) )
     {
-        parseStatement( s, &func.value.userDefined.statements, &newCtx );
+        parseStatement( s, &func->value.userDefined.statements, &newCtx );
     }
     consumeTok( s );
     expectTok( s, tokEndOfLine );
     
     freeSymbolTable( &localSymbols );
+    
+    addFunctionToContext( ctx, &funcName, func );
+    deleteRCString( &funcName );
 }
 
 // Konzumuje token.
