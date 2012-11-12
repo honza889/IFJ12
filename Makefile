@@ -9,7 +9,7 @@ ifj12: $(addprefix obj/,$(addsuffix .o,$(SOURCES)))
 
 obj/%.o: src/%.c
 	mkdir -p dep obj # Adresare nejsou v gitu
-	gcc -MMD -MP -MF dep/$*.d -c -o $@ $< $(CFLAGS)
+	gcc -MMD -MP -MF dep/$*.d -c -o $@ $< $(CFLAGS) -DNDEBUG
 
 obj/dbg/%.o: src/%.c
 	mkdir -p dep/dbg obj/dbg # Adresare nejsou v gitu

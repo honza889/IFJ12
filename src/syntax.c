@@ -77,7 +77,7 @@ void initDefaultSyntaxContext( SyntaxContext* ctx )
     addBuiltinToContext( ctx, makeRCString( "print" ), BIFprint, -1 );
     addBuiltinToContext( ctx, makeRCString( "typeOf" ), BIFtypeOf, 1 );
     addBuiltinToContext( ctx, makeRCString( "len" ), BIFlen, 1 );
-    addBuiltinToContext( ctx, makeRCString( "find" ), BIFlen, 2 );
+    addBuiltinToContext( ctx, makeRCString( "find" ), BIFlen, 2 ); // TODO: BIFfind?
 }
 
 void destroyDefaultSyntaxContext( SyntaxContext* ctx )
@@ -449,17 +449,36 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                         throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther, .line_num=current.line_num}));
                     }
                     
+                    Operator tmpOp;
+                    tmpOp.type = BINARYOP;
+                    switch(current.data.op){
+                        case opPlus:     tmpOp.value.binary.type = ADD; break;
+                        case opMinus:    tmpOp.value.binary.type = SUBTRACT; break;
+                        case opMultiple: tmpOp.value.binary.type = MULTIPLY; break;
+                        case opDivide:   tmpOp.value.binary.type = DIVIDE; break;
+                        case opPower:    tmpOp.value.binary.type = POWER; break;
+                        case opEQ:       tmpOp.value.binary.type = EQUALS; break;
+                        case opNE:       tmpOp.value.binary.type = NOTEQUALS; break;
+                        case opLT:       tmpOp.value.binary.type = LESS; break;
+                        case opGT:       tmpOp.value.binary.type = GREATER; break;
+                        case opLE:       tmpOp.value.binary.type = LEQUAL; break;
+                        case opGE:       tmpOp.value.binary.type = GEQUAL; break;
+                    }
+                    
+                    Expression *parentExp;
+                    parentExp = prevExp->parent;
                     // Je-li operace mene prioritni nez predchozi, misto predchozi operace
                     // pujdeme na misto jeste predchodnejsi (parentnejsi) operace
                     while(
-                      prevExp->parent!=NULL &&
-                      compareOperators(prevExp->parent->value.operator, newExp->value.operator)
+                      parentExp!=NULL &&
+                      compareOperators(prevExp->parent->value.operator, tmpOp)
                     ){
-                      prevExp = prevExp->parent;
+                      parentExp = parentExp->parent;
                     }
+                    // parentExp je rodic newExp (nebo NULL)
+                    // prevExp je levy potomek newExp
                     
-                    newExp->parent = prevExp->parent;
-                    if(prevExp->parent==NULL){ // je novym korenem
+                    if(parentExp==NULL){ // je novym korenem
                       // oldWholeExp je nove umisteni byvaleho korene (wholeExpression)
                       oldWholeExp = new(Expression);
                       *oldWholeExp = *wholeExpression;
@@ -476,35 +495,33 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                               oldWholeExp->value.operator.value.unary.operand->parent = oldWholeExp;
                           }
                       }
-                      prevExp = oldWholeExp;
                       newExp = wholeExpression;
+                      newExp->parent = NULL;
+                      
+                      newExp->type = OPERATOR;
+                      newExp->value.operator = tmpOp;
+                      newExp->value.operator.value.binary.left = oldWholeExp;
+                      newExp->value.operator.value.binary.left->parent = newExp;
+                      newExp->value.operator.value.binary.right = NULL;
+                      
                     }else{
                       newExp = new(Expression);
+                      newExp->parent = parentExp;
+                      
+                      assert(newExp->parent!=NULL);
+                      assert(newExp->parent->type==OPERATOR);
+                      
                       if(newExp->parent->value.operator.type==BINARYOP){
                         newExp->parent->value.operator.value.binary.right = newExp;
                       }else{
                         newExp->parent->value.operator.value.unary.operand = newExp;
                       }
-                    }
-                    newExp->type = OPERATOR;
-                    newExp->value.operator.type = BINARYOP;
-                    newExp->value.operator.value.binary.left = prevExp;
-                    if(newExp->value.operator.value.binary.left!=NULL){
-                        newExp->value.operator.value.binary.left->parent = newExp;
-                    }
-                    newExp->value.operator.value.binary.right = NULL;
-                    switch(current.data.op){
-                        case opPlus:     newExp->value.operator.value.binary.type = ADD; break;
-                        case opMinus:    newExp->value.operator.value.binary.type = SUBTRACT; break;
-                        case opMultiple: newExp->value.operator.value.binary.type = MULTIPLY; break;
-                        case opDivide:   newExp->value.operator.value.binary.type = DIVIDE; break;
-                        case opPower:    newExp->value.operator.value.binary.type = POWER; break;
-                        case opEQ:       newExp->value.operator.value.binary.type = EQUALS; break;
-                        case opNE:       newExp->value.operator.value.binary.type = NOTEQUALS; break;
-                        case opLT:       newExp->value.operator.value.binary.type = LESS; break;
-                        case opGT:       newExp->value.operator.value.binary.type = GREATER; break;
-                        case opLE:       newExp->value.operator.value.binary.type = LEQUAL; break;
-                        case opGE:       newExp->value.operator.value.binary.type = GEQUAL; break;
+                      
+                      newExp->type = OPERATOR;
+                      newExp->value.operator = tmpOp;
+                      newExp->value.operator.value.binary.left = prevExp;
+                      newExp->value.operator.value.binary.left->parent = newExp;
+                      newExp->value.operator.value.binary.right = NULL;
                     }
                 }
                 past = wasOperator;

@@ -1,0 +1,11 @@
+// test parseExpression a AST - priority operatoru
+
+//a = 10.0+2.0*3.0+100.0
+//x=print("a=",a,"\n")
+
+a = 1.0+"text"*2.0+1.0
+x=print("a=",a,"\n")
+
+//a = 10.0*2.0+100.0
+//x=print("a=",a,"\n")
+
