@@ -459,3 +459,21 @@ Value divideValue( Value* a, Value* b )
     }
     return newValueUndefined();
 }
+
+Value powerValue( Value* a, Value* b )
+{
+    if( a->type == typeNumeric && b->type == typeNumeric )
+    {
+        return newValueNumeric( pow ( getValueNumeric( a ), getValueNumeric( b ) ) );
+    }
+    else if( a->type == typeUndefined || b->type == typeUndefined )
+    {
+        throw( UndefinedVariable, 0 );
+    }
+    else
+    {
+        throw( BadArgumentType, "operator **" );
+    }
+    return newValueUndefined();
+}
+

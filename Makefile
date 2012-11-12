@@ -1,11 +1,14 @@
+# Parametry překladu
 CFLAGS=-std=c99 -I src -Wall -Wno-unused-variable -pedantic -Wdouble-promotion
 # Úroveň množství debugovacích informací
 LDB=-g3
+# Parametry slinkování
+LINK=-lm
 
 SOURCES=ifj12 value symbols ast exceptions rcstring bif scanner syntax ial alloc
 
 ifj12: $(addprefix obj/,$(addsuffix .o,$(SOURCES)))
-	gcc -o $@ $^ $(CFLAGS)
+	gcc -o $@ $^ $(CFLAGS) $(LINK)
 
 obj/%.o: src/%.c
 	mkdir -p dep obj # Adresare nejsou v gitu
@@ -40,7 +43,7 @@ unitests/rcstring/test: obj/dbg/rcstring.o obj/dbg/alloc.o
 unitests/ial/test: obj/dbg/ial.o obj/dbg/value.o obj/dbg/alloc.o obj/dbg/ast.o
 
 unitests/%/test: unitests/%/test.c obj/dbg/exceptions.o obj/dbg/rcstring.o unitests/test.h
-	gcc -o $@ $^ $(LDB) $(CFLAGS)
+	gcc -o $@ $^ $(LDB) $(CFLAGS) $(LINK)
 
 etest: debug
 	unitests/extern/test.sh
@@ -49,7 +52,7 @@ etest: debug
 #  *****
 
 debug: $(addprefix obj/dbg/,$(addsuffix .o,$(SOURCES)))
-	gcc -o ifj12-dbg $^ $(CFLAGS) $(LDB)
+	gcc -o ifj12-dbg $^ $(CFLAGS) $(LDB) -lm
 
 clean:
 	rm -f obj/*.o obj/dbg/*.o dep/*.d dep/dbg/*.d ./ifj12 ./ifj12-dbg unitests/*/test unitests/*/test.o unitests/*/out

@@ -72,7 +72,7 @@ Value evalBinaryOp( BinaryOp* op, Context* context )
         case SUBTRACT: ret = subtractValue( &left, &right ); break;
         case MULTIPLY: ret = multiplyValue( &left, &right ); break;
         case DIVIDE: ret = divideValue( &left, &right ); break;
-        case POWER: break; 
+        case POWER: ret = powerValue( &left, &right ); break;
         case EQUALS: ret = newValueBoolean( equalValue( &left, &right ) ); break;
         case NOTEQUALS: ret = newValueBoolean( notEqualValue( &left, &right ) ); break;
         case LESS: ret = newValueBoolean( lesserValue( &left, &right ) ); break;
