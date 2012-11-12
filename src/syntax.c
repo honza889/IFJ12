@@ -549,6 +549,7 @@ void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx )
 {
     testTok( s, tokId );
     RCString name = getTok( s ).data.id;
+    name = copyRCString(&name);
     *id = getSymbol( name, ctx->globalSymbols, ctx->localSymbols );
     deleteRCString( &name );
     consumeTok( s );

@@ -115,9 +115,8 @@ void consumeTokN( Scanner* scanner, unsigned N );
  * Zjisti, zda je následující token roven typu \a tok.
  * Pokud ano, tak ho zkonzumuje.
  * Pokud ne, háže výjimku UnexpectedToken.
- * @return Vrací token, který zkonzumoval.
  */
-Token expectNextTok( Scanner* scanner, TokenType tok );
+void expectNextTok( Scanner* scanner, TokenType tok );
 
 /**
  * Jako expectTokN, ale bez konzumace.

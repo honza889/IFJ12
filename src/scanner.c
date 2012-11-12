@@ -104,7 +104,6 @@ Token getTokN( Scanner* scanner, unsigned index )
     // Jinak se prvek o daném indexu načte, pokud to kapacita bufferu dovolí.
     else {
         assert(index < SCAN_BUF_CAP);
-        new_index = scanner->count;
         while (scanner->count <= index) {	// Načti do bufferu prvky od posledního po index (včetně).
           new_index = (scanner->first + scanner->count) % SCAN_BUF_CAP;
           scanner->current[new_index] = scan( scanner->file );
@@ -136,14 +135,17 @@ void consumeTokN( Scanner* scanner, unsigned N )
     }
 }
 
-Token expectNextTok( Scanner* scanner, TokenType tok )
+void expectNextTok( Scanner* scanner, TokenType tok )
 {
     assert(scanner->count > 0);
     // Načtu nový token za poslední token v bufferu.
     Token current = testTokN( scanner, tok, scanner->count );
     // Zkonzumuju onen nový token.
+    if (current.type == tokId)
+      deleteRCString( &current.data.id );
+    else if (current.type == tokLiteral && current.data.val.type == typeString)
+      deleteRCString( &current.data.val.data.string );
     scanner->count--;
-    return current;
 }
 
 Token testTokN( Scanner* scanner, TokenType tok, unsigned index )
@@ -690,7 +692,7 @@ Token scan(FILE *f)
       
       last_letter = getc(f);
       while (last_letter != '"') {
-	// Pokud je načtené písmeno escape sekvence převede se na ní reprezentující znak.
+        // Pokud je načtené písmeno escape sekvence převede se na ní reprezentující znak.
         if (last_letter == '\\') {
           // Pokud det_esc_sequence neuspěje narazilo se na špatnou escape sekvenci.
           if (! det_esc_sequence(f, &last_letter, &lexeme, line_num, start_line_num)) {
@@ -700,17 +702,17 @@ Token scan(FILE *f)
         }
         
         else {
-	  // Pokud je načtené písmeno '\n' inkrementuje se počítadlo řádků.
-	  if (last_letter == '\n')
-	    line_num++;
-	  
-	  // Pokud add_char neuspěje narazilo se na EOF.
-	  if (! add_char(f, &last_letter, &lexeme)) {
-	    deleteRCString(&lexeme);
-	    // .line_num zde obsahuje počátek neukončeného řetězce (error: missing terminating " character)
-	    throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=start_line_num}));
-	  }
-	}
+          // Pokud je načtené písmeno '\n' inkrementuje se počítadlo řádků.
+          if (last_letter == '\n')
+            line_num++;
+          
+          // Pokud add_char neuspěje narazilo se na EOF.
+          if (! add_char(f, &last_letter, &lexeme)) {
+            deleteRCString(&lexeme);
+            // .line_num zde obsahuje počátek neukončeného řetězce (error: missing terminating " character)
+            throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=start_line_num}));
+          }
+        }
       }
       
       // Řetězec se uloží do tokenu.
