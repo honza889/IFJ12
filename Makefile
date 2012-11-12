@@ -21,9 +21,9 @@ obj/dbg/%.o: src/%.c
 #  Testy
 #  *****
 
-TESTS=value symbols ast exceptions scanner rcstring ial syntax interpret extern
+TESTS=value symbols ast exceptions scanner rcstring ial syntax interpret
 
-.PHONY: test debug clean
+.PHONY: test etest debug clean
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 	unitests/tests.sh "$?"
 tests:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
@@ -38,11 +38,12 @@ unitests/syntax/test: obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/d
 unitests/interpret/test: obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o obj/dbg/alloc.o obj/dbg/bif.o
 unitests/rcstring/test: obj/dbg/rcstring.o obj/dbg/alloc.o
 unitests/ial/test: obj/dbg/ial.o obj/dbg/value.o obj/dbg/alloc.o obj/dbg/ast.o
-unitests/extern/test: debug
 
 unitests/%/test: unitests/%/test.c obj/dbg/exceptions.o obj/dbg/rcstring.o unitests/test.h
 	gcc -o $@ $^ $(LDB) $(CFLAGS)
 
+etest: debug
+	unitests/extern/test.sh
 
 #  Debug
 #  *****
