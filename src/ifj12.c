@@ -71,7 +71,7 @@ int main(int argc, char**argv)
     
     Context context = {
         .globals=syntaxcontext.functions,
-        .locals=initValueTable(syntaxcontext.localSymbols->count)
+        .locals=NULL
     };
     
     try{

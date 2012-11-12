@@ -238,24 +238,21 @@ Value evalFunction( Function* func, ExpressionList params, Context* context )
     {
         variableCount += func->value.userDefined.variableCount;
     }
-    
     Value variables[ variableCount ];
-    
     Context nestedContext = { context->globals, variables };
-    
-    for( int i = 0; i < variableCount; i++ )
+    for( int i = 0; i < variableCount; i++ ) // inicializace lokalni tabulky symbolu
     {
-        if( i < params.count )
+        if( i < params.count ) // predane parametry
         {
             variables[ i ] = evalExpression( &params.expressions[ i ], context );
         }
-        else if( i < func->paramCount )
+        else if( i < func->paramCount ) // nepredane parametry
         {
-            variables[i] = newValueNil();
+            variables[i]=(Value){.type=typeNil};
         }
-        else
+        else // lokalni promenne
         {
-            variables[i] = newValueUndefined();
+            variables[i]=(Value){.type=typeUndefined};
         }
     }
     

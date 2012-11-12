@@ -13,7 +13,6 @@ BEGIN_TEST
   SyntaxContext syntaxcontext;
   initDefaultSyntaxContext( &syntaxcontext );
   Function mainFunction;
-
   try{
     parseProgram(&s, &syntaxcontext, &mainFunction);
   }
@@ -53,7 +52,7 @@ BEGIN_TEST
 
   Context context = {
     .globals= syntaxcontext.functions,
-    .locals=initValueTable(syntaxcontext.localSymbols->count)
+    .locals=NULL
   };
 
   try
@@ -87,7 +86,6 @@ BEGIN_TEST
     }
   }
   freeValueTable( context.globals, syntaxcontext.globalSymbols->count );
-  freeValueTable( context.locals, syntaxcontext.localSymbols->count );
   
   destroyDefaultSyntaxContext( &syntaxcontext );
 

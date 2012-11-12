@@ -102,10 +102,11 @@ void parseProgram( Scanner* s, SyntaxContext* ctx, Function* main )
         .value.userDefined = { 
             .statements = {
                 .item = NULL,
-                .count = 0
-            }
+                .count = 0 // doplni parseStatement
+            },
+            .variableCount = 0 // doplni se az po parsovani tady
         },
-        .paramCount = 0
+        .paramCount = 0 // main nikdy nema parametry
     };
     
     while( getTok( s ).type != tokEndOfFile )
@@ -120,6 +121,7 @@ void parseProgram( Scanner* s, SyntaxContext* ctx, Function* main )
             parseStatement( s, &main->value.userDefined.statements, ctx );
         }
     }
+    main->value.userDefined.variableCount = ctx->localSymbols->count;
 }
 
 void parseFunctionParameters( Scanner* s, Function* func, SyntaxContext* ctx )
@@ -162,11 +164,11 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
         .value.userDefined = {
             .statements = {
                 .item = NULL,
-                .count = 0
+                .count = 0 // dolplni parseStatement
             },
-            .variableCount = 0
+            .variableCount = ctx->localSymbols->count
         },
-        .paramCount = 0
+        .paramCount = 0 // dolplni parseFunctionParameters
     };
     
     SymbolTable localSymbols = newSymbolTable();
