@@ -1,1 +1,0 @@
-gcc -o unitests/ial/test unitests/ial/test.c obj/dbg/exceptions.o obj/dbg/rcstring.o unitests/test.h obj/dbg/ial.o obj/dbg/value.o obj/dbg/alloc.o obj/dbg/ast.o -g3 -std=c99 -I src -Wall -Wno-unused-variable -pedantic
