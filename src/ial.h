@@ -20,4 +20,8 @@
 **/
 Value find( ValueList data, int count );
 
+
+// Seradi znaky v retezci (vice v ial.c)
+Value sort(ValueList data, int count);
+
 #endif // IAL_H_INCLUDED

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ial.h"
+#include "alloc.h"
 
 
 Value find( ValueList data, int count )
@@ -100,4 +101,54 @@ Value find( ValueList data, int count )
     deleteRCString( &a );
     deleteRCString( &b );
     return newValueNumeric( stringLength );
+}
+
+// Seradi znaky ve dvou retezcich
+// Oba retezce musi byt uz samostatne serazene a neukoncene nulovym znakem
+// @param str1 - ukazatel na prvni retezec
+// @param str1 - ukazatel na druhy retezec
+// @param len  - pocet znaku v obou retezcich dohromady
+// Vraci ukazatel na serazeny retezec
+char* merge(char *str1, char *str2, int len)
+{
+    char* result = newArray(char, len);
+    int i = 0, j = 0, k = 0, len1 = len>>1, len2 = (len>>1) + (len&1);
+    while(i < len1 && j < len2)
+    {   // Serazuje dokud oba retezce obsahuji najaky neserazeny znak
+        if(str2[j] < str1[i]) result[k++] = str2[j++];
+        else result[k++] = str1[i++];
+    }
+    // Pripoji zbytek prvniho nebo druheho retezce k jiz serazenym znakum
+    while(i < len1) result[k++] = str1[i++];
+    while(j < len2) result[k++] = str2[j++];
+    free(str1);
+    free(str2);
+    return result;
+}
+
+// Rekurzivne rozdeli seznam na jednotlive polozky a serazene je slepuje dohromady
+// @param str - ukazatel na retezec, jehoz znaky se maji seradit (neobsahuje \0)
+// @param len - delka retezce
+// Vraci ukazatel na seradeny retezec
+char* mergesort(char *str, int len)
+{
+    if(len == 1)
+    {
+        char* result = newArray(char, 1);
+        result[0] = str[0];
+        return result;
+    }            // prvni mergesort se vola s prvni pulkou retezce, druhy s druhou
+    return merge(mergesort(str, len>>1), mergesort(&str[len>>1], (len>>1) + (len&1)), len);
+}
+
+// Seradi znaky v retezci
+// Obalovaci funkce kvuli konverzi z/na RCString
+Value sort(ValueList data, int count)
+{
+    RCString str = getValueString(&data[0]);
+    char *result = mergesort((char*)RCStringGetBuffer(&str), str.length);
+    result = resizeArray(result, char, str.length + 1);
+    result[str.length] = '\0';
+    deleteRCString(&str);
+    return newValueString(makeRCString(result));
 }
