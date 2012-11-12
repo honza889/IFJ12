@@ -351,7 +351,7 @@ void freeValue(Value *object){
 Value* initValueTable(int length){
  Value *table = malloc(length*sizeof(Value));
  for(int i=0;i<length;i++){
-  table[i].type=typeUndefined;
+  table[i]=(Value){.type=typeUndefined};
  }
  return table;
 }

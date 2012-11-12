@@ -1,5 +1,4 @@
 /* Program 3: Prace s retezci a vestavenymi funkcemi */
-
 function MyMain(str) // Hlavni telo programu
   str1 = str[:19.0]
   str2 = str1 + ", ktery je ulozeny jako "
@@ -17,7 +16,7 @@ function MyMain(str) // Hlavni telo programu
     str1 = input()
     str2 = sort(str1)
   end
-  return 0
+  return 0.0
 end
 foo = MyMain("Toto je nejaky text v programu jazyka IFJ12")
 
