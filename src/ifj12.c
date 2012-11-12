@@ -106,7 +106,6 @@ int main(int argc, char**argv)
     
     // Uvolneni hlavnich tabulek symbolu
     freeValueTable( context.globals, syntaxcontext.globalSymbols->count );
-    freeValueTable( context.locals, syntaxcontext.localSymbols->count );
     
     destroyDefaultSyntaxContext( &syntaxcontext );
     

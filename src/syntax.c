@@ -166,7 +166,7 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
                 .item = NULL,
                 .count = 0 // dolplni parseStatement
             },
-            .variableCount = ctx->localSymbols->count
+            .variableCount = 0 // doplni se az po parsovani tady
         },
         .paramCount = 0 // dolplni parseFunctionParameters
     };
@@ -197,6 +197,7 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
     consumeTok( s );
     expectTok( s, tokEndOfLine );
     
+    func->value.userDefined.variableCount = newCtx.localSymbols->count;
     freeSymbolTable( &localSymbols );
     
     addFunctionToContext( ctx, &funcName, func );
