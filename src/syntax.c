@@ -262,7 +262,9 @@ void detectAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Assignment ass;
-    ass.destination = getSymbol(getTok(s).data.id,ctx->globalSymbols, ctx->localSymbols ); 
+    RCString name = getTok(s).data.id;
+    ass.destination.index = getSymbol(name,ctx->globalSymbols, ctx->localSymbols );
+    ass.destination.name = copyRCString(&name);
     consumeTok(s);
     parseExpression(s, &ass.source, ctx);
     expectTok(s, tokEndOfLine);
@@ -275,23 +277,29 @@ void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Substring substr;
-    substr.destination = getSymbol(getTok(s).data.id,ctx->globalSymbols, ctx->localSymbols );
+    RCString name = getTok(s).data.id;
+    substr.destination.index = getSymbol(name,ctx->globalSymbols, ctx->localSymbols );
+    substr.destination.name = copyRCString(&name);
     consumeTok(s);
     
-    if (getTok(s).type == tokLiteral)
+    if (getTok(s).type == tokLiteral){
         substr.source = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
-    else
-        substr.source = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
+    }else{
+        RCString name = getTok(s).data.id;
+        substr.source = (Expression){ .type=VARIABLE, .value.variable=(Variable){ .index=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) } };
+    }
     consumeTok(s);
     
     assert(getTok(s).type == tokLBracket);	// V kontextu s detectAssignment().
     consumeTok(s);
     
     if (getTok(s).type & (tokId | tokLiteral)) {
-        if (getTok(s).type == tokLiteral)
+        if (getTok(s).type == tokLiteral){
             substr.offset = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
-        else
-            substr.offset = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
+        }else{
+            RCString name = getTok(s).data.id;
+            substr.offset = (Expression){ .type=VARIABLE, .value.variable=(Variable){ .index=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) } };
+        }
         consumeTok(s);
     }
     else if (getTok(s).type == tokColon) {
@@ -301,10 +309,12 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     expectTok(s, tokColon);
     
     if (getTok(s).type & (tokId | tokLiteral)) {
-        if (getTok(s).type == tokLiteral)
+        if (getTok(s).type == tokLiteral){
             substr.length = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
-        else
-            substr.length = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
+        }else{
+            RCString name = getTok(s).data.id;
+            substr.length = (Expression){ .type=VARIABLE, .value.variable=(Variable){ .index=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) } };
+        }
         consumeTok(s);
     }
     else if (getTok(s).type == tokRBracket) {
@@ -401,7 +411,8 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 // id( - Volani funkce
                 if(getTokN(s,1).type==tokLParen){
                     newExp->type=FUNCTION_CALL;
-                    newExp->value.functionCall.function=getSymbol(current.data.id,ctx->globalSymbols,NULL);
+                    RCString name = getTok(s).data.id;
+                    newExp->value.functionCall.function=(Variable){ .index=getSymbol(current.data.id,ctx->globalSymbols,NULL), .name=copyRCString(&name) };
                     newExp->value.functionCall.params = (ExpressionList){NULL,0};
                     consumeTok(s); // zkonzumovat id
                     consumeTok(s); // zkonzumovat '('
@@ -421,7 +432,8 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 // id - Promenna
                 }else{
                     newExp->type=VARIABLE;
-                    newExp->value.variable=getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols);
+                    RCString name = getTok(s).data.id;
+                    newExp->value.variable=(Variable){ .index=getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) };
                 }
                 past = wasValue;
             break;
@@ -579,7 +591,7 @@ void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx )
     testTok( s, tokId );
     RCString name = getTok( s ).data.id;
     name = copyRCString(&name);
-    *id = getSymbol( name, ctx->globalSymbols, ctx->localSymbols );
+    *id = (Variable){ .index=getSymbol( name, ctx->globalSymbols, ctx->localSymbols ), .name=copyRCString(&name) };
     deleteRCString( &name );
     consumeTok( s );
 }

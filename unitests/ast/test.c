@@ -9,11 +9,14 @@
 BEGIN_TEST
 
 {
+    RCString name0 = makeRCString("copyRCString(&name0)");
+    RCString name1 = makeRCString("copyRCString(&name1)");
+    
     Statement testStatements[] = {
         {
             .type = ASSIGNMENT,
             .value.assignment = {
-                .destination = 0,
+                .destination = (Variable){0,copyRCString(&name0)},
                 .source = {
                     .type = CONSTANT,
                     .value.constant = newValueNumeric( 5.0 )
@@ -24,7 +27,7 @@ BEGIN_TEST
             .type = RETURN,
             .value.ret = {
                 .type = VARIABLE,
-                .value.variable = 0
+                .value.variable = (Variable){0,copyRCString(&name0)}
             }
         }
     };
@@ -51,9 +54,13 @@ BEGIN_TEST
     
     RCString s = getValueString( &ret );
     STRTEST( s, "5" );
-    deleteRCString( &s ); 
+    deleteRCString( &s );
+    deleteRCString( &name0 );
+    deleteRCString( &name1 );
 }
 {
+    RCString name0 = makeRCString("copyRCString(&name0)");
+    RCString name1 = makeRCString("copyRCString(&name1)");
     
     // Test smycek, k retezcove promenne s obsahem "neco" pridame ve
     // smycce desetkrat retezec "LOL"
@@ -68,7 +75,7 @@ BEGIN_TEST
     
     *expr1 = (Expression){
         .type = VARIABLE,
-        .value.variable = 0
+        .value.variable = (Variable){0,copyRCString(&name0)}
     };
     
     *expr2 = (Expression){
@@ -78,7 +85,7 @@ BEGIN_TEST
         
     *expr3 = (Expression){
         .type = VARIABLE,
-        .value.variable = 1
+        .value.variable = (Variable){1,copyRCString(&name1)}
     };
     
     *expr4 = (Expression){
@@ -88,7 +95,7 @@ BEGIN_TEST
     
     *expr5 = (Expression){
         .type = VARIABLE,
-        .value.variable = 0
+        .value.variable = (Variable){0,copyRCString(&name0)}
     };
     
     *expr6 = (Expression){
@@ -101,7 +108,7 @@ BEGIN_TEST
     whileStmt[0] = (Statement){
         .type = ASSIGNMENT,
         .value.assignment = {
-            .destination = 1,
+            .destination = (Variable){1,copyRCString(&name1)},
             .source = {
                 .type = OPERATOR,
                 .value.operator = {
@@ -119,7 +126,7 @@ BEGIN_TEST
     whileStmt[1] = (Statement){
         .type = ASSIGNMENT,
         .value.assignment = {
-            .destination = 0,
+            .destination = (Variable){0,copyRCString(&name0)},
             .source = {
                 .type = OPERATOR,
                 .value.operator = {
@@ -138,7 +145,7 @@ BEGIN_TEST
     testStatements[0] = (Statement){
         .type = ASSIGNMENT,
         .value.assignment = {
-            .destination = 0,
+            .destination = (Variable){0,copyRCString(&name0)},
             .source = {
                 .type = CONSTANT,
                 .value.constant = newValueNumeric( 0.0 )
@@ -148,7 +155,7 @@ BEGIN_TEST
     testStatements[1] = (Statement){
         .type = ASSIGNMENT,
         .value.assignment = {
-            .destination = 1,
+            .destination = (Variable){1,copyRCString(&name1)},
             .source = {
                 .type = CONSTANT,
                 .value.constant = newValueCString( "neco" )
@@ -180,7 +187,7 @@ BEGIN_TEST
         .type = RETURN,
         .value.ret = {
             .type = VARIABLE,
-            .value.variable = 1
+            .value.variable = (Variable){1,copyRCString(&name1)}
         }
     };
     
@@ -207,6 +214,8 @@ BEGIN_TEST
     RCString retStr = getValueString( &ret );
     STRTEST( retStr, "necoLOLLOLLOLLOLLOLLOLLOLLOLLOLLOL" );
     deleteStatementList( f.value.userDefined.statements );
+    deleteRCString( &name0 );
+    deleteRCString( &name1 );
 }
 
 END_TEST

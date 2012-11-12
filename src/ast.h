@@ -7,24 +7,25 @@
 
 typedef struct SValue Value;
 typedef struct SFunction Function;
-
-typedef int Variable; // index do pole proměnných (podle symbols.h)
+typedef struct SVariable Variable;
 typedef Value Constant;
 typedef struct SBinaryOp BinaryOp;
 typedef struct SUnaryOp UnaryOp;
 typedef struct SOperator Operator;
 typedef struct SFunctionCall FunctionCall;
 typedef struct SExpression Expression;
-
 typedef struct SAssignment Assignment;
 typedef struct SSubstring Substring;
 typedef struct SLoop Loop;
 typedef struct SCondition Condition;
 typedef Expression Return;
-
 typedef struct SStatement Statement;
-
 typedef struct SContext Context;
+
+struct SVariable{
+    int index;
+    RCString name;
+};
 
 typedef struct {
     Statement* item;
@@ -35,6 +36,7 @@ typedef struct {
     Expression* expressions;
     int count;
 } ExpressionList;
+
 typedef Value* ValueList;
 
 typedef Value( *BuiltinFunction )( ValueList, int );
