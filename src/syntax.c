@@ -17,7 +17,7 @@ void addExpressionToExpressionList( ExpressionList* sl, Expression* statement );
 void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function )
 {
     // asi to chce jeste trochu predelat symboly...
-    int id = getSymbol( *name, ctx->globalSymbols, ctx->globalSymbols );
+    int id = getSymbol( *name, ctx->globalSymbols, NULL );
     if( id > ctx->globalSymbols->count )
     {
         throw( MultipleFunctionDefinitions, copyRCString( name ) );

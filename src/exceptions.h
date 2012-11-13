@@ -18,6 +18,7 @@ typedef enum
     
     /* Lexikalni analyza */
     UndefinedVariable, // exit 3
+    UndefinedFunction, // exit 3 ???
     IncompatibleComparison, // exit 1
     InvalidConversion, // exit 12 (chyba pretypovani na cislo)
     BadArgumentType, // exit 11 (behova chyba nekompatibility typu)
@@ -71,6 +72,7 @@ typedef struct
 } UnexpectedKeyWordException;
 
 typedef int UndefinedVariableException;
+typedef int UndefinedFunctionException;
 typedef bool IncompatibleComparisonException;
 typedef Value InvalidConversionException;
 typedef const char* BadArgumentTypeException;
@@ -88,6 +90,7 @@ typedef struct
         EXCEPTION( ScannerError );
     
         EXCEPTION( UndefinedVariable );
+        EXCEPTION( UndefinedFunction );
         EXCEPTION( IncompatibleComparison );
         EXCEPTION( InvalidConversion );
         EXCEPTION( BadArgumentType );

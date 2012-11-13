@@ -83,6 +83,9 @@ int main(int argc, char**argv)
         on( UndefinedVariable, e ){
             fprintf( stderr, "Byla použita proměnná bez definování její hodnoty!\n" );
         }
+        on( UndefinedFunction, e ){
+            fprintf( stderr, "Byla použita nedefinovaná funkce!\n" );
+        }
         on( IncompatibleComparison, e ){
             fprintf( stderr, "Nekompatibilní porovnávání - rozdílné datové typy porovnávaných hodnot!\n" );
         }

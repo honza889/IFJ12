@@ -100,10 +100,12 @@ x=print("\n")
 x=print("             TYPEOF\n")
 x=print("***********************************\n")
 
-t = typeof("test")
-if t==8.0
+a = typeOf("test")
+if a==8.0
+  x=print("typeof(string)=8.0 OK\n")
 else
-  //x=print("typeof(string)="+typeof("test")+"\n")
+  x=print("typeof(string)="+typeof("test")+"\n")
 end
 
+//x = neexistujici("")
 
