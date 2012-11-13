@@ -1,0 +1,17 @@
+// test substringovani
+
+a = "abc"[0.0:0.0]
+//x=print("[0:0] =",a,"\n")
+
+//a = "abc"[1.0:100.0]
+//x=print("[1:3] b=",a,"\n")
+
+//a = "abc"[1.0:2.0]
+//x=print("[1:2] b=",a,"\n")
+
+//a = "abc"[1.0:]
+//x=print("[1:3] bc=",a,"\n")
+
+//a = "abc"[:1.0]
+//x=print("[0:1] a=",a,"\n")
+
