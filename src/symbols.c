@@ -44,11 +44,11 @@ bool setNewSymbol( RCString name, SymbolTable *table )
   newSymbol->name=copyRCString(&name);
   
   // Navyseni poctu prvku v tabulce
-  table->count++;
+  //table->count++;
   
   newSymbol->lesser = NULL;
   newSymbol->greater = NULL;
-  newSymbol->index = table->count;
+  newSymbol->index = table->count++;
   *destination = newSymbol;
   
  }
