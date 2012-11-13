@@ -8,6 +8,7 @@
 #include "alloc.h"
 #include "symbols.h"
 #include "bif.h"
+#include "ial.h"
 
 void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function );
 void addStatementToStatementList( StatementList* sl, Statement* statement );
@@ -16,7 +17,7 @@ void addExpressionToExpressionList( ExpressionList* sl, Expression* statement );
 void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function )
 {
     // asi to chce jeste trochu predelat symboly...
-    int id = getSymbol( *name, ctx->globalSymbols, ctx->globalSymbols );
+    int id = getSymbol( *name, ctx->globalSymbols, NULL );
     if( id > ctx->globalSymbols->count )
     {
         throw( MultipleFunctionDefinitions, copyRCString( name ) );
@@ -77,7 +78,8 @@ void initDefaultSyntaxContext( SyntaxContext* ctx )
     addBuiltinToContext( ctx, makeRCString( "print" ), BIFprint, -1 );
     addBuiltinToContext( ctx, makeRCString( "typeOf" ), BIFtypeOf, 1 );
     addBuiltinToContext( ctx, makeRCString( "len" ), BIFlen, 1 );
-    addBuiltinToContext( ctx, makeRCString( "find" ), BIFlen, 2 ); // TODO: BIFfind?
+    addBuiltinToContext( ctx, makeRCString( "find" ), find, 2 );
+    addBuiltinToContext( ctx, makeRCString( "sort" ), sort, 1 );
 }
 
 void destroyDefaultSyntaxContext( SyntaxContext* ctx )
@@ -284,7 +286,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     consumeTok(s);
     
     if (getTok(s).type == tokLiteral){
-	valueBuffer = getTok(s).data.val;
+        valueBuffer = getTok(s).data.val;
         substr.source = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
     }else{
         RCString name = getTok(s).data.id;
@@ -297,7 +299,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     
     if (getTok(s).type & (tokId | tokLiteral)) {
         if (getTok(s).type == tokLiteral){
-	    valueBuffer = getTok(s).data.val;
+            valueBuffer = getTok(s).data.val;
             substr.offset = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
         }else{
             RCString name = getTok(s).data.id;
@@ -313,7 +315,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     
     if (getTok(s).type & (tokId | tokLiteral)) {
         if (getTok(s).type == tokLiteral){
-	    valueBuffer = getTok(s).data.val;
+            valueBuffer = getTok(s).data.val;
             substr.length = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
         }else{
             RCString name = getTok(s).data.id;

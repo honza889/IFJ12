@@ -37,8 +37,8 @@ unitests/symbols/test: obj/dbg/symbols.o obj/dbg/value.o obj/dbg/exceptions.o ob
 unitests/ast/test: obj/dbg/value.o obj/dbg/ast.o obj/dbg/exceptions.o obj/dbg/alloc.o
 unitests/exceptions/test: obj/dbg/exceptions.o obj/dbg/alloc.o
 unitests/scanner/test: obj/dbg/scanner.o obj/dbg/rcstring.o obj/dbg/alloc.o
-unitests/syntax/test: obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o obj/dbg/alloc.o obj/dbg/bif.o
-unitests/interpret/test: obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o obj/dbg/alloc.o obj/dbg/bif.o
+unitests/syntax/test: obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o obj/dbg/alloc.o obj/dbg/bif.o obj/dbg/ial.o
+unitests/interpret/test: obj/dbg/syntax.o obj/dbg/scanner.o obj/dbg/symbols.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o obj/dbg/alloc.o obj/dbg/bif.o obj/dbg/ial.o
 unitests/rcstring/test: obj/dbg/rcstring.o obj/dbg/alloc.o
 unitests/ial/test: obj/dbg/ial.o obj/dbg/value.o obj/dbg/alloc.o obj/dbg/ast.o
 

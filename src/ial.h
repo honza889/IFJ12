@@ -18,7 +18,7 @@
 *   v pripade nalezeni vrati index prvku, kde zacina nalezeny podretezec
 *             nenalezeni vrati delku retezce
 **/
-Value find( ValueList data, int count );
+Value find(ValueList data, int count);
 
 
 // Seradi znaky v retezci (vice v ial.c)

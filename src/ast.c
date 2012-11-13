@@ -131,25 +131,29 @@ void evalSubstring( Substring* substring, Context* context )
     RCString r = getValueString( &val );
     freeValue( &val );
     
-    Value offset,length; // TODO: odladit - nefuguje!
-    int num_off, num_len;
+    int offset,length;
     if(substring->offset.type==CONSTANT && substring->offset.value.constant.type==typeUndefined){
-        offset = newValueNumeric(0.0);
+        offset = 0;
     }else{
-        offset = evalExpression(&substring->offset,context);
+        Value offsetValue = evalExpression(&substring->offset,context);
+        offset = (int)getValueNumeric(&offsetValue);
+        freeValue(&offsetValue);
     }
     if(substring->length.type==CONSTANT && substring->length.value.constant.type==typeUndefined){
-        length = newValueNumeric(RCStringLength(&r));
+        length = RCStringLength(&r);
     }else{
-        length = evalExpression(&substring->length,context);
+        Value lengthValue = evalExpression(&substring->length,context);
+        length = (int)getValueNumeric(&lengthValue);
+        freeValue(&lengthValue);
     }
     
-    num_off = (int)getValueNumeric(&offset);
-    num_len = (int)getValueNumeric(&length) - num_off;
-    RCStringSubstring( &r, num_off, num_len );
-    
-    freeValue(&offset);
-    freeValue(&length);
+    if (offset >= length || length > RCStringLength(&r) || offset < 0) {
+        deleteRCString(&r);
+        r = makeEmptyRCString();
+    }else{
+        length -= offset;
+        RCStringSubstring( &r, offset, length );
+    }
     
     setVariable( &substring->destination, context, newValueString( r ) );
     deleteRCString( &r );

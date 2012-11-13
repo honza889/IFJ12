@@ -261,6 +261,9 @@ double getValueNumeric(Value *object){
 }
 
 Function* getValueFunction(Value *object){
+    if(object->type==typeUndefined){
+        throw(UndefinedFunction, -1);
+    }
     if(object->type!=typeFunction){
         throw(InvalidConversion, *object);
     }

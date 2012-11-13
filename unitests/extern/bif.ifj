@@ -1,0 +1,111 @@
+// Testy BIF a IAL funkci
+
+x=print("\n")
+x=print("             SORT\n")
+x=print("***********************************\n")
+
+if sort("cab")=="abc"
+  x=print("sort(\"cab\")=abc OK\n")
+else
+  x=print("sort(\"cab\")="+sort("cab")+"\n")
+end
+
+if sort("cabdac")=="aabccd"
+  x=print("sort(\"cabdac\")=aabccd OK\n")
+else
+  x=print("sort(\"cabdac\")="+sort("cabdac")+"\n")
+end
+
+if sort("")==""
+  x=print("sort(\"\")=\"\" OK\n")
+else
+  x=print("sort(\"\")=\""+sort("")+"\"\n")
+end
+
+x=print("\n")
+x=print("             FIND\n")
+x=print("***********************************\n")
+
+if find("abcdef","cd")==2.0
+  x=print("find(\"abcdef\",\"cd\")=2.0 OK\n")
+else
+  x=print("find(\"abcdef\",\"cd\")="+find("abcdef","cd")+"\n")
+end
+
+if find("aaaaabaaa","aab")==3.0
+  x=print("find(\"aaaaabaaa\",\"aab\")=3.0 OK\n")
+else
+  x=print("find(\"aaaaabaaa\",\"aab\")="+find("aaaaabaaa","ab")+"\n")
+end
+
+if find("---abcde-abcdef-","abcdef")==9.0
+  x=print("find(\"---abcde-abcdef-\",\"abcdef\")=9.0 OK\n")
+else
+  x=print("find(\"---abcde-abcdef-\",\"abcdef\")="+find("---abcde-abcdef-","abcdef")+"\n")
+end
+
+if find("ababababababaabab","abababaab")==6.0
+  x=print("find(\"ababababababaabab\",\"abababaab\")=6.0 OK\n")
+else
+  x=print("find(\"ababababababaabab\",\"abababaab\")="+find("ababababababaabab","abababaab")+"\n")
+end
+
+if find("xxxxxxx","xa")==(-1.0)
+  x=print("find(\"xxxxxxx\",\"xa\")=-1.0 OK\n")
+else
+  x=print("find(\"xxxxxxx\",\"xa\")="+find("xxxxxxx","xa")+"\n")
+end
+
+if find("","xa")==(-1.0)
+  x=print("find(\"\",\"xa\")=-1.0 OK\n")
+else
+  x=print("find(\"\",\"xa\")="+find("","xa")+"\n")
+end
+
+if find("xxxxxxx","")==(0.0)
+  x=print("find(\"xxxxxxx\",\"\")=0.0 OK\n")
+else
+  x=print("find(\"xxxxxxx\",\"\")="+find("xxxxxxx","")+"\n")
+end
+
+if find("","")==(0.0)
+  x=print("find(\"\",\"\")=0.0 OK\n")
+else
+  x=print("find(\"\",\"\")="+find("","")+"\n")
+end
+
+x=print("\n")
+x=print("               LEN\n")
+x=print("***********************************\n")
+
+if len("test")==4.0
+  x=print("len(\"test\")=4.0 OK\n")
+else
+  x=print("len(\"test\")="+len("test")+"\n")
+end
+
+if len("")==0.0
+  x=print("len(\"\")=0.0 OK\n")
+else
+  x=print("len(\"\")="+len("")+"\n")
+end
+
+if len(false)==0.0
+  x=print("len(false)=0.0 OK\n")
+else
+  x=print("len(false)="+len(false)+"\n")
+end
+
+x=print("\n")
+x=print("             TYPEOF\n")
+x=print("***********************************\n")
+
+a = typeOf("test")
+if a==8.0
+  x=print("typeof(string)=8.0 OK\n")
+else
+  x=print("typeof(string)="+typeof("test")+"\n")
+end
+
+//x = neexistujici("")
+

@@ -83,18 +83,27 @@ int main(int argc, char**argv)
         on( UndefinedVariable, e ){
             fprintf( stderr, "Byla použita proměnná bez definování její hodnoty!\n" );
         }
+        on( UndefinedFunction, e ){
+            fprintf( stderr, "Byla použita nedefinovaná funkce!\n" );
+        }
+        on( IncompatibleComparison, e ){
+            fprintf( stderr, "Nekompatibilní porovnávání - rozdílné datové typy porovnávaných hodnot!\n" );
+        }
         on( BadArgumentType, e ){
             fprintf( stderr, "Funkce %s byla zavolána s parametrem chybného typu!\n", *e );
+        }
+        on( IndexOutOfBounds, e ){
+            fprintf( stderr, "Index mimo pole!\n" );
+        }
+        on(InvalidConversion, value){
+            RCString buf = getValueString(value);
+            fprintf( stderr, "Nezdařil se převod hodnoty \""); RCStringPrint(&buf, stderr); fprintf( stderr, "\" na typ numeric!\n");
+            exit( 12 );
         }
         on(OutOfMemory, typename){
             fprintf( stderr, "Nezdařila se alokace paměti pro typ '%s'!\n", *typename );
             exit( 99 );
         }
-        on(InvalidConversion, value){
-	    RCString buf = getValueString(value);
-	    fprintf( stderr, "Nezdařil se převod hodnoty \""); RCStringPrint(&buf, stderr); fprintf( stderr, "\" na typ numeric!\n");
-            exit( 12 );
-	}
         onAll{
             fprintf( stderr, "Nastala neočekávaná vyjímka v průběhu vykonávání programu!\n" );
             exit( 2 );
