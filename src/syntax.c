@@ -277,13 +277,15 @@ void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Substring substr;
+    Value valueBuffer;
     RCString name = getTok(s).data.id;
     substr.destination.index = getSymbol(name,ctx->globalSymbols, ctx->localSymbols );
     substr.destination.name = copyRCString(&name);
     consumeTok(s);
     
     if (getTok(s).type == tokLiteral){
-        substr.source = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
+	valueBuffer = getTok(s).data.val;
+        substr.source = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
     }else{
         RCString name = getTok(s).data.id;
         substr.source = (Expression){ .type=VARIABLE, .value.variable=(Variable){ .index=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) } };
@@ -295,7 +297,8 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     
     if (getTok(s).type & (tokId | tokLiteral)) {
         if (getTok(s).type == tokLiteral){
-            substr.offset = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
+	    valueBuffer = getTok(s).data.val;
+            substr.offset = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
         }else{
             RCString name = getTok(s).data.id;
             substr.offset = (Expression){ .type=VARIABLE, .value.variable=(Variable){ .index=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) } };
@@ -310,7 +313,8 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     
     if (getTok(s).type & (tokId | tokLiteral)) {
         if (getTok(s).type == tokLiteral){
-            substr.length = (Expression){ .type=CONSTANT, .value.constant=getTok(s).data.val };
+	    valueBuffer = getTok(s).data.val;
+            substr.length = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
         }else{
             RCString name = getTok(s).data.id;
             substr.length = (Expression){ .type=VARIABLE, .value.variable=(Variable){ .index=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) } };

@@ -87,10 +87,14 @@ int main(int argc, char**argv)
             fprintf( stderr, "Funkce %s byla zavolána s parametrem chybného typu!\n", *e );
         }
         on(OutOfMemory, typename){
-            fprintf( stderr, "Nezdařila se alokace paměti pro typ '%s'", *typename );
-            fclose( f );
+            fprintf( stderr, "Nezdařila se alokace paměti pro typ '%s'!\n", *typename );
             exit( 99 );
         }
+        on(InvalidConversion, value){
+	    RCString buf = getValueString(value);
+	    fprintf( stderr, "Nezdařil se převod hodnoty \""); RCStringPrint(&buf, stderr); fprintf( stderr, "\" na typ numeric!\n");
+            exit( 12 );
+	}
         onAll{
             fprintf( stderr, "Nastala neočekávaná vyjímka v průběhu vykonávání programu!\n" );
             exit( 2 );

@@ -132,6 +132,7 @@ void evalSubstring( Substring* substring, Context* context )
     freeValue( &val );
     
     Value offset,length; // TODO: odladit - nefuguje!
+    int num_off, num_len;
     if(substring->offset.type==CONSTANT && substring->offset.value.constant.type==typeUndefined){
         offset = newValueNumeric(0.0);
     }else{
@@ -143,7 +144,9 @@ void evalSubstring( Substring* substring, Context* context )
         length = evalExpression(&substring->length,context);
     }
     
-    RCStringSubstring( &r, (int)getValueNumeric(&offset), (int)getValueNumeric(&length) );
+    num_off = (int)getValueNumeric(&offset);
+    num_len = (int)getValueNumeric(&length) - num_off;
+    RCStringSubstring( &r, num_off, num_len );
     
     freeValue(&offset);
     freeValue(&length);

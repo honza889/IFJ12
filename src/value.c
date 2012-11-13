@@ -423,7 +423,6 @@ Value multiplyValue( Value* a, Value* b )
         RCString result = makeEmptyRCString();
         RCString addedStr = getValueString( a );
         int howMany = (int)getValueNumeric( b );
-        RCStringResize( &result, howMany*RCStringLength( &addedStr ) );
         for( int i = 0; i < howMany; i++ )
         {
             RCStringAppendStr( &result, &addedStr );
