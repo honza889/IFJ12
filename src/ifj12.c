@@ -52,6 +52,11 @@ int main(int argc, char**argv)
             fclose( f );
             exit( 2 );
         }
+        on(MultipleFunctionDefinitions, value){
+            fprintf( stderr, "Nejednou definovaná funkce \""); RCStringPrint(value, stderr); fprintf( stderr, "\"!\n");
+            fclose( f );
+            exit( 5 );
+        }
         on(OutOfMemory, typename){
             fprintf( stderr, "Nezdařila se alokace paměti pro typ '%s'", *typename );
             fclose( f );
@@ -82,18 +87,31 @@ int main(int argc, char**argv)
     catch{
         on( UndefinedVariable, e ){
             fprintf( stderr, "Byla použita proměnná bez definování její hodnoty!\n" );
+            exit( 3 );
         }
         on( UndefinedFunction, e ){
             fprintf( stderr, "Byla použita nedefinovaná funkce!\n" );
+            exit( 4 );
+        }
+        on( VariableIsNotFunction, e ){
+            fprintf( stderr, "Pokus použít funkci jako proměnnou!\n" );
+            exit( 11 );
+        }
+        on( FunctionIsNotVariable, e ){
+            fprintf( stderr, "Pokus použít proměnnou jako funkci!\n" );
+            exit( 11 );
         }
         on( IncompatibleComparison, e ){
             fprintf( stderr, "Nekompatibilní porovnávání - rozdílné datové typy porovnávaných hodnot!\n" );
+            exit( 11 );
         }
         on( BadArgumentType, e ){
             fprintf( stderr, "Funkce %s byla zavolána s parametrem chybného typu!\n", *e );
+            exit( 11 );
         }
         on( IndexOutOfBounds, e ){
             fprintf( stderr, "Index mimo pole!\n" );
+            exit( 13 );
         }
         on(InvalidConversion, value){
             RCString buf = getValueString(value);
@@ -101,7 +119,7 @@ int main(int argc, char**argv)
             exit( 12 );
         }
         on(OutOfMemory, typename){
-            fprintf( stderr, "Nezdařila se alokace paměti pro typ '%s'!\n", *typename );
+            fprintf( stderr, "Nezdařila se alokace paměti pro typ \"%s\"!\n", *typename );
             exit( 99 );
         }
         onAll{
@@ -121,7 +139,6 @@ int main(int argc, char**argv)
     freeValueTable( context.globals, syntaxcontext.globalSymbols->count );
     
     destroyDefaultSyntaxContext( &syntaxcontext );
-    
     return 0;
 }
 

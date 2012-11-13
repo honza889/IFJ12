@@ -25,15 +25,13 @@ Symbol** searchSymbol(Symbol **destination, RCString name, bool *exist){
 /**
  * Vytvoreni uzlu v zadane tabulce
  */
-void setNewSymbol( RCString name, SymbolTable *localTable )
+bool setNewSymbol( RCString name, SymbolTable *table )
 {
  bool exist=false;
  Symbol **destination; // ukazatel na promennou v budoucim rodici
  
  // Prohledame zda uz v tabulce je
- if(localTable!=NULL && !exist){
-  destination = searchSymbol(&(localTable->root),name,&exist);
- }
+ destination = searchSymbol(&(table->root),name,&exist);
  
  // Vytvoreni symbolu, pokud nejde o prepis exitujiciho
  if(!exist){
@@ -46,14 +44,15 @@ void setNewSymbol( RCString name, SymbolTable *localTable )
   newSymbol->name=copyRCString(&name);
   
   // Navyseni poctu prvku v tabulce
-  localTable->count++;
+  table->count++;
   
   newSymbol->lesser = NULL;
   newSymbol->greater = NULL;
-  newSymbol->index = localTable->count;
+  newSymbol->index = table->count;
   *destination = newSymbol;
   
  }
+ return !exist; // true pokud byl vytvoren, false pokud uz existoval
 }
 
 

@@ -30,17 +30,25 @@ typedef struct {
  int count;
 } SymbolTable;
 
-/** Prida symbol \a name do \a localTable. Pokud tento symbol jiz 
- * existuje, tak hodi nejakou vyjimku.
+/**
+ * Prida symbol \a name do \a table.
+ * Pokud symbol jiz existuje, vrati false.
  */
-void setNewSymbol( RCString name, SymbolTable *localTable );
+bool setNewSymbol( RCString name, SymbolTable *table );
 
-/** Vrati index symbolu daneho jmena, pokud neexistuje, vytvori ho */
+/**
+ * Vrati index symbolu daneho jmena, pokud neexistuje, vytvori ho
+ */
 int getSymbol(RCString name, SymbolTable *globalTable, SymbolTable *localTable);
 
-/** Uvolnuje symboly stromu symbolu (pocet prvku zachova) */
+/**
+ * Uvolnuje symboly stromu symbolu (pocet prvku zachova)
+ */
 void freeSymbolTable(SymbolTable *st);
 
+/**
+ * Konstruktor tabulky symbolu
+ */
 static inline SymbolTable newSymbolTable(){
 	return (SymbolTable){ .root=NULL, .count=0 };
 }

@@ -14,12 +14,14 @@ typedef enum
     SyntaxError, // exit 2
     UnexpectedToken,
     UnexpectedKeyWord,
-    MultipleFunctionDefinitions,
+    MultipleFunctionDefinitions, // exit 5 (ostatni semanticke chyby)
     
     /* Lexikalni analyza */
     UndefinedVariable, // exit 3
-    UndefinedFunction, // exit 3 ???
-    IncompatibleComparison, // exit 1
+    UndefinedFunction, // exit 4
+    VariableIsNotFunction, // exit 11
+    FunctionIsNotVariable, // exit 11
+    IncompatibleComparison, // exit 11
     InvalidConversion, // exit 12 (chyba pretypovani na cislo)
     BadArgumentType, // exit 11 (behova chyba nekompatibility typu)
     IndexOutOfBounds, // exit 13
@@ -73,6 +75,8 @@ typedef struct
 
 typedef int UndefinedVariableException;
 typedef int UndefinedFunctionException;
+typedef Value VariableIsNotFunctionException;
+typedef Value FunctionIsNotVariableException;
 typedef bool IncompatibleComparisonException;
 typedef Value InvalidConversionException;
 typedef const char* BadArgumentTypeException;
@@ -91,6 +95,8 @@ typedef struct
     
         EXCEPTION( UndefinedVariable );
         EXCEPTION( UndefinedFunction );
+        EXCEPTION( VariableIsNotFunction );
+        EXCEPTION( FunctionIsNotVariable );
         EXCEPTION( IncompatibleComparison );
         EXCEPTION( InvalidConversion );
         EXCEPTION( BadArgumentType );

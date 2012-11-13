@@ -1,5 +1,7 @@
 // test parseExpression a AST - priority operatoru
 
+x=print("test\n")
+
 a = 10.0+2.0*3.0+100.0
 x=print("116=",a,"\n")
 

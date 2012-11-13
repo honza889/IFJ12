@@ -16,16 +16,14 @@ void addExpressionToExpressionList( ExpressionList* sl, Expression* statement );
 
 void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function )
 {
-    // asi to chce jeste trochu predelat symboly...
-    int id = getSymbol( *name, ctx->globalSymbols, NULL );
-    if( id > ctx->globalSymbols->count )
-    {
-        throw( MultipleFunctionDefinitions, copyRCString( name ) );
-    }
-    else
+    if(setNewSymbol( *name, ctx->globalSymbols ))
     {
         ctx->functions = resizeArray( ctx->functions, Value, ctx->globalSymbols->count );
         ctx->functions[ ctx->globalSymbols->count - 1 ] = newValueFunction( function );
+    }
+    else
+    {
+        throw( MultipleFunctionDefinitions, copyRCString( name ) );
     }
 }
 

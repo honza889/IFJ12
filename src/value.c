@@ -98,7 +98,7 @@ RCString getValueString(Value *object){
 	char* output=malloc(BUFFERSIZE*sizeof(char));
 	MALLCHECK(output);
 	if( snprintf(output,BUFFERSIZE,"%g",object->data.numeric) >= BUFFERSIZE ){
-		ERROR("Preteceni bufferu - necekane dlouhe cislo!");
+		ERROR("Preteceni bufferu - necekane dlouhe cislo!");exit(99);
 	}
 	RCString ret = makeRCString( output );
 	free( output );
@@ -107,7 +107,7 @@ RCString getValueString(Value *object){
   break;
   
   case typeFunction:
-    throw(BadArgumentType, "functionToString");
+    throw(FunctionIsNotVariable, *object);
   break;
   
   case typeString:
@@ -146,7 +146,7 @@ bool getValueBoolean(Value *object){
   break;
   
   case typeFunction:
-   throw(BadArgumentType,"getValueBoolean neni implementovano pro typeFunction!");
+   throw(FunctionIsNotVariable, *object);
   break;
   
   case typeString:
@@ -158,7 +158,7 @@ bool getValueBoolean(Value *object){
   break;
   
  }
- ERROR("getValueString: Neni implementovano pro dany typ!");
+ ERROR("getValueBoolean: Neni implementovano pro dany typ!");
  exit(99);
 }
 
@@ -240,7 +240,7 @@ double getValueNumeric(Value *object){
     switch(object->type)
     {
         case typeUndefined: throw(UndefinedVariable, -1);
-        case typeFunction:  throw(BadArgumentType, NULL);
+        case typeFunction:  throw(FunctionIsNotVariable, *object);
         case typeBoolean: throw(InvalidConversion, *object);
         case typeNil: throw(InvalidConversion, *object);
         case typeNumeric: return object->data.numeric;
@@ -265,7 +265,7 @@ Function* getValueFunction(Value *object){
         throw(UndefinedFunction, -1);
     }
     if(object->type!=typeFunction){
-        throw(InvalidConversion, *object);
+        throw(VariableIsNotFunction, *object);
     }
     return object->data.function;
 }
