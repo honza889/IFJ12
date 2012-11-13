@@ -19,10 +19,14 @@ Value find( ValueList data, int count )
     const char* string  = RCStringGetBuffer( &a ); //retezec
     const char* pattern  = RCStringGetBuffer( &b );//hledany retezec
 
-    if(stringLength == 0 || patternLength == 0){   //kontrola parametru
+    if(patternLength == 0){   //kontrola parametru
         deleteRCString( &a );
         deleteRCString( &b );
-        return newValueNumeric( stringLength );
+        return newValueNumeric( 0 ); // prazdny retezec se vyskytuje na pozici 0.0
+    }else if(stringLength == 0){
+        deleteRCString( &a );
+        deleteRCString( &b );
+        return newValueNumeric( -1 );
     }
 
 
@@ -100,7 +104,7 @@ Value find( ValueList data, int count )
 
     deleteRCString( &a );
     deleteRCString( &b );
-    return newValueNumeric( stringLength );
+    return newValueNumeric( -1 );
 }
 
 // Seradi znaky ve dvou retezcich
@@ -146,6 +150,9 @@ char* mergesort(char *str, int len)
 Value sort(ValueList data, int count)
 {
     RCString str = getValueString(&data[0]);
+    if(str.length<=1){
+      return newValueString(str);
+    }
     char *result = mergesort((char*)RCStringGetBuffer(&str), str.length);
     result = resizeArray(result, char, str.length + 1);
     result[str.length] = '\0';

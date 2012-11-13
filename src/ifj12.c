@@ -83,8 +83,17 @@ int main(int argc, char**argv)
         on( UndefinedVariable, e ){
             fprintf( stderr, "Byla použita proměnná bez definování její hodnoty!\n" );
         }
+        on( IncompatibleComparison, e ){
+            fprintf( stderr, "Nekompatibilní porovnávání - rozdílné datové typy porovnávaných hodnot!\n" );
+        }
+        on( InvalidConversion, e ){
+            fprintf( stderr, "Nekompatibilní přiřazení!\n" );
+        }
         on( BadArgumentType, e ){
             fprintf( stderr, "Funkce %s byla zavolána s parametrem chybného typu!\n", *e );
+        }
+        on( IndexOutOfBounds, e ){
+            fprintf( stderr, "Index mimo pole!\n" );
         }
         on(OutOfMemory, typename){
             fprintf( stderr, "Nezdařila se alokace paměti pro typ '%s'", *typename );

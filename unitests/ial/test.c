@@ -39,9 +39,9 @@ BEGIN_TEST
     setValueCString( stringy, "paparachurparparticipate in parachute" );
     setValueCString( stringy+1, "parachuB" );
     ret = find( stringy, 2 );
-    if(ret.data.numeric != 37){
+    if(ret.data.numeric != -1){
         printf("%s", "TEST ial.c - find cislo 4\n");
-        printf("'Ocekavana hodnota = '37'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
+        printf("'Ocekavana hodnota = '-1'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
     }
 
 
@@ -87,9 +87,9 @@ BEGIN_TEST
     setValueCString( stringy, "e" );
     setValueCString( stringy+1, "a" );
     ret = find( stringy, 2 );
-    if(ret.data.numeric != 1){
+    if(ret.data.numeric != -1){
         printf("%s", "TEST ial.c - find cislo 9\n");
-        printf("'Ocekavana hodnota = '1'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
+        printf("'Ocekavana hodnota = '-1'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
     }
 
 
@@ -114,18 +114,18 @@ BEGIN_TEST
     setValueCString( stringy, "p" );
     setValueCString( stringy+1, "" );
     ret = find( stringy, 2 );
-    if(ret.data.numeric != 1){
+    if(ret.data.numeric != 0){
         printf("%s", "TEST ial.c - find cislo 12\n");
-        printf("'Ocekavana hodnota = '1'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
+        printf("'Ocekavana hodnota = '0'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
     }
 
 
     setValueCString( stringy, "" );
     setValueCString( stringy+1, "p" );
     ret = find( stringy, 2 );
-    if(ret.data.numeric != 0){
+    if(ret.data.numeric != -1){
         printf("%s", "TEST ial.c - find cislo 13\n");
-        printf("'Ocekavana hodnota = '0'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
+        printf("'Ocekavana hodnota = '-1'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
     }
 
 
@@ -164,17 +164,17 @@ BEGIN_TEST
     setValueCString( stringy, "parachutek" );
     setValueCString( stringy+1, "" );
     ret = find( stringy, 2 );
-    if(ret.data.numeric != 10){
+    if(ret.data.numeric != 0){
         printf("%s", "TEST ial.c - find cislo 18\n");
-        printf("'Ocekavana hodnota = '10'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
+        printf("'Ocekavana hodnota = '0'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
     }
 
     setValueCString( stringy, "" );
     setValueCString( stringy+1, "c" );
     ret = find( stringy, 2 );
-    if(ret.data.numeric != 0){
+    if(ret.data.numeric != -1){
         printf("%s", "TEST ial.c - find cislo 19\n");
-        printf("'Ocekavana hodnota = '0'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
+        printf("'Ocekavana hodnota = '-1'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
     }
     freeValue( stringy );
     freeValue( stringy+1 );
