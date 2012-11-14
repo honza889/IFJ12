@@ -14,16 +14,31 @@ void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* functio
 void addStatementToStatementList( StatementList* sl, Statement* statement );
 void addExpressionToExpressionList( ExpressionList* sl, Expression* statement );
 
-void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function )
+int getFunctionId( SyntaxContext* ctx, RCString* name )
 {
-    if(setNewSymbol( *name, ctx->globalSymbols ))
+    int oldCount = ctx->globalSymbols->count;
+    int id = getSymbol( *name, ctx->globalSymbols, NULL );
+    bool novaFunkce = oldCount < ctx->globalSymbols->count;
+    if( novaFunkce )
     {
         ctx->functions = resizeArray( ctx->functions, Value, ctx->globalSymbols->count );
-        ctx->functions[ ctx->globalSymbols->count - 1 ] = newValueFunction( function );
+        ctx->functions[ -id-1 ] = newValueUndefined();
+    }
+    return id;
+}
+
+void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function )
+{
+    int id = getFunctionId( ctx, name );
+    
+    if( ctx->functions[ -id-1 ].type == typeUndefined )
+    {
+        
+        ctx->functions[ -id-1 ] = newValueFunction( function );
     }
     else
     {
-        throw( MultipleFunctionDefinitions, copyRCString( name ) );
+        throw( MultipleFunctionDefinitions, *name );
     }
 }
 
@@ -173,11 +188,8 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
     
     SymbolTable localSymbols = newSymbolTable();
     
-    SyntaxContext newCtx = {
-        .globalSymbols = ctx->globalSymbols,
-        .localSymbols = &localSymbols,
-        .functions = ctx->functions,
-    };
+    SymbolTable* oldLocalSymbols = ctx->localSymbols;
+    ctx->localSymbols = &localSymbols;
     
     expectKeyw( s, kFunction );
     
@@ -187,18 +199,20 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
     consumeTok( s );
     
     expectTok( s, tokLParen );
-    parseFunctionParameters( s, func, &newCtx );
+    parseFunctionParameters( s, func, ctx );
     expectTok( s, tokRParen );
     expectTok( s, tokEndOfLine );
     while( ! ( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd ) )
     {
-        parseStatement( s, &func->value.userDefined.statements, &newCtx );
+        parseStatement( s, &func->value.userDefined.statements, ctx );
     }
     consumeTok( s );
     expectTok( s, tokEndOfLine );
     
-    func->value.userDefined.variableCount = newCtx.localSymbols->count;
+    func->value.userDefined.variableCount = ctx->localSymbols->count;
     freeSymbolTable( &localSymbols );
+    
+    ctx->localSymbols = oldLocalSymbols;
     
     addFunctionToContext( ctx, &funcName, func );
     deleteRCString( &funcName );
@@ -416,7 +430,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 if(getTokN(s,1).type==tokLParen){
                     newExp->type=FUNCTION_CALL;
                     RCString name = getTok(s).data.id;
-                    newExp->value.functionCall.function=(Variable){ .index=getSymbol(current.data.id,ctx->globalSymbols,NULL), .name=copyRCString(&name) };
+                    newExp->value.functionCall.function=(Variable){ .index=getFunctionId( ctx, &current.data.id ), .name=copyRCString(&name) };
                     newExp->value.functionCall.params = (ExpressionList){NULL,0};
                     consumeTok(s); // zkonzumovat id
                     consumeTok(s); // zkonzumovat '('
