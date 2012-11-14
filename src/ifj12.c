@@ -74,6 +74,8 @@ int main(int argc, char**argv)
     /*************************** Uklid po prekladu ****************************/
     
     fclose( f );
+    int countOfFunctions = syntaxcontext.globalSymbols->count;
+    destroyDefaultSyntaxContext( &syntaxcontext );
     
     /****************************** Interpretace ******************************/
     
@@ -137,11 +139,8 @@ int main(int argc, char**argv)
     
     // Uvolneni vsech funkci
     deleteFunction( mainFunction );
+    freeFunctionsTable( context.globals, countOfFunctions );
     
-    // Uvolneni hlavnich tabulek symbolu
-    freeValueTable( context.globals, syntaxcontext.globalSymbols->count );
-    
-    destroyDefaultSyntaxContext( &syntaxcontext );
     return 0;
 }
 

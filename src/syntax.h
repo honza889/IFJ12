@@ -29,10 +29,10 @@ typedef struct{
 void initDefaultSyntaxContext( SyntaxContext* ctx );
 
 /**
- * Uvolní tabulky symbolů v kontextu \a ctx, vytvořeném pomocí 
+ * Uvolní stromy symbolů v kontextu \a ctx, vytvořeném pomocí 
  * initDefaultSyntaxContext.
  * 
- * Seznam funkcí nijak neuvolňuje.
+ * Seznam funkcí ani pole symbolů nijak neuvolňuje.
  */
 void destroyDefaultSyntaxContext( SyntaxContext* ctx );
 

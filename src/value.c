@@ -369,6 +369,17 @@ void freeValueTable(Value *table,int length){
  free(table);
 }
 
+/**
+ * Uvolni globalni tabulku symbolu - funkci
+ */
+void freeFunctionsTable(Value *table,int length){
+ for(int i=0;i<length;i++){
+  deleteFunction( *table[i].data.function );
+  free(table[i].data.function);
+ }
+ free(table);
+}
+
 Value addValue( Value* a, Value* b )
 {
     if( a->type == typeNumeric && b->type == typeNumeric )
