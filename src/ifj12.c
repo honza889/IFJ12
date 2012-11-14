@@ -21,14 +21,17 @@ int main(int argc, char**argv)
     }
     
     Scanner s;
-    initScanner(&s,f);
     SyntaxContext syntaxcontext;
-    initDefaultSyntaxContext(&syntaxcontext);
     Function mainFunction;
     
-    /***************************** Překlad do AST *****************************/
-    
     try{
+    
+        
+        initScanner(&s,f);
+        initDefaultSyntaxContext(&syntaxcontext);
+        
+    
+        /***************************** Překlad do AST *****************************/
         parseProgram(&s, &syntaxcontext, &mainFunction);
     }
     catch{

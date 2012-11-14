@@ -110,7 +110,7 @@ void RCStringPrint( const RCString* str, FILE* stream )
 /// Helper pro resizeRCString
 static int align( int length )
 {
-  return ( length + 128 ) & 0xFFFFFF80;
+  return ( length + 16 ) & 0xFFFFFFF0;
 }
 
 void RCStringResize( RCString* str, int length )
@@ -167,3 +167,10 @@ void RCStringSubstring( RCString* str, int start, int length )
   RCStringResize( str, length );
 }
 
+void RCStringOptimize( RCString* str )
+{
+    if( str->buffer->references == 1 && str->length != 0 )
+    {
+        str->buffer->string = resizeArray( str->buffer->string, char, str->offset + str->length );
+    }
+}

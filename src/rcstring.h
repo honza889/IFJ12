@@ -169,4 +169,10 @@ void RCStringAppendStr( RCString* str1, const RCString* str2 );
  */
 void RCStringSubstring( RCString* str, int start, int length );
 
+/**
+ * Pokusi se o optimalizaci mista vyuziteho stringem \a str.
+ * Optimalizace selze, pokud je string referencovan vice, nez jednou.
+ */
+void RCStringOptimize( RCString* str );
+
 #endif

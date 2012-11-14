@@ -727,6 +727,10 @@ Token scan(FILE *f)
   } while (repeat);
   
   deleteRCString(&lexeme);
+  if( token.type == tokId )
+  {
+    RCStringOptimize( &token.data.id );
+  }
   return token;
 }
 

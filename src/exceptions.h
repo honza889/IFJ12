@@ -194,22 +194,5 @@ void exceptions_impl_throw( Exception e );
 
 void rethrow();
 
-/**
- * Provede \a statement, pokud ten vyhodi libovolnou vyjimku, tak se 
- * provede \a handler a vyjimka se znovu vyhodi
- */
-#define onAnyException( statement, handler ) \
-  try \
-  { \
-    statement; \
-  } \
-  catch \
-  { \
-    onAll \
-    { \
-      handler; \
-      rethrow(); \
-    } \
-  }
 
 #endif
