@@ -1,12 +1,22 @@
-#include "value.h"
+/**
+ * Interpretr imperativního jazyka IFJ12
+ *
+ * @author Biberle Zdeněk <xbiber00@stud.fit.vutbr.cz>
+ * @author Doležal Jan    <xdolez52@stud.fit.vutbr.cz>
+ * @author Fryč Martin    <xfrycm01@stud.fit.vutbr.cz>
+ * @author Kalina Jan     <xkalin03@stud.fit.vutbr.cz>
+ * @author Tretter Zdeněk <xtrett00@stud.fit.vutbr.cz>
+ */
 
 #include <stdlib.h>
 #include <math.h>
 #include <errno.h>
 #include <stdbool.h>
+#include "value.h"
 #include "global.h"
 #include "exceptions.h"
 
+// Maximalni delka cisla (ve znacich) pro prevod na retezec
 #define BUFFERSIZE 128
 
 /**
@@ -165,7 +175,7 @@ bool getValueBoolean(Value *object){
 
 /**
  * Zjisti jestli retezec obsahuje cislo ve spravnem tvaru
- * @author Zdenek Tretter
+ * @author Tretter Zdeněk <xtrett00@stud.fit.vutbr.cz>
  */
 bool isNumberInString(const char *str,int strlen)
 {
@@ -372,7 +382,7 @@ void freeValueTable(Value *table,int length){
 /**
  * Uvolni globalni tabulku symbolu - funkci
  */
-void freeFunctionsTable(Value *table,int length){
+void freeFunctionsTable(Value *table, int length){
  for(int i=0;i<length;i++){
   deleteFunction( *table[i].data.function );
   free(table[i].data.function);
@@ -380,6 +390,9 @@ void freeFunctionsTable(Value *table,int length){
  free(table);
 }
 
+/**
+ * Operace scitani: a + b
+ */
 Value addValue( Value* a, Value* b )
 {
     if( a->type == typeNumeric && b->type == typeNumeric )
@@ -408,7 +421,10 @@ Value addValue( Value* a, Value* b )
     }
     return newValueUndefined();
 }
-    
+
+/**
+ * Operace odcitani: a - b
+ */
 Value subtractValue( Value* a, Value* b )
 {
     if( a->type == typeNumeric && b->type == typeNumeric )
@@ -426,6 +442,9 @@ Value subtractValue( Value* a, Value* b )
     return newValueUndefined();
 }
 
+/**
+ * Operace nasobeni: a * b
+ */
 Value multiplyValue( Value* a, Value* b )
 {
     if( a->type == typeNumeric && b->type == typeNumeric )
@@ -456,6 +475,9 @@ Value multiplyValue( Value* a, Value* b )
     return newValueUndefined();
 }
 
+/**
+ * Operace deleni: a / b
+ */
 Value divideValue( Value* a, Value* b )
 {
     if( a->type == typeNumeric && b->type == typeNumeric )
@@ -473,6 +495,9 @@ Value divideValue( Value* a, Value* b )
     return newValueUndefined();
 }
 
+/**
+ * Operace umocneni: a ** b
+ */
 Value powerValue( Value* a, Value* b )
 {
     if( a->type == typeNumeric && b->type == typeNumeric )

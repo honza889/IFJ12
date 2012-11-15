@@ -1,6 +1,15 @@
-#include "symbols.h"
+/**
+ * Interpretr imperativního jazyka IFJ12
+ *
+ * @author Biberle Zdeněk <xbiber00@stud.fit.vutbr.cz>
+ * @author Doležal Jan    <xdolez52@stud.fit.vutbr.cz>
+ * @author Fryč Martin    <xfrycm01@stud.fit.vutbr.cz>
+ * @author Kalina Jan     <xkalin03@stud.fit.vutbr.cz>
+ * @author Tretter Zdeněk <xtrett00@stud.fit.vutbr.cz>
+ */
 
 #include <string.h>
+#include "symbols.h"
 
 /**
  * Vyhledani uzlu (uzel=root/greater/lesser)
@@ -42,9 +51,6 @@ bool setNewSymbol( RCString name, SymbolTable *table )
   
   // Kopie nazvu promenne
   newSymbol->name=copyRCString(&name);
-  
-  // Navyseni poctu prvku v tabulce
-  //table->count++;
   
   newSymbol->lesser = NULL;
   newSymbol->greater = NULL;

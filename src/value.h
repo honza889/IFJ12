@@ -1,3 +1,13 @@
+/**
+ * Interpretr imperativního jazyka IFJ12
+ *
+ * @author Biberle Zdeněk <xbiber00@stud.fit.vutbr.cz>
+ * @author Doležal Jan    <xdolez52@stud.fit.vutbr.cz>
+ * @author Fryč Martin    <xfrycm01@stud.fit.vutbr.cz>
+ * @author Kalina Jan     <xkalin03@stud.fit.vutbr.cz>
+ * @author Tretter Zdeněk <xtrett00@stud.fit.vutbr.cz>
+ */
+
 #ifndef VALUE_H
 #define VALUE_H
 
@@ -76,6 +86,9 @@ Value* initValueTable(int length);
 
 /** Uvolnuje Value tabulky symbolu */
 void freeValueTable(Value *table, int length);
+
+/** Uvolnuje tabulku funkci */
+void freeFunctionsTable(Value *table, int length);
 
 //Operace
 Value addValue( Value* a, Value* b );
