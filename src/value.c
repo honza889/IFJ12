@@ -192,7 +192,7 @@ bool isNumberInString(const char *str,int strlen)
         ERROR,
         OK
     }state;
-
+    if(strlen==0) return false;
     if(str[i] == ' ' || str[i] == '\t' || str[i] == '\n') state = WHITESPACE;
     else if(str[i] >= '0' && str[i] <= '9') state = NUMBER1;
     else state = ERROR;
@@ -240,7 +240,7 @@ bool isNumberInString(const char *str,int strlen)
         }
         i++;
     }
-    return (state == ERROR) ? false : true;
+    return ( state == OK || state == NUMBER2 || state==NUMBER3 );
 }
 
 /**
@@ -259,7 +259,7 @@ double getValueNumeric(Value *object){
             {
                 RCString str = copyRCString(&object->data.string);
                 RCStringAppendChar(&str,'\0');
-                double number = atof(RCStringGetBuffer(&str));
+                double number = strtod( RCStringGetBuffer(&str),NULL);
                 deleteRCString(&str);
                 if(errno == ERANGE) throw(InvalidConversion, *object);
                 else return number;

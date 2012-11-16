@@ -57,6 +57,44 @@ BEGIN_TEST
  setValueCString(&v,"1.97e-3");
  TEST( typeOfValue(&v) == 8 );
  DBLTEST( getValueNumeric(&v), 0.00197 );
+
+ /**************** numeric - spravne ****************/
+
+ setValueCString(&v,"1.0");
+ DBLTEST( getValueNumeric(&v), 1.0);
+
+ setValueCString(&v,"1e0");
+ DBLTEST( getValueNumeric(&v), 1.0);
+
+ setValueCString(&v,"1e+1");
+ DBLTEST( getValueNumeric(&v), 10.0);
+
+ setValueCString(&v,"1e-1");
+ DBLTEST( getValueNumeric(&v), 0.1);
+
+ setValueCString(&v,"  1.2e-2xxx");
+ DBLTEST( getValueNumeric(&v), 0.012);
+
+ /************** numeric - nekorektni ***************/
+
+ setValueCString(&v,"");
+ EXCEPT_TEST(InvalidConversion, getValueNumeric(&v) );
+
+ setValueCString(&v," ");
+ EXCEPT_TEST(InvalidConversion, getValueNumeric(&v) );
+
+ setValueCString(&v,"1");
+ EXCEPT_TEST(InvalidConversion, getValueNumeric(&v) );
+
+ setValueCString(&v,"x1.0");
+ EXCEPT_TEST(InvalidConversion, getValueNumeric(&v) );
+
+ setValueCString(&v,"1ee0");
+ EXCEPT_TEST(InvalidConversion, getValueNumeric(&v) );
+
+ setValueCString(&v," 1 1.2 ");
+ EXCEPT_TEST(InvalidConversion, getValueNumeric(&v) );
+
  
  /************** porovnavani - spravne **************/
  
