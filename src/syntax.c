@@ -24,12 +24,23 @@ void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* functio
 void addStatementToStatementList( StatementList* sl, Statement* statement );
 void addExpressionToExpressionList( ExpressionList* sl, Expression* statement );
 
+void fillNameListFromSymbolTree( RCString* nl, Symbol* st )
+{
+    // rekurzivne to staci, nikdo nebude mit miliony promennych v jedne funkci
+    // a pokud bude, tak ma spatnej kod a je to jeho chyba :P
+    if( !st ) return;
+    
+    nl[ st->index ] = copyRCString( &st->name );
+    fillNameListFromSymbolTree( nl, st->lesser );
+    fillNameListFromSymbolTree( nl, st->greater );
+}
+
 int getFunctionId( SyntaxContext* ctx, RCString* name )
 {
     int oldCount = ctx->globalSymbols->count;
     int id = getSymbol( *name, ctx->globalSymbols, NULL );
-    bool novaFunkce = oldCount < ctx->globalSymbols->count;
-    if( novaFunkce )
+    bool newFunction = oldCount < ctx->globalSymbols->count;
+    if( newFunction )
     {
         ctx->functions = resizeArray( ctx->functions, Value, ctx->globalSymbols->count );
         ctx->functions[ -id-1 ] = newValueUndefined();
@@ -109,6 +120,9 @@ void destroyDefaultSyntaxContext( SyntaxContext* ctx )
 {
     freeSymbolTable( ctx->globalSymbols );
     freeSymbolTable( ctx->localSymbols );
+    for( int i=0; i < ctx->globalSymbols->count; i++ ){
+        //deleteFunction(*ctx->functions[i].data.function); // TODO: zprovoznit uvolnovani function
+    }
     free( ctx->globalSymbols );
     free( ctx->localSymbols );
     ctx->globalSymbols = NULL;
@@ -144,6 +158,8 @@ void parseProgram( Scanner* s, SyntaxContext* ctx, Function* main )
         }
     }
     main->value.userDefined.variableCount = ctx->localSymbols->count;
+    main->value.userDefined.variableNames = newArray( RCString, ctx->localSymbols->count );
+    fillNameListFromSymbolTree( main->value.userDefined.variableNames, ctx->localSymbols->root );
 }
 
 void parseFunctionParameters( Scanner* s, Function* func, SyntaxContext* ctx )
@@ -217,6 +233,8 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
     expectTok( s, tokEndOfLine );
     
     func->value.userDefined.variableCount = ctx->localSymbols->count;
+    func->value.userDefined.variableNames = newArray( RCString, ctx->localSymbols->count );
+    fillNameListFromSymbolTree( func->value.userDefined.variableNames, ctx->localSymbols->root );
     freeSymbolTable( &localSymbols );
     
     ctx->localSymbols = oldLocalSymbols;
@@ -282,15 +300,14 @@ void detectAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 // Konzumuje token.
 void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
-    Assignment ass;
+    Assignment assgn;
     RCString name = getTok(s).data.id;
-    ass.destination.index = getSymbol(name,ctx->globalSymbols, ctx->localSymbols );
-    ass.destination.name = copyRCString(&name);
+    assgn.destination = getSymbol(name,ctx->globalSymbols, ctx->localSymbols );
     consumeTok(s);
-    parseExpression(s, &ass.source, ctx);
+    parseExpression(s, &assgn.source, ctx);
     expectTok(s, tokEndOfLine);
     
-    Statement statement = { .type=ASSIGNMENT, .value.assignment=ass };
+    Statement statement = { .type=ASSIGNMENT, .value.assignment=assgn };
     addStatementToStatementList(sl,&statement);
 }
 
@@ -300,8 +317,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     Substring substr;
     Value valueBuffer;
     RCString name = getTok(s).data.id;
-    substr.destination.index = getSymbol(name,ctx->globalSymbols, ctx->localSymbols );
-    substr.destination.name = copyRCString(&name);
+    substr.destination = getSymbol(name,ctx->globalSymbols, ctx->localSymbols );
     consumeTok(s);
     
     if (getTok(s).type == tokLiteral){
@@ -309,7 +325,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
         substr.source = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
     }else{
         RCString name = getTok(s).data.id;
-        substr.source = (Expression){ .type=VARIABLE, .value.variable=(Variable){ .index=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) } };
+        substr.source = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
     }
     consumeTok(s);
     
@@ -322,7 +338,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
             substr.offset = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
         }else{
             RCString name = getTok(s).data.id;
-            substr.offset = (Expression){ .type=VARIABLE, .value.variable=(Variable){ .index=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) } };
+            substr.offset = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
         }
         consumeTok(s);
     }
@@ -338,7 +354,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
             substr.length = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
         }else{
             RCString name = getTok(s).data.id;
-            substr.length = (Expression){ .type=VARIABLE, .value.variable=(Variable){ .index=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) } };
+            substr.length = (Expression){ .type=VARIABLE, .value.variable = getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
         }
         consumeTok(s);
     }
@@ -403,6 +419,7 @@ bool compareOperators(Operator op1, Operator op2){
 
 void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ctx )
 {
+    // Porad mam dojem, ze tohle lze napsat lepe, ale co se da delat... --Biba
     Token current;
     Expression *newExp, *prevExp=NULL, *oldWholeExp=NULL;
     enum {
@@ -437,7 +454,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 if(getTokN(s,1).type==tokLParen){
                     newExp->type=FUNCTION_CALL;
                     RCString name = getTok(s).data.id;
-                    newExp->value.functionCall.function=(Variable){ .index=getFunctionId( ctx, &current.data.id ), .name=copyRCString(&name) };
+                    newExp->value.functionCall.function = getFunctionId( ctx, &current.data.id );
                     newExp->value.functionCall.params = (ExpressionList){NULL,0};
                     consumeTok(s); // zkonzumovat id
                     consumeTok(s); // zkonzumovat '('
@@ -458,7 +475,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 }else{
                     newExp->type=VARIABLE;
                     RCString name = getTok(s).data.id;
-                    newExp->value.variable=(Variable){ .index=getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols), .name=copyRCString(&name) };
+                    newExp->value.variable = getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols);
                 }
                 past = wasValue;
             break;
@@ -616,7 +633,11 @@ void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx )
     testTok( s, tokId );
     RCString name = getTok( s ).data.id;
     name = copyRCString(&name);
-    *id = (Variable){ .index=getSymbol( name, ctx->globalSymbols, ctx->localSymbols ), .name=copyRCString(&name) };
+    *id = getSymbol( name, ctx->globalSymbols, ctx->localSymbols );
+    if( *id < 0 )
+    {
+        throw( VariableOverridesFunction, name );
+    }
     deleteRCString( &name );
     consumeTok( s );
 }
