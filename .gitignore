@@ -6,3 +6,6 @@ unitests/*/test
 unitests/*/test.o
 unitests/*/out
 dep
+xbiber00.tar.gz
+pack/*.*
+

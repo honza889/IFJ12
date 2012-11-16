@@ -26,7 +26,7 @@ obj/dbg/%.o: src/%.c
 
 TESTS=value symbols ast exceptions scanner rcstring ial syntax interpret
 
-.PHONY: test etest debug clean
+.PHONY: test etest debug clean pack
 test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 	unitests/tests.sh "$?"
 tests:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
@@ -55,5 +55,10 @@ debug: $(addprefix obj/dbg/,$(addsuffix .o,$(SOURCES)))
 	gcc -o ifj12-dbg $^ $(CFLAGS) $(LDB) -lm
 
 clean:
-	rm -f obj/*.o obj/dbg/*.o dep/*.d dep/dbg/*.d ./ifj12 ./ifj12-dbg unitests/*/test unitests/*/test.o unitests/*/out
+	rm -f obj/*.o obj/dbg/*.o dep/*.d dep/dbg/*.d ./ifj12 ./ifj12-dbg
+	rm -f unitests/*/test unitests/*/test.o unitests/*/out
+	rm -f pack/ifj12 pack/*.*
+
+pack:
+	cp src/* pack/; cd pack; tar -zcvf ../xbiber00.tar.gz *
 
