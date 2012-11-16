@@ -4,19 +4,21 @@
 #include "ast.h"
 #include "bif.h"
 #include "value.h"
+#include "alloc.h"
 
 
 BEGIN_TEST
 
 {
-    RCString name0 = makeRCString("copyRCString(&name0)");
-    RCString name1 = makeRCString("copyRCString(&name1)");
+    RCString* names = newArray( RCString, 2 );
+    names[0] = makeRCString("copyRCString(&name0)");
+    names[1] = makeRCString("copyRCString(&name1)");
     
     Statement testStatements[] = {
         {
             .type = ASSIGNMENT,
             .value.assignment = {
-                .destination = (Variable){0,copyRCString(&name0)},
+                .destination = 0,
                 .source = {
                     .type = CONSTANT,
                     .value.constant = newValueNumeric( 5.0 )
@@ -27,7 +29,7 @@ BEGIN_TEST
             .type = RETURN,
             .value.ret = {
                 .type = VARIABLE,
-                .value.variable = (Variable){0,copyRCString(&name0)}
+                .value.variable = 0,
             }
         }
     };
@@ -55,12 +57,14 @@ BEGIN_TEST
     RCString s = getValueString( &ret );
     STRTEST( s, "5" );
     deleteRCString( &s );
-    deleteRCString( &name0 );
-    deleteRCString( &name1 );
+    deleteRCString( names );
+    deleteRCString( names + 1 );
+    free( names );
 }
 {
-    RCString name0 = makeRCString("copyRCString(&name0)");
-    RCString name1 = makeRCString("copyRCString(&name1)");
+    RCString* names = newArray( RCString, 2 );
+    names[0] = makeRCString("copyRCString(&name0)");
+    names[1] = makeRCString("copyRCString(&name1)");
     
     // Test smycek, k retezcove promenne s obsahem "neco" pridame ve
     // smycce desetkrat retezec "LOL"
@@ -75,7 +79,7 @@ BEGIN_TEST
     
     *expr1 = (Expression){
         .type = VARIABLE,
-        .value.variable = (Variable){0,copyRCString(&name0)}
+        .value.variable = 0
     };
     
     *expr2 = (Expression){
@@ -85,7 +89,7 @@ BEGIN_TEST
         
     *expr3 = (Expression){
         .type = VARIABLE,
-        .value.variable = (Variable){1,copyRCString(&name1)}
+        .value.variable = 1
     };
     
     *expr4 = (Expression){
@@ -95,7 +99,7 @@ BEGIN_TEST
     
     *expr5 = (Expression){
         .type = VARIABLE,
-        .value.variable = (Variable){0,copyRCString(&name0)}
+        .value.variable = 0
     };
     
     *expr6 = (Expression){
@@ -108,7 +112,7 @@ BEGIN_TEST
     whileStmt[0] = (Statement){
         .type = ASSIGNMENT,
         .value.assignment = {
-            .destination = (Variable){1,copyRCString(&name1)},
+            .destination = 1,
             .source = {
                 .type = OPERATOR,
                 .value.operator = {
@@ -126,7 +130,7 @@ BEGIN_TEST
     whileStmt[1] = (Statement){
         .type = ASSIGNMENT,
         .value.assignment = {
-            .destination = (Variable){0,copyRCString(&name0)},
+            .destination = 0,
             .source = {
                 .type = OPERATOR,
                 .value.operator = {
@@ -145,7 +149,7 @@ BEGIN_TEST
     testStatements[0] = (Statement){
         .type = ASSIGNMENT,
         .value.assignment = {
-            .destination = (Variable){0,copyRCString(&name0)},
+            .destination = 0,
             .source = {
                 .type = CONSTANT,
                 .value.constant = newValueNumeric( 0.0 )
@@ -155,7 +159,7 @@ BEGIN_TEST
     testStatements[1] = (Statement){
         .type = ASSIGNMENT,
         .value.assignment = {
-            .destination = (Variable){1,copyRCString(&name1)},
+            .destination = 1,
             .source = {
                 .type = CONSTANT,
                 .value.constant = newValueCString( "neco" )
@@ -187,7 +191,7 @@ BEGIN_TEST
         .type = RETURN,
         .value.ret = {
             .type = VARIABLE,
-            .value.variable = (Variable){1,copyRCString(&name1)}
+            .value.variable = 1
         }
     };
     
@@ -214,8 +218,9 @@ BEGIN_TEST
     RCString retStr = getValueString( &ret );
     STRTEST( retStr, "necoLOLLOLLOLLOLLOLLOLLOLLOLLOLLOL" );
     deleteStatementList( f.value.userDefined.statements );
-    deleteRCString( &name0 );
-    deleteRCString( &name1 );
+    deleteRCString( names );
+    deleteRCString( names + 1 );
+    free( names );
 }
 
 END_TEST

@@ -26,7 +26,7 @@ typedef enum
     UnexpectedKeyWord,
     MultipleFunctionDefinitions, // exit 5 (ostatni semanticke chyby)
     
-    /* Lexikalni analyza */
+    /* Semanticka analyza/behove chyby */
     UndefinedVariable, // exit 3
     UndefinedFunction, // exit 4
     VariableIsNotFunction, // exit 11
@@ -34,8 +34,9 @@ typedef enum
     IncompatibleComparison, // exit 11
     InvalidConversion, // exit 12 (chyba pretypovani na cislo)
     BadArgumentType, // exit 11 (behova chyba nekompatibility typu)
-    IndexOutOfBounds, // exit 13
+    VariableOverridesFunction,
     
+    IndexOutOfBounds, // exit 13
     OutOfMemory, // exit 99 (chyba alokace pameti)
 } ExceptionType;
 
@@ -93,6 +94,7 @@ typedef const char* BadArgumentTypeException;
 typedef int IndexOutOfBoundsException;
 typedef const char* OutOfMemoryException;
 typedef RCString MultipleFunctionDefinitionsException;
+typedef RCString VariableOverridesFunctionException; // nazev funkce/promenne
 
 #define EXCEPTION( name ) name##Exception name##ExceptionValue
 
@@ -116,6 +118,7 @@ typedef struct
         EXCEPTION( UnexpectedKeyWord );
         EXCEPTION( OutOfMemory );
         EXCEPTION( MultipleFunctionDefinitions );
+        EXCEPTION( VariableOverridesFunction );
     } value;
 } Exception;
 

@@ -40,7 +40,7 @@ Value evalFunction( Function* func, ExpressionList params, Context* context );
 // Pozor: value uz musi byt nakopirovana ( drobna optimalizace predavani )
 static inline void setVariable( Variable* var, Context* context, Value value )
 {
-    Value* varPtr = symbol( var->index, context );
+    Value* varPtr = symbol( *var, context );
     freeValue( varPtr );
     *varPtr = value;
 }
@@ -52,7 +52,7 @@ static inline Value evalConstant( Constant* constant )
 
 static inline Value evalVariable( Variable* var, Context* context )
 {
-  return copyValue( symbol( var->index, context ) );
+  return copyValue( symbol( *var, context ) );
 }
 
 
@@ -315,7 +315,6 @@ void deleteConstant( Constant* constant )
 
 void deleteVariable( Variable* var )
 {
-    deleteRCString(&var->name);
 }
 
 void deleteUnaryOp( UnaryOp* op )

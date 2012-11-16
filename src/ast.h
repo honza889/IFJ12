@@ -17,7 +17,7 @@
 
 typedef struct SValue Value;
 typedef struct SFunction Function;
-typedef struct SVariable Variable;
+typedef int Variable;
 typedef Value Constant;
 typedef struct SBinaryOp BinaryOp;
 typedef struct SUnaryOp UnaryOp;
@@ -31,11 +31,6 @@ typedef struct SCondition Condition;
 typedef Expression Return;
 typedef struct SStatement Statement;
 typedef struct SContext Context;
-
-struct SVariable{
-    int index;
-    RCString name;
-};
 
 typedef struct {
     Statement* item;
@@ -85,6 +80,7 @@ struct SFunction
     union{
         struct{
             StatementList statements;
+            RCString* variableNames;
             int variableCount;
         } userDefined;
         BuiltinFunction builtin;
@@ -236,6 +232,8 @@ void deleteStatementList( StatementList sl );
 static void inline deleteFunction( Function func ){
     if(func.type==USER_DEFINED){
         deleteStatementList(func.value.userDefined.statements);
+        free( func.value.userDefined.variableNames );
     }
 }
 #endif
+
