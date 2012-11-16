@@ -12,10 +12,10 @@
 
 SOURCES=ifj12 value symbols ast exceptions rcstring bif scanner syntax ial alloc
 
-CFLAGS=-std=c99 -I src -Wall -Wno-unused-variable -pedantic -Wdouble-promotion -DNDEBUG -lm
+CFLAGS=-std=c99 -Wall -Wno-unused-variable -pedantic -DNDEBUG -lm
 
 ifj12: $(addsuffix .c,$(SOURCES))
-	gcc -o $@ $^ $(CFLAGS) $(LINK)
+	gcc -o $@ $^ $(CFLAGS)
 
 .PHONY: clean
 

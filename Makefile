@@ -1,5 +1,5 @@
 # Parametry překladu
-CFLAGS=-std=c99 -I src -Wall -Wno-unused-variable -pedantic -Wdouble-promotion
+CFLAGS=-std=c99 -I src -Wall -pedantic -Wno-unused-variable
 # Úroveň množství debugovacích informací
 LDB=-g3
 # Parametry slinkování

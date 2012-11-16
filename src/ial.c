@@ -19,7 +19,7 @@ Value find( ValueList data, int count )
     //pro pochopeni celeho algoritmu doporucuji priklad na wiki
     //http://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
 
-    int i, j, match = 0;
+    int i, j;
 
     RCString a = getValueString( &data[0] );
     RCString b = getValueString( &data[1] );

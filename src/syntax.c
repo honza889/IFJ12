@@ -324,7 +324,6 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
         valueBuffer = getTok(s).data.val;
         substr.source = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
     }else{
-        RCString name = getTok(s).data.id;
         substr.source = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
     }
     consumeTok(s);
@@ -337,7 +336,6 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
             valueBuffer = getTok(s).data.val;
             substr.offset = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
         }else{
-            RCString name = getTok(s).data.id;
             substr.offset = (Expression){ .type=VARIABLE, .value.variable=getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
         }
         consumeTok(s);
@@ -353,7 +351,6 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
             valueBuffer = getTok(s).data.val;
             substr.length = (Expression){ .type=CONSTANT, .value.constant=copyValue(&valueBuffer) };
         }else{
-            RCString name = getTok(s).data.id;
             substr.length = (Expression){ .type=VARIABLE, .value.variable = getSymbol(getTok(s).data.id,ctx->globalSymbols,ctx->localSymbols) };
         }
         consumeTok(s);
@@ -453,7 +450,6 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 // id( - Volani funkce
                 if(getTokN(s,1).type==tokLParen){
                     newExp->type=FUNCTION_CALL;
-                    RCString name = getTok(s).data.id;
                     newExp->value.functionCall.function = getFunctionId( ctx, &current.data.id );
                     newExp->value.functionCall.params = (ExpressionList){NULL,0};
                     consumeTok(s); // zkonzumovat id
@@ -474,7 +470,6 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 // id - Promenna
                 }else{
                     newExp->type=VARIABLE;
-                    RCString name = getTok(s).data.id;
                     newExp->value.variable = getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols);
                 }
                 past = wasValue;

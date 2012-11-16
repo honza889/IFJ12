@@ -657,8 +657,6 @@ Token scan(FILE *f)
   static char last_letter = '\t';		/** Poslední načtený znak ze zdrojového kódu. */
   static unsigned line_num = 1;			/** Počítadlo řádků vstupního zdrojového kódu. */
   
-  int keyw;
-  
   bool repeat;		// true pokud se má čtení restartovat, protože se nic nenačetlo (byl komentář)
   
   // začátek do-while(repeat)
