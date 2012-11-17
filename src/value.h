@@ -22,6 +22,18 @@
 Value copyValue( Value* other ); // kvuli RCStringu
 void freeValue(Value *object);
 
+/**
+ * Zjisti, zda je \a value typu \a expected.
+ * Pokud ne, haze vyjimku UnexpectedValueType.
+ */
+Value* testValue( Value* value, ValueType expected );
+
+/**
+ * Zjisti, zda je \a value typu typeNumeric a zda je nezáporné číslo.
+ * Pokud ne, haze vyjimku NegativeNumeric nebo UnexpectedValueType.
+ */
+Value* testValuePositiveNumeric( Value* value );
+
 // Konstruktory Value...
 static inline Value newValueUndefined(){ 
   return (Value){ .type=typeUndefined };
@@ -88,7 +100,7 @@ Value* initValueTable(int length);
 void freeValueTable(Value *table, int length);
 
 /** Uvolnuje tabulku funkci */
-void freeFunctionsTable(Value *table, int length);
+void freeFunctionsTable(Value *table,int length);
 
 //Operace
 Value addValue( Value* a, Value* b );

@@ -79,3 +79,29 @@ void exceptions_impl_throw( Exception e )
     exit(99);
   }
 }
+
+// ===========MĚLO BY BÝT VE 'src/value.c' ALE KŘÍŽOVÉ ZÁVISLOSTI TO NEDOVOLÍ============
+void PrintValueType(ValueType type)
+{
+  switch (type) {
+    case typeUndefined:	fprintf(stderr,"typeUndefined"); break;
+    case typeNil:	fprintf(stderr,"typeNil"); break;
+    case typeBoolean:	fprintf(stderr,"typeBoolean"); break;
+    case typeNumeric:	fprintf(stderr,"typeNumeric"); break;
+    case typeFunction:	fprintf(stderr,"typeFunction"); break;
+    case typeString:	fprintf(stderr,"typeString"); break;
+  }
+}
+
+/**
+ * Vytiskne na stderr text chybové hlášky pro danou výjimku.
+ * @param[in] e Výjimka vrácena sémantickým analyzátorem.
+ */
+void UnexpectedValueTypePrint(UnexpectedValueTypeException e)
+{	// TODO: Udělat lepší popis chyby.
+  fprintf(stderr,"Type error: Predpokladany typ hodnoty je ");
+  PrintValueType(e.expected);
+  fprintf(stderr,", ale ziskany typ hodnoty je ");
+  PrintValueType(e.got);
+  fprintf(stderr,".\n");
+}

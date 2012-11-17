@@ -120,9 +120,6 @@ void destroyDefaultSyntaxContext( SyntaxContext* ctx )
 {
     freeSymbolTable( ctx->globalSymbols );
     freeSymbolTable( ctx->localSymbols );
-    for( int i=0; i < ctx->globalSymbols->count; i++ ){
-        //deleteFunction(*ctx->functions[i].data.function); // TODO: zprovoznit uvolnovani function
-    }
     free( ctx->globalSymbols );
     free( ctx->localSymbols );
     ctx->globalSymbols = NULL;

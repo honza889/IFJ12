@@ -359,6 +359,37 @@ void freeValue(Value *object){
 }
 
 /**
+ * Zjisti, zda je \a value typu \a expected.
+ * Pokud ne, haze vyjimku UnexpectedValueType.
+ */
+Value* testValue( Value* value, ValueType expected )
+{
+    if ( value->type != expected )
+    {
+        throw( UnexpectedValueType, ((UnexpectedValueTypeException){ 
+            .expected = expected,
+            .got = value->type
+        }));
+    }
+    
+    return value;
+}
+
+/**
+ * Zjisti, zda je \a value typu typeNumeric a zda je nezáporné číslo.
+ * Pokud ne, haze vyjimku NegativeNumeric nebo UnexpectedValueType.
+ */
+Value* testValuePositiveNumeric( Value* value )
+{
+    if ( getValueNumeric(testValue( value, typeNumeric )) < 0 )
+    {
+        throw( NegativeNumeric, *value);
+    }
+    
+    return value;
+}
+
+/**
  * Alokuje tabulku symbolu
  */
 Value* initValueTable(int length){
@@ -372,22 +403,30 @@ Value* initValueTable(int length){
 /**
  * Uvolni tabulku symbolu
  */
-void freeValueTable(Value *table,int length){
- for(int i=0;i<length;i++){
-  freeValue( &table[i] );
- }
- free(table);
+void freeValueTable(Value *table, int length) {
+  for (int i=0; i < length; i++) {
+    if (table[i].type==typeFunction) {
+      free(table[i].data.function);
+      table[i].data.function = NULL;
+    }
+    else {
+      freeValue( &table[i] );
+    }
+  }
+  free(table);
+  table=NULL;
 }
 
 /**
  * Uvolni globalni tabulku symbolu - funkci
  */
-void freeFunctionsTable(Value *table, int length){
- for(int i=0;i<length;i++){
-  deleteFunction( *table[i].data.function );
-  free(table[i].data.function);
- }
- free(table);
+void freeFunctionsTable(Value *table, int length) {
+  for (int i=0; i < length; i++) {
+    deleteFunction( *table[i].data.function );
+    free(table[i].data.function);
+  }
+  free(table);
+  table=NULL;
 }
 
 /**
@@ -421,7 +460,7 @@ Value addValue( Value* a, Value* b )
     }
     return newValueUndefined();
 }
-
+    
 /**
  * Operace odcitani: a - b
  */
@@ -461,6 +500,7 @@ Value multiplyValue( Value* a, Value* b )
             RCStringAppendStr( &result, &addedStr );
         }
         Value ret = newValueString( result );
+        deleteRCString( &addedStr );
         deleteRCString( &result );
         return ret;
     }

@@ -46,20 +46,22 @@ typedef Value* ValueList;
 
 typedef Value( *BuiltinFunction )( ValueList, int );
 
+typedef enum {
+    typeUndefined=-1,
+    typeNil=0,
+    typeBoolean=1,
+    typeNumeric=3,
+    typeFunction=6,
+    typeString=8
+} ValueType;
+
 /**
  * Hodnota promenne generickeho datoveho typu
  */
 struct SValue {
  
     // Aktualni typ
-    enum {
-        typeUndefined=-1,
-        typeNil=0,
-        typeBoolean=1,
-        typeNumeric=3,
-        typeFunction=6,
-        typeString=8
-    } type;
+    ValueType type;
  
     // Hodnota
     union {

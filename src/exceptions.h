@@ -27,13 +27,15 @@ typedef enum
     MultipleFunctionDefinitions, // exit 5 (ostatni semanticke chyby)
     
     /* Semanticka analyza/behove chyby */
-    UndefinedVariable, // exit 3
-    UndefinedFunction, // exit 4
-    VariableIsNotFunction, // exit 11
-    FunctionIsNotVariable, // exit 11
-    IncompatibleComparison, // exit 11
-    InvalidConversion, // exit 12 (chyba pretypovani na cislo)
-    BadArgumentType, // exit 11 (behova chyba nekompatibility typu)
+    UndefinedVariable,		// exit 3
+    UndefinedFunction,		// exit 4
+    UnexpectedValueType,	// exit 5
+    NegativeNumeric,		// exit 5
+    VariableIsNotFunction,	// exit 11
+    FunctionIsNotVariable,	// exit 11
+    IncompatibleComparison,	// exit 11
+    InvalidConversion,		// exit 12 (chyba pretypovani na cislo)
+    BadArgumentType,		// exit 11 (behova chyba nekompatibility typu)
     VariableOverridesFunction,
     
     IndexOutOfBounds, // exit 13
@@ -84,8 +86,15 @@ typedef struct
     unsigned line_num;
 } UnexpectedKeyWordException;
 
+typedef struct
+{
+    int expected;
+    int got;
+} UnexpectedValueTypeException;
+
 typedef int UndefinedVariableException;
 typedef int UndefinedFunctionException;
+typedef Value NegativeNumericException;
 typedef Value VariableIsNotFunctionException;
 typedef Value FunctionIsNotVariableException;
 typedef bool IncompatibleComparisonException;
@@ -107,6 +116,8 @@ typedef struct
     
         EXCEPTION( UndefinedVariable );
         EXCEPTION( UndefinedFunction );
+        EXCEPTION( UnexpectedValueType );
+        EXCEPTION( NegativeNumeric );
         EXCEPTION( VariableIsNotFunction );
         EXCEPTION( FunctionIsNotVariable );
         EXCEPTION( IncompatibleComparison );
@@ -207,5 +218,11 @@ void exceptions_impl_throw( Exception e );
 
 void rethrow();
 
+// ===========MĚLO BY BÝT VE 'src/value.h' ALE KŘÍŽOVÉ ZÁVISLOSTI TO NEDOVOLÍ============
+/**
+ * Vytiskne na stderr text chybové hlášky pro danou výjimku.
+ * @param[in] e Výjimka vrácena sémantickým analyzátorem.
+ */
+void UnexpectedValueTypePrint(UnexpectedValueTypeException e);
 
 #endif

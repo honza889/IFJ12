@@ -108,6 +108,14 @@ int main(int argc, char**argv)
             fprintf( stderr, "Byla použita nedefinovaná funkce!\n" );
             exit( 4 );
         }
+        on( UnexpectedValueType, e ){
+            UnexpectedValueTypePrint(*e);
+            exit( 5 );
+        }
+        on( NegativeNumeric, e ){
+            fprintf( stderr, "ValueError: Bylo použito záporné číslo tam kde nemělo!\n" );
+            exit( 5 );
+        }
         on( VariableIsNotFunction, e ){
             fprintf( stderr, "Pokus použít funkci jako proměnnou!\n" );
             exit( 11 );
@@ -124,14 +132,14 @@ int main(int argc, char**argv)
             fprintf( stderr, "Funkce %s byla zavolána s parametrem chybného typu!\n", *e );
             exit( 11 );
         }
-        on( IndexOutOfBounds, e ){
-            fprintf( stderr, "Index mimo pole!\n" );
-            exit( 13 );
-        }
-        on(InvalidConversion, value){
+        on( InvalidConversion, value ){
             RCString buf = getValueString(value);
             fprintf( stderr, "Nezdařil se převod hodnoty \""); RCStringPrint(&buf, stderr); fprintf( stderr, "\" na typ numeric!\n");
             exit( 12 );
+        }
+        on( IndexOutOfBounds, e ){
+            fprintf( stderr, "Index mimo pole!\n" );
+            exit( 13 );
         }
         on(OutOfMemory, typename){
             fprintf( stderr, "Nezdařila se alokace paměti pro typ \"%s\"!\n", *typename );
@@ -149,7 +157,8 @@ int main(int argc, char**argv)
     
     // Uvolneni vsech funkci
     deleteFunction( mainFunction );
-    freeFunctionsTable( context.globals, countOfFunctions );
+//    freeFunctionsTable( context.globals, countOfFunctions );
+    freeValueTable( context.globals, countOfFunctions );
     
     return 0;
 }

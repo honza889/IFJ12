@@ -26,7 +26,9 @@ Value BIFinput(ValueList param, int count)
     {
         RCStringAppendChar(&str, c);
     }
-    return newValueString(str);
+    Value ret = newValueString(str);
+    deleteRCString(&str);
+    return ret;
 }
 
 // Prevede retezec na cislo

@@ -138,7 +138,7 @@ inline void evalAssignment( Assignment* assgn, Context* context )
 void evalSubstring( Substring* substring, Context* context )
 {
     Value val = evalExpression( &substring->source, context );
-    RCString r = getValueString( &val );
+    RCString r = getValueString( testValue( &val, typeString ) );
     freeValue( &val );
     
     int offset,length;
@@ -146,14 +146,14 @@ void evalSubstring( Substring* substring, Context* context )
         offset = 0;
     }else{
         Value offsetValue = evalExpression(&substring->offset,context);
-        offset = (int)getValueNumeric(&offsetValue);
+        offset = (int)getValueNumeric( testValuePositiveNumeric( &offsetValue ) );
         freeValue(&offsetValue);
     }
     if(substring->length.type==CONSTANT && substring->length.value.constant.type==typeUndefined){
         length = RCStringLength(&r);
     }else{
         Value lengthValue = evalExpression(&substring->length,context);
-        length = (int)getValueNumeric(&lengthValue);
+        length = (int)getValueNumeric( testValuePositiveNumeric( &lengthValue ) );
         freeValue(&lengthValue);
     }
     
@@ -284,7 +284,14 @@ Value evalFunction( Function* func, ExpressionList params, Context* context )
     
     if( func->type == BUILTIN )
     {
-        return func->value.builtin( variables, params.count );
+        Value ret = func->value.builtin( variables, params.count );
+        
+        for( int i = 0; i < variableCount; i++ )
+        {
+            freeValue( variables + i );
+        }
+        
+        return ret;
     }
     else
     {
@@ -373,6 +380,8 @@ static inline void deleteAssignment( Assignment* assgn )
 
 static inline void deleteSubstring( Substring* substring )
 {
+    deleteExpression( &substring->offset );
+    deleteExpression( &substring->length );
     deleteExpression( &substring->source );
     deleteVariable( &substring->destination );
 }

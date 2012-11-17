@@ -60,5 +60,4 @@ clean:
 	rm -f pack/ifj12 pack/*.*
 
 pack:
-	cp src/* pack/; cd pack; tar -zcvf ../xbiber00.tar.gz *
-
+	bash -c 'cp src/*[^~] pack/; cd pack; tar -zcvf ../xbiber00.tar.gz *'

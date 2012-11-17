@@ -160,12 +160,22 @@ char* mergesort(char *str, int len)
 Value sort(ValueList data, int count)
 {
     RCString str = getValueString(&data[0]);
-    if(str.length<=1){
-      return newValueString(str);
+    if (str.length <= 1) {
+      Value ret = newValueString(str);
+      deleteRCString(&str);
+      return ret;
     }
+    
     char *result = mergesort((char*)RCStringGetBuffer(&str), str.length);
     result = resizeArray(result, char, str.length + 1);
     result[str.length] = '\0';
     deleteRCString(&str);
-    return newValueString(makeRCString(result));
+    
+    RCString resultStr = makeRCString(result);
+    free(result);
+    
+    Value ret = newValueString(resultStr);
+    deleteRCString(&resultStr);
+    
+    return ret;
 }
