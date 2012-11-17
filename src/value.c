@@ -557,3 +557,27 @@ Value powerValue( Value* a, Value* b )
     return newValueUndefined();
 }
 
+/**
+ * Operace logickeho soucinu: a and b
+ */
+Value andValue( Value* a, Value* b )
+{
+    return newValueBoolean( getValueBoolean( a ) && getValueBoolean( b ) );
+}
+
+/**
+ * Operace logickeho souctu: a or b
+ */
+Value orValue( Value* a, Value* b )
+{
+    return newValueBoolean( getValueBoolean( a ) || getValueBoolean( b ) );
+}
+
+/**
+ * Operace logicke negace: not a
+ */
+Value notValue( Value* a )
+{
+    return newValueBoolean( ! getValueBoolean( a ) );
+}
+

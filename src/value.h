@@ -108,6 +108,9 @@ Value subtractValue( Value* a, Value* b );
 Value multiplyValue( Value* a, Value* b );
 Value divideValue( Value* a, Value* b );
 Value powerValue( Value* a, Value* b );
+Value andValue( Value* a, Value* b );
+Value orValue( Value* a, Value* b );
+Value notValue( Value* a );
 
 static inline int typeOfValue(Value *object){
   return (int)object->type;

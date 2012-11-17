@@ -60,11 +60,11 @@ Value evalUnaryOp( UnaryOp* op, Context* context )
 {
     Value ret = newValueUndefined();
     Value zero = newValueNumeric( 0.0 );
-    Value number = evalExpression( op->operand, context );
+    Value val = evalExpression( op->operand, context );
     switch( op->type )
     {
-        // nejlepsi switch ever
-        case MINUS: ret = subtractValue( &zero, &number ); break;
+        case MINUS: ret = subtractValue( &zero, &val ); break;
+        case NOT: ret = notValue( &val ); break;
     }
     return ret;
 }
@@ -74,10 +74,10 @@ Value evalBinaryOp( BinaryOp* op, Context* context )
     Value ret = newValueUndefined();
     Value left = evalExpression( op->left, context );
     Value right = evalExpression( op->right, context );
-    // GIVE ME MY POLYMORPHISM GODDAMIT
     switch( op->type )
     {
-        // TODO
+        case AND: ret = andValue( &left, &right ); break;
+        case OR: ret = orValue( &left, &right ); break;
         case ADD: ret = addValue( &left, &right ); break;
         case SUBTRACT: ret = subtractValue( &left, &right ); break;
         case MULTIPLY: ret = multiplyValue( &left, &right ); break;
