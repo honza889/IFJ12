@@ -525,15 +525,27 @@ bool det_key_word(RCString lexeme, Token *token, unsigned line_num)
     token->data.keyw = kWhile;
   else {
     
-    token->type = tokLiteral;	// Poté se dívám na klíčová slova mimo výčet.
+    // Poté se dívám na klíčová slova mimo výčet.
     
-    if (! strcmp("true", RCStringGetBuffer(&cmp_lexeme)))
+    if (! strcmp("and", RCStringGetBuffer(&cmp_lexeme))) {
+      token->type = tokOp;
+      token->data.op = opAND;
+    } else if (! strcmp("or", RCStringGetBuffer(&cmp_lexeme))) {
+      token->type = tokOp;
+      token->data.op = opOR;
+    } else if (! strcmp("not", RCStringGetBuffer(&cmp_lexeme))) {
+      token->type = tokOp;
+      token->data.op = opNOT;
+    } else if (! strcmp("true", RCStringGetBuffer(&cmp_lexeme))) {
+      token->type = tokLiteral;
       token->data.val = newValueBoolean(true);
-    else if (! strcmp("false", RCStringGetBuffer(&cmp_lexeme)))
+    } else if (! strcmp("false", RCStringGetBuffer(&cmp_lexeme))) {
+      token->type = tokLiteral;
       token->data.val = newValueBoolean(false);
-    else if (! strcmp("nil", RCStringGetBuffer(&cmp_lexeme)))
+    } else if (! strcmp("nil", RCStringGetBuffer(&cmp_lexeme))) {
+      token->type = tokLiteral;
       token->data.val = newValueNil();
-    else {
+    } else {
       if (! strcmp("as", RCStringGetBuffer(&cmp_lexeme))	||
           ! strcmp("def", RCStringGetBuffer(&cmp_lexeme))	||
           ! strcmp("directive", RCStringGetBuffer(&cmp_lexeme))	||

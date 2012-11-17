@@ -51,7 +51,8 @@ typedef struct {
         Value val;	/** Hodnota zapsaná ve zdrojáku */
         enum {		/** Unárni nebo binární operátor */
             opPlus, opMinus, opMultiple, opDivide, opPower,
-            opLT, opGT, opLE, opGE, opNE, opEQ
+            opLT, opGT, opLE, opGE, opNE, opEQ,
+            opAND, opOR, opNOT
         } op;
         KeyWord keyw;	/** Klíčová slova */
     } data;

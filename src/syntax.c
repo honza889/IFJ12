@@ -493,6 +493,13 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 past = wasValue;
             break;
             case tokOp:
+                if(current.data.op==opNOT){
+                    // TODO: Implementovat operator NOT
+                    ERROR("Operator NOT neni implementovan!");
+                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
+                    past = wasOperator;
+                    break;
+                }
                 if(past==wasStart){ // prvnim tokenem vyrazu?
                     if(current.data.op==opMinus){
                         newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu - unarni minus)
@@ -523,6 +530,9 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                         case opGT:       tmpOp.value.binary.type = GREATER; break;
                         case opLE:       tmpOp.value.binary.type = LEQUAL; break;
                         case opGE:       tmpOp.value.binary.type = GEQUAL; break;
+                        case opAND:      tmpOp.value.binary.type = AND; break;
+                        case opOR:       tmpOp.value.binary.type = OR; break;
+                        default: break;
                     }
                     
                     Expression *parentExp;

@@ -29,3 +29,7 @@ x=print("8=",a,"\n")
 a = 5.0 + 2.0 * 2.0 ** 2.0 == 13.0
 x=print("true=",a,"\n")
 
+a = false or false and not true
+x=print("true=",a,"\n")
+
+
