@@ -1,0 +1,44 @@
+// Funkce
+// ******
+function secist(a,b,c)
+	d = a+b
+	return d+c
+end
+
+function pi()
+	return 3.14
+end
+
+function nepouzita(a,b)
+	promenna = true
+end
+
+promenna = 3.0
+x = print("1+2+3=",secist(1.0,2.0,promenna),"\n")
+x = print("2pi=",2.0*pi(),"\n")
+
+// Podminka
+// ********
+z = 5.0
+if z==5.0
+	x=print("z je 5\n")
+else
+	x=print("z neni 5\n")
+end
+
+// logicke kulate zavorky (soucast rozsireni LOGOP)
+if(z==5.0)
+	x=print("z je 5\n")
+else
+	x=print("z neni 5\n")
+end
+
+
+// Cyklus
+// ******
+z = 8.0
+loop z
+	x = print("test\n")
+	z = z - 1.0
+end
+
