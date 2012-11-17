@@ -30,7 +30,7 @@ void fillNameListFromSymbolTree( RCString* nl, Symbol* st )
     // a pokud bude, tak ma spatnej kod a je to jeho chyba :P
     if( !st ) return;
     
-    nl[ st->index ] = copyRCString( &st->name );
+    nl[ st->index ] = copyRCString( &st->name );		// DE-BUG: 2. kopie
     fillNameListFromSymbolTree( nl, st->lesser );
     fillNameListFromSymbolTree( nl, st->greater );
 }
@@ -155,8 +155,9 @@ void parseProgram( Scanner* s, SyntaxContext* ctx, Function* main )
         }
     }
     main->value.userDefined.variableCount = ctx->localSymbols->count;
-    main->value.userDefined.variableNames = newArray( RCString, ctx->localSymbols->count );
-    fillNameListFromSymbolTree( main->value.userDefined.variableNames, ctx->localSymbols->root );
+    // BUG: Následující dva zakomentované řádky způsobovaly leak a ani nevím k čemu byli. (Jan Doležal)
+//     main->value.userDefined.variableNames = newArray( RCString, ctx->localSymbols->count );
+//     fillNameListFromSymbolTree( main->value.userDefined.variableNames, ctx->localSymbols->root );
 }
 
 void parseFunctionParameters( Scanner* s, Function* func, SyntaxContext* ctx )
@@ -230,8 +231,9 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
     expectTok( s, tokEndOfLine );
     
     func->value.userDefined.variableCount = ctx->localSymbols->count;
-    func->value.userDefined.variableNames = newArray( RCString, ctx->localSymbols->count );
-    fillNameListFromSymbolTree( func->value.userDefined.variableNames, ctx->localSymbols->root );
+    // BUG: Následující dva zakomentované řádky způsobovaly leak a ani nevím k čemu byli. (Jan Doležal)
+//     func->value.userDefined.variableNames = newArray( RCString, ctx->localSymbols->count );
+//     fillNameListFromSymbolTree( func->value.userDefined.variableNames, ctx->localSymbols->root );
     freeSymbolTable( &localSymbols );
     
     ctx->localSymbols = oldLocalSymbols;
@@ -298,7 +300,7 @@ void detectAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Assignment assgn;
-    RCString name = getTok(s).data.id;
+    RCString name = getTok(s).data.id;		// DE-BUG: původ
     assgn.destination = getSymbol(name,ctx->globalSymbols, ctx->localSymbols );
     consumeTok(s);
     parseExpression(s, &assgn.source, ctx);

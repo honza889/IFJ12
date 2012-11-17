@@ -406,6 +406,7 @@ Value* initValueTable(int length){
 void freeValueTable(Value *table, int length) {
   for (int i=0; i < length; i++) {
     if (table[i].type==typeFunction) {
+      deleteFunction( *table[i].data.function );
       free(table[i].data.function);
       table[i].data.function = NULL;
     }
@@ -424,6 +425,7 @@ void freeFunctionsTable(Value *table, int length) {
   for (int i=0; i < length; i++) {
     deleteFunction( *table[i].data.function );
     free(table[i].data.function);
+    table[i].data.function = NULL;
   }
   free(table);
   table=NULL;

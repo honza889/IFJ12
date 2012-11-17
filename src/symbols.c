@@ -90,7 +90,7 @@ int getSymbol(RCString name, SymbolTable *globalTable, SymbolTable *localTable){
   MALLCHECK(newSymbol);
   
   // Kopie nazvu promenne
-  newSymbol->name=copyRCString(&name);
+  newSymbol->name=copyRCString(&name);		// DE-BUG: 1. kopie
   
   // Ziskani a nasledne navyseni indexu
   index=(inLocal?localTable:globalTable)->count++;
