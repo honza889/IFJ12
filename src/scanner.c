@@ -521,7 +521,7 @@ bool det_key_word(RCString lexeme, Token *token, unsigned line_num)
     token->data.keyw = kIf;
   else if (! strcmp("return", RCStringGetBuffer(&cmp_lexeme)))
     token->data.keyw = kReturn;
-  else if (! strcmp("loop", RCStringGetBuffer(&cmp_lexeme)))
+  else if (! strcmp("while", RCStringGetBuffer(&cmp_lexeme)))
     token->data.keyw = kWhile;
   else {
     
