@@ -416,12 +416,14 @@ bool compareOperators(Operator op1, Operator op2){
 void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ctx )
 {
     // Porad mam dojem, ze tohle lze napsat lepe, ale co se da delat... --Biba
+    // Porad mam dojem ze vzdycky kdyz to zkusim vylepsit, je vysledkem segfault nebo nahodne chovani --JK
     Token current;
     Expression *newExp, *prevExp=NULL, *oldWholeExp=NULL;
     enum {
         wasStart, // zatim nebylo nic, zacatek expression
         wasValue, // byla promenna, literal nebo zavorka (uzavrena)
-        wasOperator // byl operator (unarni nebo binarni)
+        wasOperator, // byl binarni operator
+        wasUnaryOperator // byl unarni operator
     } past;
     past = wasStart;
     while(true){
@@ -435,12 +437,10 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
                 }else if(past==wasOperator){
                     newExp = new(Expression);
-                    // pripojit za nejnovejsi operator
-                    if(prevExp->value.operator.type==BINARYOP){
-                        prevExp->value.operator.value.binary.right = newExp;
-                    }else{
-                        prevExp->value.operator.value.unary.operand = newExp;
-                    }
+                    prevExp->value.operator.value.binary.right = newExp;
+                }else if(past==wasUnaryOperator){
+                    newExp = new(Expression);
+                    prevExp->value.operator.value.unary.operand = newExp;
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
@@ -478,12 +478,10 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                     newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
                 }else if(past==wasOperator){
                     newExp = new(Expression);
-                    // pripojit za nejnovejsi operator
-                    if(prevExp->value.operator.type==BINARYOP){
-                        prevExp->value.operator.value.binary.right = newExp;
-                    }else{
-                        prevExp->value.operator.value.unary.operand = newExp;
-                    }
+                    prevExp->value.operator.value.binary.right = newExp;
+                }else if(past==wasUnaryOperator){
+                    newExp = new(Expression);
+                    prevExp->value.operator.value.unary.operand = newExp;
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
                 }
@@ -493,28 +491,40 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 past = wasValue;
             break;
             case tokOp:
-                if(current.data.op==opNOT){
-                    // TODO: Implementovat operator NOT
-                    ERROR("Operator NOT neni implementovan!");
-                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
-                    past = wasOperator;
-                    break;
-                }
                 if(past==wasStart){ // prvnim tokenem vyrazu?
-                    if(current.data.op==opMinus){
+                    if(current.data.op==opMinus || current.data.op==opNOT){
                         newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu - unarni minus)
                         *newExp = (Expression){ .type=OPERATOR };
-                        newExp->value.operator.type = UNARYOP;
-                        newExp->value.operator.value.unary.type = MINUS;
                         newExp->parent = NULL;
+                        newExp->value.operator.type = UNARYOP;
+                        if(current.data.op==opMinus){
+                            newExp->value.operator.value.unary.type = MINUS;
+                        }else{
+                            newExp->value.operator.value.unary.type = NOT;
+                        }
+                        past = wasUnaryOperator;
                     }else{
                         throw(SyntaxError,((SyntaxErrorException){.type=BinaryOperatorAtBegin, .line_num=current.line_num}));
                     }
-                }else{ // ve vyrazu jiz je promenna/konstanta
-                    
-                    if(past==wasOperator){ // pred timto operatorem je dalsi operator - nepripustne
+                }else if(past==wasUnaryOperator){ // za unarnim operatorem
+                    if(current.data.op==opMinus || current.data.op==opNOT){
+                        newExp = new(Expression);
+                        prevExp->value.operator.value.unary.operand = newExp;
+                        *newExp = (Expression){ .type=OPERATOR };
+                        newExp->parent = prevExp;
+                        newExp->value.operator.type = UNARYOP;
+                        if(current.data.op==opMinus){
+                            newExp->value.operator.value.unary.type = MINUS;
+                        }else{
+                            newExp->value.operator.value.unary.type = NOT;
+                        }
+                        past = wasUnaryOperator;
+                    }else{
                         throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther, .line_num=current.line_num}));
                     }
+                }else if(past==wasOperator){ // pred timto operatorem je dalsi binarni operator - nepripustne
+                    throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther, .line_num=current.line_num}));
+                }else{ // ve vyrazu je pred timto operatorem promenna/konstanta
                     
                     Operator tmpOp;
                     tmpOp.type = BINARYOP;
@@ -593,16 +603,20 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                       newExp->value.operator.value.binary.left->parent = newExp;
                       newExp->value.operator.value.binary.right = NULL;
                     }
+                    past = wasOperator;
                 }
-                past = wasOperator;
             break;
             case tokLParen:
-                if(past==wasStart){
-                    newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
+                if(past==wasStart){ // na zacatku vyrazu
+                    newExp = wholeExpression; // do korene
                     newExp->parent = NULL;
-                }else if(past==wasOperator){
+                }else if(past==wasOperator){ // za binarnim operatorem
                     newExp = new(Expression);
                     prevExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
+                    newExp->parent = prevExp;
+                }else if(past==wasUnaryOperator){ // za unarnim operatorem
+                    newExp = new(Expression);
+                    prevExp->value.operator.value.unary.operand = newExp; // pripojit za nejnovejsi operator
                     newExp->parent = prevExp;
                 }else{
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
@@ -615,7 +629,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
                 past = wasValue;
             break;
             case tokRParen: case tokComma: case tokEndOfLine:
-                if(past==wasOperator){ // na konci vyrazu nesmi byt operator
+                if(past==wasOperator || past==wasUnaryOperator){ // na konci vyrazu nesmi byt operator
                   throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd, .line_num=current.line_num}));
                 }
                 if(past==wasStart){ // vyraz nesmi byt prazdny

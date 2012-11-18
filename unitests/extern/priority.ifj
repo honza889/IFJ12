@@ -1,7 +1,5 @@
 // test parseExpression a AST - priority operatoru
 
-x=print("test\n")
-
 a = 10.0+2.0*3.0+100.0
 x=print("116=",a,"\n")
 
@@ -29,7 +27,21 @@ x=print("8=",a,"\n")
 a = 5.0 + 2.0 * 2.0 ** 2.0 == 13.0
 x=print("true=",a,"\n")
 
-a = false or false and not true
+a = false or false and true
 x=print("true=",a,"\n")
 
+a = - - 5.0
+x=print("5=",a,"\n")
+
+a = - ( - 5.0 )
+x=print("5=",a,"\n")
+
+a = 1.0 + ( 1.0 )
+x=print("2=",a,"\n")
+
+a = (10.0)
+x=print("10=",a,"\n")
+
+a = not not true
+x=print("true=",a,"\n")
 

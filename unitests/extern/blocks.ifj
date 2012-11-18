@@ -17,6 +17,12 @@ promenna = 3.0
 x = print("1+2+3=",secist(1.0,2.0,promenna),"\n")
 x = print("2pi=",2.0*pi(),"\n")
 
+z = -pi()
+x = print("-pi=",z,"\n")
+
+z = 1.0-pi()
+x = print("1-pi=",z,"\n")
+
 // Podminka
 // ********
 z = 5.0
