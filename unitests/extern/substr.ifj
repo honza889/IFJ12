@@ -1,50 +1,119 @@
-// test substringovani
-x=print("========================\n")
-x=print("= Test substringovani: =\n")
-x=print("========================\n")
+/************************/
+/* Test substringovani: */
+/************************/
+
+isOK=true
 
 // Desetinná část čísel je případně oříznuta.
-x=print("Desetinna cast cisel je pripadne oriznuta:\n")
 a = "abc"[0.1:0.9]
-x=print("\"abc\"[0:0]\t-> \"\"\t=",a,"\n")
+if "" != a
+  x=print("\"\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
+
+a = "abc"[1.1:2.9]
+if "b" != a
+  x=print("\"b\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
+
+a = "abc"[1.9:2.1]
+if "b" != a
+  x=print("\"b\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
 
 // Je-li hodnota od nebo do mimo interval <0.0, len(řetězec)> nebo do < od, je vybraný podřetězec prázdný.
-x=print("Hodnoty od do pro prazdny retezec:\n")
 a = "abc"[1.0:100.0]
-x=print("\"abc\"[1:100]\t-> \"\"\t=",a,"\n")
+if "" != a
+  x=print("\"\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
+
 a = "abc"[3.0:2.0]
-x=print("\"abc\"[3:2]\t-> \"\"\t=",a,"\n")
+if "" != a
+  x=print("\"\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
+
 a = "abc"[2.0:2.0]
-x=print("\"abc\"[2:2]\t-> \"\"\t=",a,"\n")
+if "" != a
+  x=print("\"\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
 
 // Zkouška výpisu podřetězce.
-x=print("Zkouska vypisu podretezce:\n")
 a = "abc"[1.0:2.0]
-x=print("\"abc\"[1:2]\t-> \"b\"\t=",a,"\n")
+if "b" != a
+  x=print("\"b\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
+
 a = "abc"[0.0:3.0]
-x=print("\"abc\"[0:3]\t-> \"abc\"\t=",a,"\n")
+if "abc" != a
+  x=print("\"abc\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
 
 // Zkouška s proměnnými
-x=print("Zkouska s promennymi:\n")
 b= 1.0
 a = "abc"[b:2.0]
-x=print("\"abc\"[1:2]\t-> \"b\"\t=",a,"\n")
+if "b" != a
+  x=print("\"b\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
+
 c= 3.0
 a = "abc"[b:c]
-x=print("\"abc\"[1:3]\t-> \"bc\"\t=",a,"\n")
+if "bc" != a
+  x=print("\"bc\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
+
 a = "abc"
 a = a[b:c]
-x=print("\"abc\"[1:3]\t-> \"bc\"\t=",a,"\n")
+if "bc" != a
+  x=print("\"bc\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
 
-x=print("Zkouska vynechani od do:\n")
 // Je-li vynechána hodnota do, končí vybíraný podřetězec na konci řetězce řetězec (tj. do = len(řetězec)).
 a = "abc"[1.0:]
-x=print("\"abc\"[1:]\t-> \"bc\"\t=",a,"\n")
+if "bc" != a
+  x=print("\"bc\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
 
 // Je-li vynechána hodnota od, začíná vybíraný podřetězec na začátku řetězce řetězec (tj. od = 0.0).
 a = "abc"[:1.0]
-x=print("\"abc\"[:1]\t-> \"a\"\t=",a,"\n")
+if "a" != a
+  x=print("\"a\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
 
 // Zkusíme vynechat obojí.
 a = "abc"[:]
-x=print("\"abc\"[:]\t-> \"abc\"\t=",a,"\n")
+if "abc" != a
+  x=print("\"abc\"==\"",a,"\": ERROR\n")
+  isOK=false
+else
+end
+
+if isOK
+  x=print("unitests/extern/substr.ifj: OK\n")
+else
+  x=print("unitests/extern/substr.ifj: ERROR\n")
+end

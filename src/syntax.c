@@ -410,7 +410,7 @@ bool compareOperators(Operator op1, Operator op2){
     if(op2.type==UNARYOP) return true;
     if(op1.type==UNARYOP) return false;
     // jinak je prioritnejší operátor s vyšší hodnotou prvních 4 bitů
-    return ( (op1.value.binary.type & 0xF0) > (op2.value.binary.type & 0xF0) );
+    return ( (op1.value.binary.type & 0xF0) >= (op2.value.binary.type & 0xF0) );
 }
 
 void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ctx )

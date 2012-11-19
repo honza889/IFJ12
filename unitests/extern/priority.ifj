@@ -1,47 +1,121 @@
 // test parseExpression a AST - priority operatoru
 
+isOK=true
+
 a = 10.0+2.0*3.0+100.0
-x=print("116=",a,"\n")
+if 116.0 != a
+  x=print("116.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = 5.0+4.0*3.0**2.0
-x=print("41=",a,"\n")
+if 41.0 != a
+  x=print("41.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = 3.0**2.0*4.0+5.0
-x=print("41=",a,"\n")
+if 41.0 != a
+  x=print("41.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = 1.0+"text"*2.0+1.0
-x=print("1texttext1=",a,"\n")
+if "1texttext1" != a
+  x=print("1texttext1==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = 10.0*2.0+100.0
-x=print("120=",a,"\n")
+if 120.0 != a
+  x=print("120.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = 10.0+2.0*100.0
-x=print("210=",a,"\n")
+if 210.0 != a
+  x=print("210.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = 8.0**2.0
-x=print("64=",a,"\n")
+if 64.0 != a
+  x=print("64.0==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = 2.0**3.0**4.0
+if 4096.0 != a
+  x=print("4096.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = 64.0**0.5
-x=print("8=",a,"\n")
+if 8.0 != a
+  x=print("8.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = 5.0 + 2.0 * 2.0 ** 2.0 == 13.0
-x=print("true=",a,"\n")
+if true != a
+  x=print("true==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = false or false and true
-x=print("true=",a,"\n")
+if false != a
+  x=print("false==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = - - 5.0
-x=print("5=",a,"\n")
+if 5.0 != a
+  x=print("5.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = - ( - 5.0 )
-x=print("5=",a,"\n")
+if 5.0 != a
+  x=print("5.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = 1.0 + ( 1.0 )
-x=print("2=",a,"\n")
+if 2.0 != a
+  x=print("2.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = (10.0)
-x=print("10=",a,"\n")
+if 10.0 != a
+  x=print("10.0==",a,": ERROR\n")
+  isOK=false
+else
+end
 
 a = not not true
-x=print("true=",a,"\n")
+if true != a
+  x=print("true==",a,": ERROR\n")
+  isOK=false
+else
+end
 
+if isOK
+  x=print("unitests/extern/priority.ifj: OK\n")
+else
+  x=print("unitests/extern/priority.ifj: ERROR\n")
+end

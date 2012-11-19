@@ -1,8 +1,13 @@
+// Test function, if, while:
+
+isOK=true
+
 // Funkce
 // ******
 function secist(a,b,c)
 	d = a+b
-	return d+c
+	c = d+c
+	return c
 end
 
 function pi()
@@ -14,37 +19,100 @@ function nepouzita(a,b)
 end
 
 promenna = 3.0
-x = print("1+2+3=",secist(1.0,2.0,promenna),"\n")
-x = print("2pi=",2.0*pi(),"\n")
+z = secist(1.0,2.0,promenna)
+if promenna == 3.0
+else
+	x=print("3.0 == "+promenna+": ERROR\n")
+	isOK=false
+end
+
+if z == 6.0
+else
+	x=print("-3.14 == "+z+": ERROR\n")
+	isOK=false
+end
+
+z = 2.0*pi()
+if z == 6.28
+else
+	x=print("6.28 == "+z+": ERROR\n")
+	isOK=false
+end
 
 z = -pi()
-x = print("-pi=",z,"\n")
+if z == -3.14	// BUG: Parse error: Two operators next to each other on line 43
+else
+	x=print("-3.14 == "+z+": ERROR\n")
+	isOK=false
+end
 
 z = 1.0-pi()
-x = print("1-pi=",z,"\n")
+if z == -2.14	// BUG: Parse error: Two operators next to each other on line 50
+else
+	x=print("-2.14 == "+z+": ERROR\n")
+	isOK=false
+end
 
 // Podminka
 // ********
 z = 5.0
 if z==5.0
-	x=print("z je 5\n")
 else
-	x=print("z neni 5\n")
+	x=print("5.0 == "+z+": ERROR\n")
+	isOK=false
 end
 
 // logicke kulate zavorky (soucast rozsireni LOGOP)
 if(z==5.0)
-	x=print("z je 5\n")
 else
-	x=print("z neni 5\n")
+	x=print("(5.0 == "+z+"): ERROR\n")
+	isOK=false
 end
 
+// Pokud je první operand jiného typu než druhý operand, výslek je false.
+result = ((0.0=="0.0") == false)
+if result
+else
+	x=print("(0.0==\"0.0\") == "+result+": ERROR\n")
+	isOK=false
+end
+
+// Zkouška levé asociativity.
+result = (0.0=="0.0"==false)
+if result
+else
+	x=print("0.0==\"0.0\"=="+result+": ERROR\n")
+	isOK=false
+end
 
 // Cyklus
 // ******
-z = 8.0
-loop z
-	x = print("test\n")
-	z = z - 1.0
+z = 0.0
+while z < 8.0
+	z = z + 1.0
 end
 
+if z == 8.0
+else
+	x=print("While cyklus probehl "+z+" krat, ale mel probehnout "+8.0+" krat: ERROR\n")
+	isOK=false
+end
+
+// Cyklus - Loop (kdyby jsme ho chtěli implementovat)
+// ******
+//a = 0.0
+//loop
+//	a = a + 1.0
+//end a >= 10.0
+//
+//if a == 10.0
+//else
+//	x=print("Loop cyklus probehl "+a+" krat, ale mel probehnout "+10.0+" krat: ERROR\n")
+//	isOK=false
+//end
+
+if isOK
+  x=print("unitests/extern/blocks.ifj: OK\n")
+else
+  x=print("unitests/extern/blocks.ifj: ERROR\n")
+end

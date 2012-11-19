@@ -1,111 +1,114 @@
 // Testy BIF a IAL funkci
 
-x=print("\n")
-x=print("             SORT\n")
-x=print("***********************************\n")
+isOK=true
 
+/********/
+/* SORT */
+/********/
 if sort("cab")=="abc"
-  x=print("sort(\"cab\")=abc OK\n")
 else
-  x=print("sort(\"cab\")="+sort("cab")+"\n")
+  x=print("sort(\"cab\")=\""+sort("cab")+"\": ERROR\n")
+  isOK=false
 end
 
 if sort("cabdac")=="aabccd"
-  x=print("sort(\"cabdac\")=aabccd OK\n")
 else
-  x=print("sort(\"cabdac\")="+sort("cabdac")+"\n")
+  x=print("sort(\"cabdac\")=\""+sort("cabdac")+"\": ERROR\n")
+  isOK=false
 end
 
 if sort("")==""
-  x=print("sort(\"\")=\"\" OK\n")
 else
-  x=print("sort(\"\")=\""+sort("")+"\"\n")
+  x=print("sort(\"\")=\""+sort("")+"\": ERROR\n")
+  isOK=false
 end
 
-x=print("\n")
-x=print("             FIND\n")
-x=print("***********************************\n")
-
+/********/
+/* FIND */
+/********/
 if find("abcdef","cd")==2.0
-  x=print("find(\"abcdef\",\"cd\")=2.0 OK\n")
 else
-  x=print("find(\"abcdef\",\"cd\")="+find("abcdef","cd")+"\n")
+  x=print("find(\"abcdef\",\"cd\")="+find("abcdef","cd")+": ERROR\n")
+  isOK=false
 end
 
 if find("aaaaabaaa","aab")==3.0
-  x=print("find(\"aaaaabaaa\",\"aab\")=3.0 OK\n")
 else
-  x=print("find(\"aaaaabaaa\",\"aab\")="+find("aaaaabaaa","ab")+"\n")
+  x=print("find(\"aaaaabaaa\",\"aab\")="+find("aaaaabaaa","ab")+": ERROR\n")
+  isOK=false
 end
 
 if find("---abcde-abcdef-","abcdef")==9.0
-  x=print("find(\"---abcde-abcdef-\",\"abcdef\")=9.0 OK\n")
 else
-  x=print("find(\"---abcde-abcdef-\",\"abcdef\")="+find("---abcde-abcdef-","abcdef")+"\n")
+  x=print("find(\"---abcde-abcdef-\",\"abcdef\")="+find("---abcde-abcdef-","abcdef")+": ERROR\n")
+  isOK=false
 end
 
 if find("ababababababaabab","abababaab")==6.0
-  x=print("find(\"ababababababaabab\",\"abababaab\")=6.0 OK\n")
 else
-  x=print("find(\"ababababababaabab\",\"abababaab\")="+find("ababababababaabab","abababaab")+"\n")
+  x=print("find(\"ababababababaabab\",\"abababaab\")="+find("ababababababaabab","abababaab")+": ERROR\n")
+  isOK=false
 end
 
 if find("xxxxxxx","xa")==(-1.0)
-  x=print("find(\"xxxxxxx\",\"xa\")=-1.0 OK\n")
 else
-  x=print("find(\"xxxxxxx\",\"xa\")="+find("xxxxxxx","xa")+"\n")
+  x=print("find(\"xxxxxxx\",\"xa\")="+find("xxxxxxx","xa")+": ERROR\n")
+  isOK=false
 end
 
 if find("","xa")==(-1.0)
-  x=print("find(\"\",\"xa\")=-1.0 OK\n")
 else
-  x=print("find(\"\",\"xa\")="+find("","xa")+"\n")
+  x=print("find(\"\",\"xa\")="+find("","xa")+": ERROR\n")
+  isOK=false
 end
 
 if find("xxxxxxx","")==(0.0)
-  x=print("find(\"xxxxxxx\",\"\")=0.0 OK\n")
 else
-  x=print("find(\"xxxxxxx\",\"\")="+find("xxxxxxx","")+"\n")
+  x=print("find(\"xxxxxxx\",\"\")="+find("xxxxxxx","")+": ERROR\n")
+  isOK=false
 end
 
 if find("","")==(0.0)
-  x=print("find(\"\",\"\")=0.0 OK\n")
 else
-  x=print("find(\"\",\"\")="+find("","")+"\n")
+  x=print("find(\"\",\"\")="+find("","")+": ERROR\n")
+  isOK=false
 end
 
-x=print("\n")
-x=print("               LEN\n")
-x=print("***********************************\n")
-
+/*******/
+/* LEN */
+/*******/
 if len("test")==4.0
-  x=print("len(\"test\")=4.0 OK\n")
 else
-  x=print("len(\"test\")="+len("test")+"\n")
+  x=print("len(\"test\")="+len("test")+": ERROR\n")
+  isOK=false
 end
 
 if len("")==0.0
-  x=print("len(\"\")=0.0 OK\n")
 else
-  x=print("len(\"\")="+len("")+"\n")
+  x=print("len(\"\")="+len("")+": ERROR\n")
+  isOK=false
 end
 
 if len(false)==0.0
-  x=print("len(false)=0.0 OK\n")
 else
-  x=print("len(false)="+len(false)+"\n")
+  x=print("len(false)="+len(false)+": ERROR\n")
+  isOK=false
 end
 
-x=print("\n")
-x=print("             TYPEOF\n")
-x=print("***********************************\n")
-
+/**********/
+/* TYPEOF */
+/**********/
 a = typeOf("test")
 if a==8.0
-  x=print("typeof(string)=8.0 OK\n")
 else
-  x=print("typeof(string)="+typeof("test")+"\n")
+  x=print("typeof(string)="+typeof("test")+": ERROR\n")
+  isOK=false
 end
 
 //x = neexistujici("")
 
+if isOK
+  x=print("unitests/extern/bif.ifj: OK\n")
+else
+  x=print("unitests/extern/bif.ifj: ERROR\n")
+end

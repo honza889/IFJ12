@@ -1,9 +1,0 @@
-// Test chovani funkce numeric
-//x=print(numeric("42.0")) //=> 42 :)
-//x=print(numeric("ab42.0cc")) //=> chyba 12 :)
-//x=print(numeric("  42.0 c ")) //=> 42 :)
-//x=print(numeric("42.0cde")) //=> 42 :)
-//x=print(numeric(" 1.0 2.0 ")) //=> 1 :)
-//x=print(numeric("")) //=> chyba 12 :)
-//x=print(numeric("abc")) //=> chyba 12 :)
-
