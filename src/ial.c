@@ -21,8 +21,8 @@ Value find( ValueList data, int count )
 
     int i, j;
 
-    RCString a = getValueString( &data[0] );
-    RCString b = getValueString( &data[1] );
+    RCString a = getValueString( testValue(&data[0], typeString) );
+    RCString b = getValueString( testValue(&data[1], typeString) );
     int stringLength = RCStringLength( &a );    //delka retezce
     int patternLength = RCStringLength( &b );    //delka vzorku
 
@@ -159,23 +159,23 @@ char* mergesort(char *str, int len)
 // Obalovaci funkce kvuli konverzi z/na RCString
 Value sort(ValueList data, int count)
 {
-    RCString str = getValueString(&data[0]);
+    RCString str = getValueString(testValue(&data[0], typeString));
     if (str.length <= 1) {
       Value ret = newValueString(str);
       deleteRCString(&str);
       return ret;
     }
-    
+
     char *result = mergesort((char*)RCStringGetBuffer(&str), str.length);
     result = resizeArray(result, char, str.length + 1);
     result[str.length] = '\0';
     deleteRCString(&str);
-    
+
     RCString resultStr = makeRCString(result);
     free(result);
-    
+
     Value ret = newValueString(resultStr);
     deleteRCString(&resultStr);
-    
+
     return ret;
 }
