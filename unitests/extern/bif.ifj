@@ -23,6 +23,24 @@ else
   isOK=false
 end
 
+if sort("a")=="a"
+else
+  x=print("sort(\"a\")=\""+sort("a")+"\": ERROR\n")
+  isOK=false
+end
+
+if sort("1a1")=="11a"
+else
+  x=print("sort(\"1a1\")=\""+sort("1a1")+"\": ERROR\n")
+  isOK=false
+end
+
+if sort("bba")=="abb"
+else
+  x=print("sort(\"bba\")=\""+sort("bba")+"\": ERROR\n")
+  isOK=false
+end
+
 /********/
 /* FIND */
 /********/
@@ -67,6 +85,13 @@ else
   x=print("find(\"xxxxxxx\",\"\")="+find("xxxxxxx","")+": ERROR\n")
   isOK=false
 end
+
+if find("","")==(0.0)
+else
+  x=print("find(\"\",\"\")="+find("","")+": ERROR\n")
+  isOK=false
+end
+
 
 if find("/","/")==(0.0)
 else
