@@ -68,9 +68,39 @@ else
   isOK=false
 end
 
-if find("","")==(0.0)
+if find("/","/")==(0.0)
 else
-  x=print("find(\"\",\"\")="+find("","")+": ERROR\n")
+  x=print("find(\"/\",\"/\")="+find("/","/")+": ERROR\n")
+  isOK=false
+end
+
+if find("ababab","ab")==(0.0)
+else
+  x=print("find(\"ababab\",\"ab\")="+find("ababab","ab")+": ERROR\n")
+  isOK=false
+end
+
+if find("bab","ab")==(1.0)
+else
+  x=print("find(\"bab\",\"ab\")="+find("bab","ab")+": ERROR\n")
+  isOK=false
+end
+
+if find("bab","aba")==(-1.0)
+else
+  x=print("find(\"bab\",\"aba\")="+find("bab","aba")+": ERROR\n")
+  isOK=false
+end
+
+if find("","aba")==(-1.0)
+else
+  x=print("find(\"\",\"aba\")="+find("","aba")+": ERROR\n")
+  isOK=false
+end
+
+if find("aababb","abb")==(3.0)
+else
+  x=print("find(\"aababb\",\"abb\")="+find("aababb","abb")+": ERROR\n")
   isOK=false
 end
 

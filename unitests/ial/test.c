@@ -176,6 +176,63 @@ BEGIN_TEST
         printf("%s", "TEST ial.c - find cislo 19\n");
         printf("'Ocekavana hodnota = '-1'\nSkutecna hodnota = '%f'\n", ret.data.numeric);
     }
+
+    setValueCString( stringy, "cba" );
+    ret = sort( stringy, 1);
+    RCString rcs = getValueString( &ret);
+    STRTEST( rcs, "abc" );
+
+    setValueCString( stringy, "a" );
+    ret = sort( stringy, 1);
+     rcs = getValueString( &ret);
+    STRTEST( rcs, "a" );
+
+    setValueCString( stringy, "" );
+    ret = sort( stringy, 1);
+     rcs = getValueString( &ret);
+    STRTEST( rcs, "" );
+
+    setValueCString( stringy, "cc" );
+    ret = sort( stringy, 1);
+     rcs = getValueString( &ret);
+    STRTEST( rcs, "cc" );
+
+    setValueCString( stringy, "ab" );
+    ret = sort( stringy, 1);
+     rcs = getValueString( &ret);
+    STRTEST( rcs, "ab" );
+
+    setValueCString( stringy, "tgfr" );
+    ret = sort( stringy, 1);
+     rcs = getValueString( &ret);
+    STRTEST( rcs, "fgrt" );
+
+    setValueCString( stringy, "ababab" );
+    ret = sort( stringy, 1);
+     rcs = getValueString( &ret);
+    STRTEST( rcs, "aaabbb" );
+
+    setValueCString( stringy, "b " );
+    ret = sort( stringy, 1);
+     rcs = getValueString( &ret);
+    STRTEST( rcs, " b" );
+
+    setValueCString( stringy, "3241658790" );
+    ret = sort( stringy, 1);
+     rcs = getValueString( &ret);
+    STRTEST( rcs, "0123456789" );
+
+
+    setValueCString( stringy, "-1" );
+    ret = sort( stringy, 1);
+     rcs = getValueString( &ret);
+    STRTEST( rcs, "-1" );
+
+    setValueCString( stringy, "2 -1" );
+    ret = sort( stringy, 1);
+     rcs = getValueString( &ret);
+    STRTEST( rcs, " -12" );
+
     freeValue( stringy );
     freeValue( stringy+1 );
     freeValue( &ret );
