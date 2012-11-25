@@ -50,13 +50,27 @@ echo "=============="
 echo "= TESTY CHYB ="
 echo "=============="
 IFS=''; echo
+
 echo "Testy chovani funkce numeric:"
 got=$(unitests/extern/numeric.sh 2>&1 >/dev/null)
 if [ $? -eq 0 ]; then
   echo "unitests/extern/numeric.sh: OK"
+  echo
 else
   echo $got
   echo "---------------------------------"
   echo "unitests/extern/numeric.sh: ERROR"
+  echo; pause
 fi
-echo; pause
+
+echo 'Test navratovych hodnot:'
+got=$(unitests/extern/exceptions.sh 2>&1 >/dev/null)
+if [ $? -eq 0 ]; then
+  echo "unitests/extern/exceptions.sh: OK"
+  echo
+else
+  echo $got
+  echo "---------------------------------"
+  echo "unitests/extern/exceptions.sh: ERROR"
+  echo; pause
+fi
