@@ -119,4 +119,8 @@ void parseFunction( Scanner* s, SyntaxContext* ctx );
  */
 void syntaxErrorPrint(SyntaxErrorException e);
 
+int getFunctionId( SyntaxContext* ctx, RCString* name );
+
+void addExpressionToExpressionList( ExpressionList* el, Expression* expression );
+
 #endif

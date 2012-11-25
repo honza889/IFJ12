@@ -90,6 +90,7 @@ typedef enum {
     close, // >
     equal, // =
     blank, // -
+    func   // volani funkce
 } tableRel;
 
 typedef enum {
@@ -102,26 +103,30 @@ typedef enum {
     oId=16, oEOF=17
 } tableOp;
 
-/** Precedencni tabulka */ // TODO: dodelat tuto tabulku pro porovnavaci a logicke operatory!
+/** Precedencni tabulka */ // (majitele eee PC mne budou nenavidet)
 tableRel precTable[18][18] = {
              /*  +      -      *      /     **      (      )      <      >     <=     >=     !=     ==     and    or     not    id     EOF */
- /*    +  */ { close, close, open,  open,  open,  open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*    -  */ { close, close, open,  open,  open,  open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*    *  */ { close, close, close, close, open,  open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*    /  */ { close, close, close, close, open,  open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   **  */ { close, close, close, close, close, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*    +  */ { close, close, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    -  */ { close, close, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    *  */ { close, close, close, close, open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    /  */ { close, close, close, close, open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   **  */ { close, close, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+
  /*    (  */ { open,  open,  open,  open,  open,  open,  equal, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
  /*    )  */ { close, close, close, close, close, blank, close, close, close, close, close, close, close, close, close, close, blank, close },
- /*    <  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*    >  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   <=  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   >=  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   !=  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   ==  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*  and  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   or  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*  not  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   id  */ { close, close, close, close, close, blank, close, close, close, close, close, close, close, close, close, close, blank, close },
+
+ /*    <  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    >  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   <=  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   >=  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   !=  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   ==  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+
+ /*  and  */ { open,  open,  open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
+ /*   or  */ { open,  open,  open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
+ /*  not  */ { open,  open,  open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
+
+ /*   id  */ { close, close, close, close, close, func,  close, close, close, close, close, close, close, close, close, close, blank, close },
  /*  EOF  */ { open,  open,  open,  open,  open,  open,  blank, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
 };
 
@@ -169,6 +174,7 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
         printf("E->id\n"); // DEBUG
         E.type=VARIABLE;
         E.value.variable = getSymbol(itemFromStack(stack,1)->val.term.data.id,ctx->globalSymbols,ctx->localSymbols);
+        
         removeFromExpStack(stack,2);
         addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
         return true;
@@ -183,6 +189,7 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
         E.type=CONSTANT;
         Value val = itemFromStack(stack,1)->val.term.data.val;
         E.value.constant=copyValue(&val);
+        
         removeFromExpStack(stack,2);
         addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
         return true;
@@ -221,6 +228,7 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
         *Eright = itemFromStack(stack,1)->val.exp;
         E.value.operator.value.binary.left = Eleft;
         E.value.operator.value.binary.right = Eright;
+        
         removeFromExpStack(stack,4);
         addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
         return true;
@@ -245,6 +253,7 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
         Expression* Eoperand = new(Expression);
         *Eoperand = itemFromStack(stack,1)->val.exp;
         E.value.operator.value.unary.operand = Eoperand;
+        
         removeFromExpStack(stack,3);
         addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
         return true;
@@ -259,13 +268,40 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
     ){
         printf("E->(E)\n"); // DEBUG
         E = itemFromStack(stack,2)->val.exp;
+        
         removeFromExpStack(stack,4);
         addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
         return true;
     }
     
     printf("zadne pouzitelne pravidlo!\n"); // DEBUG
-    return false;
+    return false; // Nastala syntakticka chyba
+}
+
+/**
+ * Ze vstupu bylo precteno id( - nacte parametry a nahradi retezec
+ * tokenu volani funkce vyrazem Expression, ktery vrati na zasobnik
+ */
+bool replaceByFunctionCall( ExpStack* stack, Scanner* s, SyntaxContext* ctx ){
+    ERROR("Volani funkce neimplementovano!");
+/*
+    Expression E, subExp;
+    E.type = FUNCTION_CALL;
+    E.value.functionCall.function = getFunctionId( ctx, &itemFromStack(stack,1)->val.term.data.id );
+    E.value.functionCall.params = (ExpressionList){NULL,0};
+    consumeTok(s); // zkonzumovat '('
+    while(getTok(s).type!=tokRParen){
+        parseExpression(s,&subExp,ctx);
+        addExpressionToExpressionList(&E.value.functionCall.params,&subExp);
+        // musi nasledovat ',' nebo ')'
+        if(getTok(s).type!=tokComma && getTok(s).type!=tokRParen){
+            throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=getTok(s).line_num}));
+        }else if(getTok(s).type==tokComma){
+            consumeTok(s); // zkonzumovat ','
+        }
+    }
+*/
+    return false; // Nastala syntakticka chyba
 }
 
 /** Funkce zahajujici samotnou precedencni analyzu */
@@ -277,7 +313,7 @@ void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx ){
         a = operatorFromExpStack(&stack); // nejvrchnejsi terminal
         b = getTok(s); // terminal na vstupu
         
-        if(a.type==tokEndOfFile && (b.type==tokEndOfFile || b.type==tokEndOfLine)){
+        if(a.type==tokEndOfFile && (b.type==tokEndOfFile || b.type==tokEndOfLine || b.type==tokComma)){
             break;
         }
         
@@ -302,6 +338,12 @@ void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx ){
             case blank: // prazdne policko: chyba
                 printf("prazdne pole v tabulce! [%d,%d]\n",token2tableOp(a),token2tableOp(b)); // DEBUG
                 throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=b.line_num}));
+            break;
+            case func: // volani funkce (precteno id( )
+                printf("fce()\n");
+                if(!replaceByFunctionCall(&stack,s,ctx)){
+                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=b.line_num}));
+                }
             break;
         }
     }
