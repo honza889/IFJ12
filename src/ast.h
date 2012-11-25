@@ -240,5 +240,8 @@ static void inline deleteFunction( Function func ){
         free( func.value.userDefined.variableNames );
     }
 }
+
+void deleteExpression( Expression* expr );
+
 #endif
 

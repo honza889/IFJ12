@@ -159,7 +159,6 @@ tableOp token2tableOp(Token t){
 
 /** Zkusi nahradit konec zasobniku podle pravidel gramatiky */
 bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
-    ExpItem a,b,c;
     Expression E;
     
     // E -> id
@@ -167,11 +166,11 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
       (itemFromStack(stack,1)->type==term && itemFromStack(stack,1)->val.term.type==tokId) &&
       (itemFromStack(stack,2)->type==bracket)
     ){
+        printf("E->id\n"); // DEBUG
         E.type=VARIABLE;
         E.value.variable = getSymbol(itemFromStack(stack,1)->val.term.data.id,ctx->globalSymbols,ctx->localSymbols);
         removeFromExpStack(stack,2);
         addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
-        printf("E->id\n"); // DEBUG
         return true;
     }
     
@@ -180,26 +179,12 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
       (itemFromStack(stack,1)->type==term && itemFromStack(stack,1)->val.term.type==tokLiteral) &&
       (itemFromStack(stack,2)->type==bracket)
     ){
+        printf("E->lit\n"); // DEBUG
         E.type=CONSTANT;
         Value val = itemFromStack(stack,1)->val.term.data.val;
         E.value.constant=copyValue(&val);
         removeFromExpStack(stack,2);
         addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
-        printf("E->lit\n"); // DEBUG
-        return true;
-    }
-    
-    // E -> (E)
-    if(
-      (itemFromStack(stack,1)->type==term && itemFromStack(stack,1)->val.term.type==tokRParen) &&
-      (itemFromStack(stack,2)->type==exp) &&
-      (itemFromStack(stack,3)->type==term && itemFromStack(stack,3)->val.term.type==tokLParen) &&
-      (itemFromStack(stack,4)->type==bracket)
-    ){
-        E = itemFromStack(stack,2)->val.exp;
-        removeFromExpStack(stack,4);
-        addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
-        printf("E->(E)\n"); // DEBUG
         return true;
     }
     
@@ -210,9 +195,9 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
       (itemFromStack(stack,3)->type==exp) &&
       (itemFromStack(stack,4)->type==bracket)
     ){
+        printf("E->ExE\n"); // DEBUG
         E.type = OPERATOR;
         E.value.operator.type = BINARYOP;
-        
         switch(itemFromStack(stack,2)->val.term.data.op){
             case opPlus: E.value.operator.value.binary.type = ADD; break;
             case opMinus: E.value.operator.value.binary.type = SUBTRACT; break;
@@ -229,18 +214,53 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
             case opOR: E.value.operator.value.binary.type = OR; break;
             default: assert(false);
         }
-        
+        // operandy do nove alokovane pameti
         Expression* Eleft = new(Expression);
         Expression* Eright = new(Expression);
         *Eleft = itemFromStack(stack,3)->val.exp;
         *Eright = itemFromStack(stack,1)->val.exp;
         E.value.operator.value.binary.left = Eleft;
         E.value.operator.value.binary.right = Eright;
-        //E.value.operator.value.binary.left = &(itemFromStack(stack,3)->val.exp);
-        //E.value.operator.value.binary.right = &(itemFromStack(stack,1)->val.exp);
         removeFromExpStack(stack,4);
         addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
-        printf("E->ExE\n"); // DEBUG
+        return true;
+    }
+    
+    // E -> -E (a ostatni unarni operatory)
+    if(
+      (itemFromStack(stack,1)->type==exp) &&
+      (itemFromStack(stack,2)->type==term && itemFromStack(stack,2)->val.term.type==tokOp &&
+        (itemFromStack(stack,2)->val.term.data.op==opMinus || itemFromStack(stack,2)->val.term.data.op==opNOT)) &&
+      (itemFromStack(stack,3)->type==bracket)
+    ){
+        printf("E->-E\n"); // DEBUG
+        E.type = OPERATOR;
+        E.value.operator.type = UNARYOP;        
+        switch(itemFromStack(stack,2)->val.term.data.op){
+            case opMinus: E.value.operator.value.unary.type = MINUS; break;
+            case opNOT: E.value.operator.value.unary.type = NOT; break;
+            default: assert(false);
+        }
+        // operand do nove alokovane pameti
+        Expression* Eoperand = new(Expression);
+        *Eoperand = itemFromStack(stack,1)->val.exp;
+        E.value.operator.value.unary.operand = Eoperand;
+        removeFromExpStack(stack,3);
+        addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
+        return true;
+    }
+    
+    // E -> (E)
+    if(
+      (itemFromStack(stack,1)->type==term && itemFromStack(stack,1)->val.term.type==tokRParen) &&
+      (itemFromStack(stack,2)->type==exp) &&
+      (itemFromStack(stack,3)->type==term && itemFromStack(stack,3)->val.term.type==tokLParen) &&
+      (itemFromStack(stack,4)->type==bracket)
+    ){
+        printf("E->(E)\n"); // DEBUG
+        E = itemFromStack(stack,2)->val.exp;
+        removeFromExpStack(stack,4);
+        addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
         return true;
     }
     

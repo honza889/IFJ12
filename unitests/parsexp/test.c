@@ -21,6 +21,8 @@ BEGIN_TEST
   Expression result;
   try{
     parseExpression( &s, &result, &ctx );
+    
+    deleteExpression( &result );
   }
   catch{
     on(ScannerError, e){
