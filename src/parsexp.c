@@ -102,25 +102,25 @@ typedef enum {
     oId=16, oEOF=17
 } tableOp;
 
-/** Precedencni tabulka */
+/** Precedencni tabulka */ // TODO: dodelat tuto tabulku pro porovnavaci a logicke operatory!
 tableRel precTable[18][18] = {
              /*  +      -      *      /     **      (      )      <      >     <=     >=     !=     ==     and    or     not    id     EOF */
- /*    +  */ { close, close, open,  blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*    -  */ { close, close, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*    *  */ { close, blank, close, close, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*    /  */ { blank, blank, close, close, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   **  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*    (  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  blank },
- /*    )  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, close },
- /*    <  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*    >  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   <=  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   >=  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   !=  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   ==  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*  and  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*   or  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
- /*  not  */ { blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*    +  */ { close, close, open,  open,  open,  open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*    -  */ { close, close, open,  open,  open,  open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*    *  */ { close, close, close, close, open,  open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*    /  */ { close, close, close, close, open,  open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*   **  */ { close, close, close, close, close, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*    (  */ { open,  open,  open,  open,  open,  open,  equal, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
+ /*    )  */ { close, close, close, close, close, blank, close, close, close, close, close, close, close, close, close, close, blank, close },
+ /*    <  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*    >  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*   <=  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*   >=  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*   !=  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*   ==  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*  and  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*   or  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
+ /*  not  */ { blank, blank, blank, blank, blank, open,  close, blank, blank, blank, blank, blank, blank, blank, blank, blank, open,  close },
  /*   id  */ { close, close, close, close, close, blank, close, close, close, close, close, close, close, close, close, close, blank, close },
  /*  EOF  */ { open,  open,  open,  open,  open,  open,  blank, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
 };
@@ -189,21 +189,58 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
         return true;
     }
     
-    // E -> E + E
+    // E -> (E)
+    if(
+      (itemFromStack(stack,1)->type==term && itemFromStack(stack,1)->val.term.type==tokRParen) &&
+      (itemFromStack(stack,2)->type==exp) &&
+      (itemFromStack(stack,3)->type==term && itemFromStack(stack,3)->val.term.type==tokLParen) &&
+      (itemFromStack(stack,4)->type==bracket)
+    ){
+        E = itemFromStack(stack,2)->val.exp;
+        removeFromExpStack(stack,4);
+        addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
+        printf("E->(E)\n"); // DEBUG
+        return true;
+    }
+    
+    // E -> E + E (a vsechny ostatni binarni operatory)
     if(
       (itemFromStack(stack,1)->type==exp) &&
-      (itemFromStack(stack,2)->type==term && itemFromStack(stack,2)->val.term.type==tokOp && itemFromStack(stack,2)->val.term.data.op==opPlus) &&
+      (itemFromStack(stack,2)->type==term && itemFromStack(stack,2)->val.term.type==tokOp && itemFromStack(stack,2)->val.term.data.op!=opNOT) &&
       (itemFromStack(stack,3)->type==exp) &&
       (itemFromStack(stack,4)->type==bracket)
     ){
         E.type = OPERATOR;
         E.value.operator.type = BINARYOP;
-        E.value.operator.value.binary.type = ADD;
-        E.value.operator.value.binary.left = &(itemFromStack(stack,3)->val.exp);
-        E.value.operator.value.binary.right = &(itemFromStack(stack,1)->val.exp);
+        
+        switch(itemFromStack(stack,2)->val.term.data.op){
+            case opPlus: E.value.operator.value.binary.type = ADD; break;
+            case opMinus: E.value.operator.value.binary.type = SUBTRACT; break;
+            case opMultiple: E.value.operator.value.binary.type = MULTIPLY; break;
+            case opDivide: E.value.operator.value.binary.type = DIVIDE; break;
+            case opPower: E.value.operator.value.binary.type = POWER; break;
+            case opLT: E.value.operator.value.binary.type = LESS; break;
+            case opGT: E.value.operator.value.binary.type = GREATER; break;
+            case opLE: E.value.operator.value.binary.type = LEQUAL; break;
+            case opGE: E.value.operator.value.binary.type = GEQUAL; break;
+            case opNE: E.value.operator.value.binary.type = NOTEQUALS; break;
+            case opEQ: E.value.operator.value.binary.type = EQUALS; break;
+            case opAND: E.value.operator.value.binary.type = AND; break;
+            case opOR: E.value.operator.value.binary.type = OR; break;
+            default: assert(false);
+        }
+        
+        Expression* Eleft = new(Expression);
+        Expression* Eright = new(Expression);
+        *Eleft = itemFromStack(stack,3)->val.exp;
+        *Eright = itemFromStack(stack,1)->val.exp;
+        E.value.operator.value.binary.left = Eleft;
+        E.value.operator.value.binary.right = Eright;
+        //E.value.operator.value.binary.left = &(itemFromStack(stack,3)->val.exp);
+        //E.value.operator.value.binary.right = &(itemFromStack(stack,1)->val.exp);
         removeFromExpStack(stack,4);
         addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
-        printf("E->E+E\n"); // DEBUG
+        printf("E->ExE\n"); // DEBUG
         return true;
     }
     
@@ -243,7 +280,7 @@ void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx ){
                 }
             break;
             case blank: // prazdne policko: chyba
-                printf("prazdne pole v tabulce!\n"); // DEBUG
+                printf("prazdne pole v tabulce! [%d,%d]\n",token2tableOp(a),token2tableOp(b)); // DEBUG
                 throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=b.line_num}));
             break;
         }
