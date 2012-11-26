@@ -157,6 +157,7 @@ tableOp token2tableOp(Token t){
     switch(t.type){
         case tokEndOfFile: return oEOF; break;
         case tokEndOfLine: return oEOF; break;
+        case tokComma: return oEOF; break;
         case tokId: return oId; break;
         case tokLiteral: return oId; break;
         case tokLParen: return oLParen; break;
@@ -180,6 +181,7 @@ tableOp token2tableOp(Token t){
             }
         break;
         default:
+            printf("nelze pretypovat token typu %x\n",t.type);
             throw(SyntaxError,((SyntaxErrorException){.type=BadTokenInExpression, .line_num=t.line_num}));
     }
     return oEOF; // jen pro kompilator nechapajici vyjimky
@@ -194,7 +196,7 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
       (itemFromStack(stack,1)->type==term && itemFromStack(stack,1)->val.term.type==tokId) &&
       (itemFromStack(stack,2)->type==bracket)
     ){
-        printf("E->id\n"); // DEBUG
+        //printf("E->id\n"); // DEBUG
         E.type=VARIABLE;
         E.value.variable = getSymbol(itemFromStack(stack,1)->val.term.data.id,ctx->globalSymbols,ctx->localSymbols);
         
@@ -208,9 +210,12 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
       (itemFromStack(stack,1)->type==term && itemFromStack(stack,1)->val.term.type==tokLiteral) &&
       (itemFromStack(stack,2)->type==bracket)
     ){
-        printf("E->lit\n"); // DEBUG
+        //printf("E->lit\n"); // DEBUG
         E.type=CONSTANT;
         Value val = itemFromStack(stack,1)->val.term.data.val;
+        printf("test: ");
+        RCStringPrint(&val.data.string,stdout);
+        printf("\n");
         E.value.constant=copyValue(&val);
         
         removeFromExpStack(stack,2);
@@ -225,7 +230,7 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
       (itemFromStack(stack,3)->type==exp) &&
       (itemFromStack(stack,4)->type==bracket)
     ){
-        printf("E->ExE\n"); // DEBUG
+        //printf("E->ExE\n"); // DEBUG
         E.type = OPERATOR;
         E.value.operator.type = BINARYOP;
         switch(itemFromStack(stack,2)->val.term.data.op){
@@ -264,7 +269,7 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
         (itemFromStack(stack,2)->val.term.data.op==opMinus || itemFromStack(stack,2)->val.term.data.op==opNOT)) &&
       (itemFromStack(stack,3)->type==bracket)
     ){
-        printf("E->-E\n"); // DEBUG
+        //printf("E->-E\n"); // DEBUG
         E.type = OPERATOR;
         E.value.operator.type = UNARYOP;        
         switch(itemFromStack(stack,2)->val.term.data.op){
@@ -289,7 +294,7 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
       (itemFromStack(stack,3)->type==term && itemFromStack(stack,3)->val.term.type==tokLParen) &&
       (itemFromStack(stack,4)->type==bracket)
     ){
-        printf("E->(E)\n"); // DEBUG
+        //printf("E->(E)\n"); // DEBUG
         E = itemFromStack(stack,2)->val.exp;
         
         removeFromExpStack(stack,4);
@@ -316,19 +321,20 @@ bool replaceByFunctionCall( ExpStack* stack, Scanner* s, SyntaxContext* ctx ){
         parseExpression(s,&subExp,ctx);
         addExpressionToExpressionList(&E.value.functionCall.params,&subExp);
         // musi nasledovat ',' nebo ')'
-        expectTok( s, tokComma | tokRParen );
-        consumeTok(s); // zkonzumovat ','
+        testTok( s, tokComma | tokRParen );
+		  if( getTok( s ).type == tokComma ){
+            consumeTok(s); // konzumace ','
+        }
     }
-    
+    consumeTok(s); // konzumace ')'
     ExpItem ei = {
         .type = exp,
         .val.exp = E
     };
-    
     removeFromExpStack( stack, 1 );
     addToExpStack( stack, ei );
 
-    return false; // Nastala syntakticka chyba
+    return true;
 }
 
 /** Funkce zahajujici samotnou precedencni analyzu */
@@ -340,24 +346,24 @@ void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx ){
         a = operatorFromExpStack(&stack); // nejvrchnejsi terminal
         b = getTok(s); // terminal na vstupu
         
-        if(a.type==tokEndOfFile && (b.type==tokEndOfFile || b.type==tokEndOfLine || b.type==tokComma)){
+        if((b.type==tokEndOfFile || b.type==tokEndOfLine || b.type==tokComma || b.type==tokRParen) && a.type==tokEndOfFile){
             break;
         }
         
         switch(precTable[token2tableOp(a)][token2tableOp(b)]){
             case equal: // =
-                printf("=\n");
+                //printf("=\n");
                 addToExpStack(&stack, (ExpItem){.type=term, .val.term=b}); // push(b)
                 consumeTok(s); // precti dalsi symbol ze vstupu
             break;
             case open: // <
-                printf("<\n");
+                //printf("<\n");
                 addToAfterTermExpStack(&stack, (ExpItem){.type=bracket}); // vlozit < za a
                 addToExpStack(&stack, (ExpItem){.type=term, .val.term=b}); // push(b)
                 consumeTok(s); // precti dalsi symbol ze vstupu
             break;
             case close: // >
-                printf(">\n");
+                //printf(">\n");
                 if(!tryUseRules(&stack,ctx)){
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=b.line_num}));
                 }
@@ -367,7 +373,7 @@ void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx ){
                 throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=b.line_num}));
             break;
             case func: // volani funkce (precteno id( )
-                printf("fce()\n");
+                //printf("func\n");
                 if(!replaceByFunctionCall(&stack,s,ctx)){
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=b.line_num}));
                 }
@@ -379,6 +385,5 @@ void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx ){
     assert(ret->type==exp);
     *expr=ret->val.exp;
     freeExpStack(&stack);
-
 }
 
