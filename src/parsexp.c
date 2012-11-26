@@ -63,6 +63,10 @@ void addToExpStack(ExpStack* stack, ExpItem item){
     stack->array[stack->count] = item;
     if(item.type==term){
         stack->termIndex = stack->count;
+        if( item.val.term.type == tokId )
+        {
+            stack->array[stack->count].val.term.data.id = copyRCString( &item.val.term.data.id );
+        }
     }
     stack->count++;
 }
