@@ -19,6 +19,7 @@
 #include "symbols.h"
 #include "bif.h"
 #include "ial.h"
+#include "parsexp.h"
 
 void addFunctionToContext( SyntaxContext* ctx, RCString* name, Function* function );
 void addStatementToStatementList( StatementList* sl, Statement* statement );
@@ -413,6 +414,7 @@ bool compareOperators(Operator op1, Operator op2){
     return ( (op1.value.binary.type & 0xF0) >= (op2.value.binary.type & 0xF0) );
 }
 
+/*
 void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ctx )
 {
     // Porad mam dojem, ze tohle lze napsat lepe, ale co se da delat... --Biba
@@ -644,7 +646,7 @@ void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ct
         prevExp = newExp;
         consumeTok(s);
     } // endwhile
-}
+}*/
 
 void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx )
 {

@@ -13,6 +13,25 @@
 #include "syntax.h"
 #include "alloc.h"
 
+typedef struct{
+    enum {
+        exp,     // E
+        bracket, // <
+        term     // $ + - id...
+    } type;
+    union {
+        Expression exp;
+        Token term;
+    } val;
+} ExpItem;
+
+typedef struct{
+    ExpItem* array; // ukazatel na pole polozek zasobniku (zacatek, nikoli vrchol!)
+    int count; // pocet polozek na zasobniku
+    int allocated; // alokovana delka pole polozek (>=count)
+    int termIndex; // index nejvrcholovejsiho terminalu (primy index do array)
+} ExpStack;
+
 /** Inicializace noveho zasobniku pro precedencni analyzu s EOF na vrcholu */
 ExpStack newExpStack(){
     ExpItem* array = newArray( ExpItem, 8 );
@@ -283,8 +302,7 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
  * tokenu volani funkce vyrazem Expression, ktery vrati na zasobnik
  */
 bool replaceByFunctionCall( ExpStack* stack, Scanner* s, SyntaxContext* ctx ){
-    ERROR("Volani funkce neimplementovano!");
-/*
+
     Expression E, subExp;
     E.type = FUNCTION_CALL;
     E.value.functionCall.function = getFunctionId( ctx, &itemFromStack(stack,1)->val.term.data.id );
@@ -294,13 +312,10 @@ bool replaceByFunctionCall( ExpStack* stack, Scanner* s, SyntaxContext* ctx ){
         parseExpression(s,&subExp,ctx);
         addExpressionToExpressionList(&E.value.functionCall.params,&subExp);
         // musi nasledovat ',' nebo ')'
-        if(getTok(s).type!=tokComma && getTok(s).type!=tokRParen){
-            throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=getTok(s).line_num}));
-        }else if(getTok(s).type==tokComma){
-            consumeTok(s); // zkonzumovat ','
-        }
+        expectTok( s, tokComma | tokRParen );
+        consumeTok(s); // zkonzumovat ','
     }
-*/
+
     return false; // Nastala syntakticka chyba
 }
 

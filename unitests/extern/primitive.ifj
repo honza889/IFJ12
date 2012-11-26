@@ -1,0 +1,4 @@
+// primitivní test, nic moc netestuje
+
+A = 5.0
+B = A + 1.337

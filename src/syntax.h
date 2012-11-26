@@ -62,7 +62,7 @@ void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx );
  * Parsuje pomocí scanneru \a s v kontextu \a ctx libovolný výraz.
  * Ten poté uloží do \a expr
  */
-void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx );
+//void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx );
 
 /**
  * Parsuje pomocí scanneru \a s v kontextu \a ctx celou smyčku while. 
