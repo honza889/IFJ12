@@ -492,8 +492,14 @@ Value multiplyValue( Value* a, Value* b )
     {
         return newValueNumeric( getValueNumeric( a ) * getValueNumeric( b ) );
     }
-    else if( a->type == typeString && b->type == typeNumeric )
+    else if( ( a->type == typeString && b->type == typeNumeric ) || ( a->type == typeNumeric && b->type == typeString ) )
     {
+        if( a->type == typeNumeric )
+        {
+            Value* tmp = a;
+            a = b;
+            b = tmp;
+        }
         RCString result = makeEmptyRCString();
         RCString addedStr = getValueString( a );
         int howMany = (int)getValueNumeric( b );
