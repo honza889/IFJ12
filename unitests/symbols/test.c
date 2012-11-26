@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include "value.h"
-#include "symbols.h"
+#include "ial.h"
 #include "../test.h"
 
 BEGIN_TEST

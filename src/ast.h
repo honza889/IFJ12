@@ -12,8 +12,8 @@
 #define AST_H
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include "rcstring.h"
-#include "symbols.h"
 
 typedef struct SValue Value;
 typedef struct SFunction Function;

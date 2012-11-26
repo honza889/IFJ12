@@ -12,7 +12,7 @@
 
 #include <stdbool.h>
 #include "global.h"
-#include "symbols.h"
+#include "ial.h"
 #include "value.h"
 
 typedef struct

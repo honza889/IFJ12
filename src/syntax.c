@@ -16,7 +16,6 @@
 #include "scanner.h"
 #include "ast.h"
 #include "alloc.h"
-#include "symbols.h"
 #include "bif.h"
 #include "ial.h"
 #include "parsexp.h"

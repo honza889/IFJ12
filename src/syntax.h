@@ -17,6 +17,7 @@
 
 #include "scanner.h"
 #include "ast.h"
+#include "ial.h"
 
 /**
  * Kontext pro syntaktický analyzátor.
