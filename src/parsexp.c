@@ -56,22 +56,30 @@ void freeExpStack(ExpStack* stack){
 
 /** Prida polozku do vrcholu zasobniku */
 void addToExpStack(ExpStack* stack, ExpItem item){
+    // zvetseni zasobniku, neni-li dostatecne velky
     if(stack->count==stack->allocated){
         stack->allocated += 8;
         stack->array = resizeArray( stack->array, ExpItem, stack->allocated );
     }
+    // pridani polozky
     stack->array[stack->count] = item;
     if(item.type==term){
-        stack->termIndex = stack->count;
+        stack->termIndex = stack->count; // nyni je nevrcholovejsim terminalem
+        
+        // kopirovani hodnot pro potreby pozdejsiho uvolnovani pameti
         if( item.val.term.type == tokId )
         {
             stack->array[stack->count].val.term.data.id = copyRCString( &item.val.term.data.id );
         }
+        if( item.val.term.type == tokLiteral )
+        {
+            stack->array[stack->count].val.term.data.val = copyValue( &item.val.term.data.val );
+        }
     }
-    stack->count++;
+    stack->count++; // zvyseni poctu polozek
 }
 
-/** Prida polozku do zasobniku za nejvrchnejsi terminal */
+/** Prida polozku do zasobniku za nejvrchnejsi terminal (jen pro zavorky, bez uvolnovani!) */
 void addToAfterTermExpStack(ExpStack* stack, ExpItem item){
     if(stack->count==stack->allocated){
         stack->allocated += 8;
@@ -84,20 +92,35 @@ void addToAfterTermExpStack(ExpStack* stack, ExpItem item){
     if(item.type==term){
         stack->termIndex = stack->termIndex+1;
     }
-    stack->count++;
+    stack->count++; // zvyseni poctu polozek
 }
 
 /** Odstrani ze zasobniku \a i polozek (EOF se odstranit nesmi!) */
 void removeFromExpStack(ExpStack* stack, int i){
     assert( i >= 1 && i <= stack->count );
+    
+    // uvolneni odstranovanych prvku
+    for( int ii = stack->count - i - 1 ; ii < stack->count ; ii++ )
+    {
+        if( stack->array[ii].val.term.type == tokId )
+        {
+            //deleteRCString( &stack->array[i].val.term.data.id ); // TODO: uvolnovani
+        }
+        if( stack->array[ii].val.term.type == tokLiteral )
+        {
+            freeValue( &stack->array[i].val.term.data.val );
+        }
+    }
+    // snizeni poctu prvku
     stack->count -= i;
     
+    // nalezeni noveho nejvrcholovejsiho terminalu
     for( i=stack->count-1; stack->array[i].type!=term; i-- );
     stack->termIndex = i;
 }
 
 /** Vrati \a i-ty prvek ze zasobniku (pocitano od vrcholu, 1=vrchol) */
-ExpItem* itemFromStack(ExpStack* stack, int i){
+static inline ExpItem* itemFromStack(ExpStack* stack, int i){
     assert( i >= 1 && i <= stack->count );
     return &(stack->array[ stack->count - i ]);
 }
@@ -213,9 +236,6 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
         //printf("E->lit\n"); // DEBUG
         E.type=CONSTANT;
         Value val = itemFromStack(stack,1)->val.term.data.val;
-        printf("test: ");
-        RCStringPrint(&val.data.string,stdout);
-        printf("\n");
         E.value.constant=copyValue(&val);
         
         removeFromExpStack(stack,2);

@@ -1,3 +1,7 @@
 // primitivní test, nic moc netestuje
 
-h = print( 5.0 )
+a = 1.0 + 8.0
+b = a + 4.0
+c = "ABC"
+h = print( b, "\n" )
+
