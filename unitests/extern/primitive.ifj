@@ -1,4 +1,3 @@
 // primitivní test, nic moc netestuje
 
-A = 5.0
-B = A + 1.337
+h = print( 5.0 )

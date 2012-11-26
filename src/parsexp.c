@@ -319,6 +319,14 @@ bool replaceByFunctionCall( ExpStack* stack, Scanner* s, SyntaxContext* ctx ){
         expectTok( s, tokComma | tokRParen );
         consumeTok(s); // zkonzumovat ','
     }
+    
+    ExpItem ei = {
+        .type = exp,
+        .val.exp = E
+    };
+    
+    removeFromExpStack( stack, 1 );
+    addToExpStack( stack, ei );
 
     return false; // Nastala syntakticka chyba
 }
