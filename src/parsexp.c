@@ -102,13 +102,16 @@ void removeFromExpStack(ExpStack* stack, int i){
     // uvolneni odstranovanych prvku
     for( int ii = stack->count - i - 1 ; ii < stack->count ; ii++ )
     {
-        if( stack->array[ii].val.term.type == tokId )
+        if(stack->array[ii].type==term)
         {
-            //deleteRCString( &stack->array[i].val.term.data.id ); // TODO: uvolnovani
-        }
-        if( stack->array[ii].val.term.type == tokLiteral )
-        {
-            freeValue( &stack->array[i].val.term.data.val );
+            if( stack->array[ii].val.term.type == tokId )
+            {
+                //deleteRCString( &stack->array[i].val.term.data.id ); // TODO: uvolnovani
+            }
+            if( stack->array[ii].val.term.type == tokLiteral )
+            {
+                //freeValue( &stack->array[i].val.term.data.val ); // TODO: uvolnovani
+            }
         }
     }
     // snizeni poctu prvku
@@ -238,6 +241,18 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
         Value val = itemFromStack(stack,1)->val.term.data.val;
         E.value.constant=copyValue(&val);
         
+        removeFromExpStack(stack,2);
+        addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
+        return true;
+    }
+    
+    // E -> E
+    if(
+      (itemFromStack(stack,1)->type==exp) &&
+      (itemFromStack(stack,2)->type==bracket)
+    ){
+        //printf("E->E\n"); // DEBUG
+        E = itemFromStack(stack,1)->val.exp;
         removeFromExpStack(stack,2);
         addToExpStack(stack, (ExpItem){ .type=exp, .val.exp=E } );
         return true;
