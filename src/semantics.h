@@ -22,6 +22,7 @@
 #include "exceptions.h"
 
 //NECO
+void validateFunction( Function* f );
 
 
 #endif

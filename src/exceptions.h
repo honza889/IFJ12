@@ -37,6 +37,8 @@ typedef enum
     InvalidConversion,		// exit 12 (chyba pretypovani na cislo)
     BadArgumentType,		// exit 11 (behova chyba nekompatibility typu)
     VariableOverridesFunction,
+    InvalidAssignment, // neplatne prirazeni (napr. do globalni promenne)
+    InvalidExpression, // naplatny vyraz (napr. cteni globalni promenne)
     
     IndexOutOfBounds, // exit 13
     OutOfMemory, // exit 99 (chyba alokace pameti)
@@ -104,6 +106,8 @@ typedef int IndexOutOfBoundsException;
 typedef const char* OutOfMemoryException;
 typedef RCString MultipleFunctionDefinitionsException;
 typedef RCString VariableOverridesFunctionException; // nazev funkce/promenne
+typedef int InvalidAssignmentException; // index promenne, do ktere se prirazuje
+typedef int InvalidExpressionException; // nevim, co ten int znamena
 
 #define EXCEPTION( name ) name##Exception name##ExceptionValue
 
@@ -130,6 +134,8 @@ typedef struct
         EXCEPTION( OutOfMemory );
         EXCEPTION( MultipleFunctionDefinitions );
         EXCEPTION( VariableOverridesFunction );
+        EXCEPTION( InvalidAssignment );
+        EXCEPTION( InvalidExpression );
     } value;
 } Exception;
 

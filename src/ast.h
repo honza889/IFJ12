@@ -17,7 +17,7 @@
 
 typedef struct SValue Value;
 typedef struct SFunction Function;
-typedef int Variable;
+typedef int Variable; /// index do pole proměnných podle symbols.h
 typedef Value Constant;
 typedef struct SBinaryOp BinaryOp;
 typedef struct SUnaryOp UnaryOp;
@@ -83,7 +83,7 @@ struct SFunction
         struct{
             StatementList statements;
             RCString* variableNames;
-            int variableCount;
+            int variableCount; // kolik promennych funkce pouziva, vcetne parametru
         } userDefined;
         BuiltinFunction builtin;
     } value;
@@ -107,7 +107,8 @@ struct SBinaryOp
     SUBTRACT=0x32,
     MULTIPLY=0x41,
     DIVIDE=0x42,
-    POWER=0x51
+    POWER=0x51,
+    SBINARYOP_TYPE_MAXVALUE // nepouzivat jako operator! slouzi pro definici poli
   } type;
   
   Expression* left;
@@ -168,7 +169,8 @@ struct SExpression
   Expression *parent;
 };
 
-struct SAssignment
+/// Popisuje přiřazení z výrazu \a source do proměnné \a destination
+struct SAssignment 
 {
   Variable destination;
   Expression source;
