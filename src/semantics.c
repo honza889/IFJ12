@@ -188,7 +188,12 @@ SemanticType validateBinaryOp( BinaryOp* op, SemCtx* ctx )
     SemanticBinaryOperator opType = astOperatorConvTable[op->type];
     SemanticType leftType = validateExpression( op->left, ctx );
     SemanticType rightType = validateExpression( op->right, ctx );
-    return getTypeOfBinaryOperator( opType, leftType, rightType );
+    SemanticType resType = getTypeOfBinaryOperator( opType, leftType, rightType );
+    if( resType == 0 )
+    {
+        // Vysledek operace neni definovany, hodime chybu
+        throw( InvalidExpression, 0 ); 
+    }
 }
 
 void validateIf( Condition* cond, SemCtx* ctx )
