@@ -440,9 +440,7 @@ Value addValue( Value* a, Value* b )
     {
         return newValueNumeric( getValueNumeric( a ) + getValueNumeric( b ) );
     }
-    else if( ( a->type == typeString && b->type == typeString ) ||
-             ( a->type == typeNumeric && b->type == typeString ) ||
-             ( a->type == typeString && b->type == typeNumeric ) )
+    else if( a->type == typeString && b->type != typeUndefined )
     {
         RCString as = getValueString( a );
         RCString bs = getValueString( b );
@@ -492,14 +490,8 @@ Value multiplyValue( Value* a, Value* b )
     {
         return newValueNumeric( getValueNumeric( a ) * getValueNumeric( b ) );
     }
-    else if( ( a->type == typeString && b->type == typeNumeric ) || ( a->type == typeNumeric && b->type == typeString ) )
+    else if( a->type == typeString && b->type == typeNumeric )
     {
-        if( a->type == typeNumeric )
-        {
-            Value* tmp = a;
-            a = b;
-            b = tmp;
-        }
         RCString result = makeEmptyRCString();
         RCString addedStr = getValueString( a );
         int howMany = (int)getValueNumeric( b );
