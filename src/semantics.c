@@ -35,6 +35,16 @@ typedef enum
     BINARYOP_MAXVALUE
 } SemanticBinaryOperator;
 
+/// Popisuje mod semanticke validace kodu
+typedef enum
+{
+    /// Analyzator se pokusi udrzovat si typy promennych
+    FULL_VALIDATION,
+    /// Analyzator bude kontrolovat pouze operace nad konstantami
+    /// Vhodne napr. pro smycky
+    PERMISSIVE_VALIDATION
+} ValidationMode;
+
 const SemanticBinaryOperator astOperatorConvTable[SBINARYOP_TYPE_MAXVALUE] = {
     [AND]=BINARYOP_AND,
     [OR]=BINARYOP_OR,
@@ -66,6 +76,7 @@ typedef struct
 {
     SemanticType* types;
     int varCount;
+    ValidationMode mode;
 } SemCtx;
 
 void validateFunction( Function* f )
@@ -73,7 +84,7 @@ void validateFunction( Function* f )
     if( f->type == USER_DEFINED )
     {
         SemanticType types[ f->value.userDefined.variableCount ];
-        SemCtx ctx = { types, f->value.userDefined.variableCount };
+        SemCtx ctx = { types, f->value.userDefined.variableCount, FULL_VALIDATION };
         for( int i = 0; ....do paramCount )
         {
             ctx->types[i] = TYPE_ALL;
@@ -107,7 +118,16 @@ void validateAssignment( Assignment* assgn, SemCtx* ctx )
     }
     else
     {
-        ctx->types[ assgn->destination ] = validateExpression( assgn->source, ctx );
+        if( ctx->mode == FULL_VALIDATION )
+        {
+            ctx->types[ assgn->destination ] = validateExpression( assgn->source, ctx );
+        }
+        else
+        {
+            // Pri volnejsi validaci nastavime vsechny pouzite promenne
+            // na "cokoliv". To je opet vhodne pro smycky
+            ctx->types[ assgn->destination ] = TYPE_ALL;
+        }
     }
 }
 
@@ -128,7 +148,14 @@ SemanticType validateVariable( Variable* var, SemCtx* ctx )
         throw( InvalidExpression, 0 );
     }
     
-    return ctx->types[ *var ];
+    if( ctx->mode == FULL_VALIDATION )
+    {
+        return ctx->types[ *var ];
+    }
+    else
+    {
+        return TYPE_ALL;
+    }
 }
 
 SemanticType validateOperator( Operator* op, SemCtx* ctx )
@@ -140,12 +167,28 @@ SemanticType validateOperator( Operator* op, SemCtx* ctx )
     }
 }
 
+SemanticType getTypeOfBinaryOperator( SemanticBinaryOperator op, SemanticType l, SemanticType r )
+{
+    SemanticType res = 0;
+    for( int i = 0; i < 4; i++ )
+    {
+        for( int j = 0; j < 4; j++ )
+        {
+            if( ( ( 1 << i ) & l ) && ( ( 1 << j ) & r ) )
+            {
+                res |= binaryOperatorTypeTable[op][i][j];
+            }
+        }
+    }
+    return res;
+}
+
 SemanticType validateBinaryOp( BinaryOp* op, SemCtx* ctx )
 {
     SemanticBinaryOperator opType = astOperatorConvTable[op->type];
-    SemCtx leftType = validateExpression( op->left, ctx );
-    SemCtx rightType = validateExpression( op->right, ctx );
-    return binaryOperatorTypeTable[opType][leftType][rightType];
+    SemanticType leftType = validateExpression( op->left, ctx );
+    SemanticType rightType = validateExpression( op->right, ctx );
+    return getTypeOfBinaryOperator( opType, leftType, rightType );
 }
 
 void validateIf( Condition* cond, SemCtx* ctx )
@@ -155,8 +198,8 @@ void validateIf( Condition* cond, SemCtx* ctx )
     memcpy( typesIf, ctx->types, ctx->varCount * sizeof( SemanticType ) );
     memcpy( typesElse, ctx->types, ctx->varCount * sizeof( SemanticType ) );
     
-    SemCtx ctxIf = { typesIf, ctx->varCount };
-    SemCtx ctxElse = { typesElse, ctx->varCount };
+    SemCtx ctxIf = { typesIf, ctx->varCount, ctx->mode };
+    SemCtx ctxElse = { typesElse, ctx->varCount, ctx->mode };
     
     for( int i = 0; i < f->ifTrue.count; i++ )
     {
