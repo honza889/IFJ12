@@ -8,95 +8,34 @@
  * @author Tretter Zdeněk <xtrett00@stud.fit.vutbr.cz>
  */
 
-typedef enum 
-{
-    TYPE_NIL = 0x1,
-    TYPE_BOOLEAN = 0x2,
-    TYPE_NUMERIC = 0x4,
-    TYPE_STRING = 0x8,
-    TYPE_ALL = 0xF
-} SemanticType;
-
-typedef enum
-{
-    BINARYOP_AND,
-    BINARYOP_OR,
-    BINARYOP_EQUALS,
-    BINARYOP_NOTEQUALS,
-    BINARYOP_LESS,
-    BINARYOP_GREATER,
-    BINARYOP_LEQUAL,
-    BINARYOP_GEQUAL,
-    BINARYOP_ADD,
-    BINARYOP_SUBTRACT,
-    BINARYOP_MULTIPLY,
-    BINARYOP_DIVIDE,
-    BINARYOP_POWER,
-    BINARYOP_MAXVALUE
-} SemanticBinaryOperator;
-
-/// Popisuje mod semanticke validace kodu
-typedef enum
-{
-    /// Analyzator se pokusi udrzovat si typy promennych
-    FULL_VALIDATION,
-    /// Analyzator bude kontrolovat pouze operace nad konstantami
-    /// Vhodne napr. pro smycky
-    PERMISSIVE_VALIDATION
-} ValidationMode;
-
-const SemanticBinaryOperator astOperatorConvTable[SBINARYOP_TYPE_MAXVALUE] = {
-    [AND]=BINARYOP_AND,
-    [OR]=BINARYOP_OR,
-    EQUALS=0x21, // atd
-    NOTEQUALS=0x22,
-    LESS=0x23,
-    GREATER=0x24,
-    LEQUAL=0x25,
-    GEQUAL=0x26,
-    ADD=0x31,
-    SUBTRACT=0x32,
-    MULTIPLY=0x41,
-    DIVIDE=0x42,
-    POWER=0x51,
-};
-
-/// Definuje typ vysledku aplikovani binarniho operatoru, ktery je jako
-/// prvni index na typy druheho indexu a tretiho indexu (druhy je levy, treti je pravy)
-const SemanticType binaryOperatorTypeTable[OPERATOR_MAXVALUE][4][4] = {
-    [BINARYOP_ADD] = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, TYPE_NUMERIC, 0 },
-        { TYPE_STRING, TYPE_STRING, TYPE_STRING, TYPE_STRING }
-    } /// a takhle pro další operátory
-};
-    
-typedef struct 
-{
-    SemanticType* types;
-    int varCount;
-    ValidationMode mode;
-} SemCtx;
+#include "semantics.h"
 
 void validateFunction( Function* f )
 {
-    if( f->type == USER_DEFINED )
+    if( f->type == USER_DEFINED )   //vestavene funkce validovat nebudeme
     {
-        SemanticType types[ f->value.userDefined.variableCount ];
-        SemCtx ctx = { types, f->value.userDefined.variableCount, FULL_VALIDATION };
-        for( int i = 0; ....do paramCount )
-        {
+        SemanticType types[ f->value.userDefined.variableCount ];   //tabulka pro propojeni promene(vyrazu) a nejakeho datoveho typu (i vice zaroven)
+                                                                    //index urcuje assgn->destination
+
+        SemCtx ctx = { types, f->value.userDefined.variableCount, FULL_VALIDATION }; //pom struktura
+
+
+        /* INICIALIZACE types*/
+        for( int i = 0; i < paramCount; i++ ){  // zacatek pole vyhrazen pro parametry funkce
+
             ctx->types[i] = TYPE_ALL;
         }
+
         for( int i = paramCount; .... do variableCount )
         {
             ctx->types[i] = 0;
         }
+
+        /* VYHODNOCENI statements (error == except.)*/
         for( int i = 0; i < f->value.userDefined.statements.count; i++ )
         {
             validateStatement( &f->value.userDefined.statements.item[i], ctx );
-        } 
+        }
     }
 }
 
@@ -104,20 +43,52 @@ void validateStatement( Statement* stmt, SemCtx* ctx )
 {
     switch( stmt->type )
     {
-        case ASSIGNMENT: validateAssignment( &stmt->value.assignment, ctx ); return;
-        //dalsi case....
+        case ASSIGNMENT: validateAssignment( &stmt->value.assignment, ctx );
+            break;
+
+        case SUBSTRING: validateSubstring( &stmt->value.substring, ctx );
+            break;
+
+        case LOOP: validateLoop( &stmt->value.loop, ctx );
+            break;
+
+        case CONDITION: validateCondition( &stmt->value.condition, ctx );
+            break;
+
+        case RETURN: validateReturn( &stmt->value.ret, ctx );
+            break;
+        default :
     }
 }
 
+void validateSubstring(Substring* substring, SemCtx* ctx ){
+
+
+}
+
+
+void validateLoop(Loop* loop, SemCtx* ctx ){
+
+}
+
+void validateCondition(Condition* condition, SemCtx* ctx ){
+
+}
+
+void validateReturn(Return ret, SemCtx* ctx ){
+
+}
+
+
+
 void validateAssignment( Assignment* assgn, SemCtx* ctx )
 {
-    if( assgn->destination < 0 )
-    {
-        // je to globální proměnná
+    if( assgn->destination < 0 ){ // je to globální proměnná
+
         throw( InvalidAssignment, assgn->destination );
-    }
-    else
-    {
+
+    }else{
+
         if( ctx->mode == FULL_VALIDATION )
         {
             ctx->types[ assgn->destination ] = validateExpression( assgn->source, ctx );
@@ -133,12 +104,23 @@ void validateAssignment( Assignment* assgn, SemCtx* ctx )
 
 SemanticType validateExpression( Expression* expr, SemCtx* ctx )
 {
-    switch( expr->type )
-    {
+    switch( expr->type ){
+
         case VARIABLE: return validateVariable( &expr->value.variable, ctx );
         case OPERATOR: return validateOperator( &expr->value.operator, ctx );
-        // další casy
-    }
+        case FUNCTION_CALL: return validateFunctionCall( &expr->value.functionCall, ctx );
+        case CONSTANT: return validateConstant( &expr->value.constant, ctx );
+        default:
+}
+
+SemanticType validateFunctionCall( FunctionCall* functionCall, SemCtx* ctx ){
+
+
+}
+
+SemanticType validateConstant( Constatn* constant, SemCtx* ctx ){
+
+
 }
 
 SemanticType validateVariable( Variable* var, SemCtx* ctx )
@@ -147,7 +129,7 @@ SemanticType validateVariable( Variable* var, SemCtx* ctx )
     {
         throw( InvalidExpression, 0 );
     }
-    
+
     if( ctx->mode == FULL_VALIDATION )
     {
         return ctx->types[ *var ];
@@ -164,6 +146,7 @@ SemanticType validateOperator( Operator* op, SemCtx* ctx )
     {
         case BINARYOP: return validateBinaryOp( &op->value.binary, ctx );
         case UNARYOP: return validateUnaryOp( &op->value.unary, ctx );
+        default:
     }
 }
 
@@ -192,20 +175,20 @@ SemanticType validateBinaryOp( BinaryOp* op, SemCtx* ctx )
     if( resType == 0 )
     {
         // Vysledek operace neni definovany, hodime chybu
-        throw( InvalidExpression, 0 ); 
+        throw( InvalidExpression, 0 );
     }
 }
 
 void validateIf( Condition* cond, SemCtx* ctx )
 {
-    SemanticType typesIf[ctx->varCount];
+    SemanticType typesIf[ctx->varCount];        //potrebujeme dve nove tabulky, pro IF a ELSE
     SemanticType typesElse[ctx->varCount];
-    memcpy( typesIf, ctx->types, ctx->varCount * sizeof( SemanticType ) );
+    memcpy( typesIf, ctx->types, ctx->varCount * sizeof( SemanticType ) );  //prekopirovani
     memcpy( typesElse, ctx->types, ctx->varCount * sizeof( SemanticType ) );
-    
+
     SemCtx ctxIf = { typesIf, ctx->varCount, ctx->mode };
     SemCtx ctxElse = { typesElse, ctx->varCount, ctx->mode };
-    
+
     for( int i = 0; i < f->ifTrue.count; i++ )
     {
         validateStatement( &cond->ifTrue.item[i], &ctxIf );
@@ -213,9 +196,9 @@ void validateIf( Condition* cond, SemCtx* ctx )
     for( int i = 0; i < cond->ifFalse.count; i++ )
     {
         validateStatement( &cond->ifFalse.item[i], &ctxElse );
-    }  
+    }
     for( int i = 0; i < ctx->varCount; i++ )
     {
-        ctx->types[i] = typesIf[i] | typesElse[i];
+        ctx->types[i] = typesIf[i] | typesElse[i];  //operace OR, pokud je moznost validace aspon jedne vetve IF ELSE
     }
 }
