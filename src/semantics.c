@@ -88,7 +88,7 @@ void validateAssignment( Assignment* assgn, SemCtx* ctx )
 
 void validateSubstring(Substring* substring, SemCtx* ctx ){
 
-    if( substring->destination < 0 ){ // je to globální proměnná
+    if( substring->destination < 0 ){
 
         throw( InvalidAssignment, substring->destination );
 
@@ -100,8 +100,7 @@ void validateSubstring(Substring* substring, SemCtx* ctx ){
         }
         else
         {
-            // Pri volnejsi validaci nastavime vsechny pouzite promenne
-            // na "cokoliv". To je opet vhodne pro smycky
+
             ctx->types[ substring->destination ] = TYPE_ALL;
         }
     }
@@ -110,10 +109,15 @@ void validateSubstring(Substring* substring, SemCtx* ctx ){
 
 void validateLoop(Loop* loop, SemCtx* ctx ){
 
+    ctx->mode = PERMISSIVE_VALIDATION;
+
     for( int i = 0; i < loop->ifFalse.count; i++ )
     {
         validateStatement( &loop->statements.item[i], &ctx );
     }
+
+    ctx->mode = FULL_VALIDATION;
+
 }
 
 void validateCondition(Condition* condition, SemCtx* ctx ){
@@ -185,7 +189,13 @@ SemanticType validateOperator( Operator* op, SemCtx* ctx )
 
 SemanticType validateFunctionCall( FunctionCall* functionCall, SemCtx* ctx ){
 
+    if( functionCall->type == USER_DEFINED ){   //vestavene funkce validovat nebudeme
 
+        for( int i = 0; i < functionCall->value.userDefined.statements.count; i++ ){
+
+            validateStatement( &functionCall->value.userDefined.statements.item[i], ctx );
+        }
+    }
 }
 
 SemanticType validateConstant( Constatn* constant, SemCtx* ctx ){
