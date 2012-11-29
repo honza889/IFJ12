@@ -88,20 +88,25 @@ void validateAssignment( Assignment* assgn, SemCtx* ctx )
 
 void validateSubstring(Substring* substring, SemCtx* ctx ){
 
+SemanticType result;
     if( substring->destination < 0 ){
 
-        throw( InvalidAssignment, substring->destination );
+        throw( InvalidExpression, substring->destination );
 
     }else{
 
-        if( ctx->mode == FULL_VALIDATION )
-        {
-            ctx->types[ substring->destination ] = validateExpression( substring->source, ctx );
-        }
-        else
-        {
+        if( ctx->mode == FULL_VALIDATION ){
 
-            ctx->types[ substring->destination ] = TYPE_ALL;
+            if((result = validateExpression( substring->source, ctx )) == TYPE_STRING){
+                ctx->types[ substring->destination ] = result;
+            }else{
+
+                throw( InvalidExpression, substring->destination );
+
+            }
+        }else{
+
+            ctx->types[ substring->destination ] |= TYPE_STRING;
         }
     }
 }
@@ -111,7 +116,7 @@ void validateLoop(Loop* loop, SemCtx* ctx ){
 
     ctx->mode = PERMISSIVE_VALIDATION;
 
-    for( int i = 0; i < loop->ifFalse.count; i++ )
+    for( int i = 0; i < loop->statements.count; i++ )
     {
         validateStatement( &loop->statements.item[i], &ctx );
     }
