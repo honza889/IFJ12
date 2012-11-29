@@ -23,9 +23,9 @@ if 41.0 != a
 else
 end
 
-a = 1.0+"text"*2.0+1.0
-if "1texttext1" != a
-  x=print("1texttext1==",a,": ERROR\n")
+a = "text"+1.0+"text"*2.0+1.0
+if "text1texttext1" != a
+  x=print("text1texttext1==",a,": ERROR\n")
   isOK=false
 else
 end
@@ -107,7 +107,28 @@ if 10.0 != a
 else
 end
 
-a = not not true
+a = -(-10.0)
+if 10.0 != a
+  x=print("10.0==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = --10.0
+if 10.0 != a
+  x=print("10.0==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = true and not not true
+if true != a
+  x=print("true==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = (true)and(not(not(true)))
 if true != a
   x=print("true==",a,": ERROR\n")
   isOK=false
