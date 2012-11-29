@@ -63,31 +63,112 @@ typedef enum    //necht existuji semanticke binarni operace
 const SemanticBinaryOperator astOperatorConvTable[SBINARYOP_TYPE_MAXVALUE] = {
     [AND]=BINARYOP_AND,
     [OR]=BINARYOP_OR,
-    EQUALS=0x21, // atd
-    NOTEQUALS=0x22,
-    LESS=0x23,
-    GREATER=0x24,
-    LEQUAL=0x25,
-    GEQUAL=0x26,
-    ADD=0x31,
-    SUBTRACT=0x32,
-    MULTIPLY=0x41,
-    DIVIDE=0x42,
-    POWER=0x51,
+    [EQUALS]=BINARYOP_EQUALS,
+    [NOTEQUALS]=BINARYOP_NOTEQUALS,
+    [LESS]=BINARYOP_LESS,
+    [GREATER]=BINARYOP_GREATER,
+    [LEQUAL]=BINARYOP_LEQUAL,
+    [GEQUAL]=BINARYOP_GEQUAL,
+    [ADD]=BINARYOP_ADD,
+    [SUBTRACT]=BINARYOP_SUBTRACT,
+    [MULTIPLY]=BINARYOP_MULTIPLY,
+    [DIVIDE]=BINARYOP_DIVIDE,
+    [POWER]=BINARYOP_POWER,
 };
 
 /// Definuje typ vysledku aplikovani binarniho operatoru, ktery je jako
 /// prvni index na typy druheho indexu a tretiho indexu (druhy je levy, treti je pravy)
-const SemanticType binaryOperatorTypeTable[OPERATOR_MAXVALUE][4][4] = {
+const SemanticType binaryOperatorTypeTable[BINARYOP_MAXVALUE][4][4] = {
+    /*[SemanticType] = {
+                                    pravy, treti index
+                    TYPE_NIL, TYPE_BOOLEAN, TYPE_NUMERIC, TYPE_STRING
+        TYPE_NIL    {   X,          X,           X,            X },
+levy    TYPE_BOOLEAN{   X,          X,           X,            X },
+druhy   TYPE_NUMERIC{   X,          X,           X,            X },
+        TYPE_STRING {   X,          X,           X,            X }
+    }*/
+
+    [BINARYOP_AND] = {
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN }
+    },
+    [BINARYOP_OR] = {
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN }
+    },
+    [BINARYOP_EQUALS] = {
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN }
+    },
+    [BINARYOP_NOTEQUALS] = {
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN }
+    },
+    [BINARYOP_LESS] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, TYPE_BOOLEAN, 0 },
+        { 0, 0, 0, TYPE_BOOLEAN }
+    },
+    [BINARYOP_GREATER] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, TYPE_BOOLEAN, 0 },
+        { 0, 0, 0, TYPE_BOOLEAN }
+    },
+    [BINARYOP_LEQUAL] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, TYPE_BOOLEAN, 0 },
+        { 0, 0, 0, TYPE_BOOLEAN }
+    },
+    [BINARYOP_GEQUAL] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, TYPE_BOOLEAN, 0 },
+        { 0, 0, 0, TYPE_BOOLEAN }
+    },
     [BINARYOP_ADD] = {
         { 0, 0, 0, 0 },
         { 0, 0, 0, 0 },
         { 0, 0, TYPE_NUMERIC, 0 },
         { TYPE_STRING, TYPE_STRING, TYPE_STRING, TYPE_STRING }
-    }
+    },
+    [BINARYOP_SUBTRACT] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, TYPE_NUMERIC, 0 },
+        { 0, 0, 0, 0 }
+    },
+    [BINARYOP_MULTIPLY] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, TYPE_NUMERIC, 0 },
+        { 0, 0, TYPE_STRING, 0 }
+    },
+    [BINARYOP_DIVIDE] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, TYPE_NUMERIC, 0 },
+        { 0, 0, 0, 0 }
+    },
+    [BINARYOP_POWER] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, TYPE_NUMERIC, 0 },
+        { 0, 0, 0, 0 }
+    },
+
 };
 
-/** HEEEEEEEEEEEEEYYYYYYYY TADY JSEM SEL SPAT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! :] */
 
 typedef struct
 {
