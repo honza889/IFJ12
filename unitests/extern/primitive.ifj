@@ -1,7 +1,14 @@
 // primitivní test, nic moc netestuje
 
-a = 1.0 + 8.0
-b = a + 4.0
-c = "ABC"
-h = print( b, "\n" )
+a = 2.0 - 1.0
+h = print( a, "\n" )
+
+a = 1.0 - - 1.0
+h = print( a, "\n" )
+
+a = -1.0 + 4.0
+h = print( a, "\n" )
+
+a = 3.0 - ( - 1.0 )
+h = print( a, "\n" )
 

@@ -52,7 +52,8 @@ typedef struct {
         enum {		/** Unárni nebo binární operátor */
             opPlus, opMinus, opMultiple, opDivide, opPower,
             opLT, opGT, opLE, opGE, opNE, opEQ,
-            opAND, opOR, opNOT
+            opAND, opOR, opNOT,
+            opUMinus // unarni minus, neni produkovan scannerem, pouziva se v zasobniku syntakticke analyzy
         } op;
         KeyWord keyw;	/** Klíčová slova */
     } data;
