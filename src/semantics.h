@@ -209,7 +209,7 @@ SemanticType validateFunctionCall( FunctionCall* functionCall, SemCtx* ctx );
 
 SemanticType validateConstant( Constatn* constant, SemCtx* ctx );
 
-
+SemanticType validateUnaryOp( UnaryOp* op, SemCtx* ctx );
 
 
 #endif

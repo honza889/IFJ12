@@ -61,23 +61,6 @@ void validateStatement( Statement* stmt, SemCtx* ctx )
     }
 }
 
-void validateSubstring(Substring* substring, SemCtx* ctx ){
-
-
-}
-
-
-void validateLoop(Loop* loop, SemCtx* ctx ){
-
-}
-
-void validateCondition(Condition* condition, SemCtx* ctx ){
-
-}
-
-void validateReturn(Return ret, SemCtx* ctx ){
-
-}
 
 
 
@@ -102,6 +85,64 @@ void validateAssignment( Assignment* assgn, SemCtx* ctx )
     }
 }
 
+
+void validateSubstring(Substring* substring, SemCtx* ctx ){
+
+    if( substring->destination < 0 ){ // je to globální proměnná
+
+        throw( InvalidAssignment, substring->destination );
+
+    }else{
+
+        if( ctx->mode == FULL_VALIDATION )
+        {
+            ctx->types[ substring->destination ] = validateExpression( substring->source, ctx );
+        }
+        else
+        {
+            // Pri volnejsi validaci nastavime vsechny pouzite promenne
+            // na "cokoliv". To je opet vhodne pro smycky
+            ctx->types[ substring->destination ] = TYPE_ALL;
+        }
+    }
+}
+
+
+void validateLoop(Loop* loop, SemCtx* ctx ){
+
+    for( int i = 0; i < loop->ifFalse.count; i++ )
+    {
+        validateStatement( &loop->statements.item[i], &ctx );
+    }
+}
+
+void validateCondition(Condition* condition, SemCtx* ctx ){
+    SemanticType typesIf[ctx->varCount];        //potrebujeme dve nove tabulky, pro IF a ELSE
+    SemanticType typesElse[ctx->varCount];
+    memcpy( typesIf, ctx->types, ctx->varCount * sizeof( SemanticType ) );  //prekopirovani
+    memcpy( typesElse, ctx->types, ctx->varCount * sizeof( SemanticType ) );
+
+    SemCtx ctxIf = { typesIf, ctx->varCount, ctx->mode };
+    SemCtx ctxElse = { typesElse, ctx->varCount, ctx->mode };
+
+    for( int i = 0; i < f->ifTrue.count; i++ )
+    {
+        validateStatement( &condition->ifTrue.item[i], &ctxIf );
+    }
+    for( int i = 0; i < condition->ifFalse.count; i++ )
+    {
+        validateStatement( &condition->ifFalse.item[i], &ctxElse );
+    }
+    for( int i = 0; i < ctx->varCount; i++ )
+    {
+        ctx->types[i] = typesIf[i] | typesElse[i];  //operace OR, pokud je moznost validace aspon jedne vetve IF ELSE
+    }
+}
+
+void validateReturn(Return ret, SemCtx* ctx ){
+
+}
+
 SemanticType validateExpression( Expression* expr, SemCtx* ctx )
 {
     switch( expr->type ){
@@ -113,15 +154,6 @@ SemanticType validateExpression( Expression* expr, SemCtx* ctx )
         default:
 }
 
-SemanticType validateFunctionCall( FunctionCall* functionCall, SemCtx* ctx ){
-
-
-}
-
-SemanticType validateConstant( Constatn* constant, SemCtx* ctx ){
-
-
-}
 
 SemanticType validateVariable( Variable* var, SemCtx* ctx )
 {
@@ -150,6 +182,23 @@ SemanticType validateOperator( Operator* op, SemCtx* ctx )
     }
 }
 
+
+SemanticType validateFunctionCall( FunctionCall* functionCall, SemCtx* ctx ){
+
+
+}
+
+SemanticType validateConstant( Constatn* constant, SemCtx* ctx ){
+
+
+}
+
+SemanticType validateUnaryOp( UnaryOp* op, SemCtx* ctx )
+{
+
+}
+
+
 SemanticType getTypeOfBinaryOperator( SemanticBinaryOperator op, SemanticType l, SemanticType r )
 {
     SemanticType res = 0;
@@ -166,6 +215,7 @@ SemanticType getTypeOfBinaryOperator( SemanticBinaryOperator op, SemanticType l,
     return res;
 }
 
+
 SemanticType validateBinaryOp( BinaryOp* op, SemCtx* ctx )
 {
     SemanticBinaryOperator opType = astOperatorConvTable[op->type];
@@ -176,29 +226,5 @@ SemanticType validateBinaryOp( BinaryOp* op, SemCtx* ctx )
     {
         // Vysledek operace neni definovany, hodime chybu
         throw( InvalidExpression, 0 );
-    }
-}
-
-void validateIf( Condition* cond, SemCtx* ctx )
-{
-    SemanticType typesIf[ctx->varCount];        //potrebujeme dve nove tabulky, pro IF a ELSE
-    SemanticType typesElse[ctx->varCount];
-    memcpy( typesIf, ctx->types, ctx->varCount * sizeof( SemanticType ) );  //prekopirovani
-    memcpy( typesElse, ctx->types, ctx->varCount * sizeof( SemanticType ) );
-
-    SemCtx ctxIf = { typesIf, ctx->varCount, ctx->mode };
-    SemCtx ctxElse = { typesElse, ctx->varCount, ctx->mode };
-
-    for( int i = 0; i < f->ifTrue.count; i++ )
-    {
-        validateStatement( &cond->ifTrue.item[i], &ctxIf );
-    }
-    for( int i = 0; i < cond->ifFalse.count; i++ )
-    {
-        validateStatement( &cond->ifFalse.item[i], &ctxElse );
-    }
-    for( int i = 0; i < ctx->varCount; i++ )
-    {
-        ctx->types[i] = typesIf[i] | typesElse[i];  //operace OR, pokud je moznost validace aspon jedne vetve IF ELSE
     }
 }
