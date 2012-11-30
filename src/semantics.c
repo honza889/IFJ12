@@ -150,6 +150,8 @@ void validateCondition(Condition* condition, SemCtx* ctx ){
 
 void validateReturn(Return ret, SemCtx* ctx ){
 
+    validateExpression( ret, ctx );
+
 }
 
 SemanticType validateExpression( Expression* expr, SemCtx* ctx )
