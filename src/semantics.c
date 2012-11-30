@@ -208,12 +208,6 @@ SemanticType validateConstant( Constatn* constant, SemCtx* ctx ){
     return ValueToSemanticType[constant->type];  //prevedeme typ na semanticType
 }
 
-SemanticType validateUnaryOp( UnaryOp* op, SemCtx* ctx )
-{
-
-}
-
-
 SemanticType getTypeOfBinaryOperator( SemanticBinaryOperator op, SemanticType l, SemanticType r )
 {
     SemanticType res = 0;
@@ -243,3 +237,24 @@ SemanticType validateBinaryOp( BinaryOp* op, SemCtx* ctx )
         throw( InvalidExpression, 0 );
     }
 }
+
+
+SemanticType validateUnaryOp( UnaryOp* op, SemCtx* ctx )
+{
+    SemanticUnaryOperator opType = astUnaryOperatorConvTable[op->type];
+    SemanticType unaryType = validateExpression( op->operand, ctx );
+    SemanticType resType = 0;
+    for( int i = 0; i < 4; i++ )
+    {
+            if( ( ( 1 << i ) & unaryType ){
+                resType |= binaryOperatorTypeTable[opType][i];
+            }
+        }
+    }
+
+    if( resType == 0 ){
+
+        throw( InvalidExpression, 0 );
+    }
+}
+

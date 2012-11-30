@@ -42,8 +42,7 @@ typedef enum    //necht existuji semanticke typy
     TYPE_ALL = 0xF
 } SemanticType;
 
-
-    /*binarni operatory*/
+    /*Pro prevod valueType -> semanticType*/
 const SemanticType ValueToSemanticType[typeString+1] = {
     [typeUndefined] = TYPE_UNDEFINED,
     [typeNil] = TYPE_NIL,
@@ -180,6 +179,31 @@ druhy   TYPE_NUMERIC{   X,          X,           X,            X },
 
 };
 
+
+typedef enum    //necht existuji semanticke binarni operace
+{
+    UNARYOP_NOT,
+    UNARYOP_MINUS,
+    UNARYOP_MAXVALUE   //nepouzivat, uzcuje pouze velikost
+} SemanticUnaryOperator;
+
+    /*binarni operatory*/
+const SemanticUnaryOperator astUnaryOperatorConvTable[SUNARYOP_TYPE_MAXVALUE] = {
+    [NOT]=UNARYOP_NOT,
+    [MINUS]=UNARYOP_MINUS
+
+};
+
+const SemanticType unaryOperatorTypeTable[UNARYOP_MAXVALUE][4] = {
+
+
+    [UNARYOP_NOT] = {
+        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN }
+    },
+
+    [UNARYOP_MINUS] = {
+        { 0, 0, TYPE_NUMERIC, 0 }
+};
 
 typedef struct
 {
