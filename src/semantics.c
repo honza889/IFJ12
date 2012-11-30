@@ -247,7 +247,7 @@ SemanticType validateUnaryOp( UnaryOp* op, SemCtx* ctx )
     for( int i = 0; i < 4; i++ )
     {
             if( ( ( 1 << i ) & unaryType ){
-                resType |= binaryOperatorTypeTable[opType][i];
+                resType |= unaryOperatorTypeTable[opType][i];
             }
         }
     }
