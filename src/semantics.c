@@ -21,12 +21,12 @@ void validateFunction( Function* f )
 
 
         /* INICIALIZACE types*/
-        for( int i = 0; i < paramCount; i++ ){  // zacatek pole vyhrazen pro parametry funkce
+        for( int i = 0; i < f->paramCount; i++ ){  // zacatek pole vyhrazen pro parametry funkce
 
             ctx->types[i] = TYPE_ALL;
         }
 
-        for( int i = paramCount; .... do variableCount )
+        for( int i = paramCount; i < f->value.userDefined.variableCount ;i++)
         {
             ctx->types[i] = 0;
         }
@@ -205,7 +205,7 @@ SemanticType validateFunctionCall( FunctionCall* functionCall, SemCtx* ctx ){
 
 SemanticType validateConstant( Constatn* constant, SemCtx* ctx ){
 
-
+    return ValueToSemanticType[constant->type];  //prevedeme typ na semanticType
 }
 
 SemanticType validateUnaryOp( UnaryOp* op, SemCtx* ctx )

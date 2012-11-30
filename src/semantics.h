@@ -34,12 +34,23 @@ typedef enum
 
 typedef enum    //necht existuji semanticke typy
 {
+    TYPE_UNDEFINED = 0x0,
     TYPE_NIL = 0x1,
     TYPE_BOOLEAN = 0x2,
     TYPE_NUMERIC = 0x4,
     TYPE_STRING = 0x8,
     TYPE_ALL = 0xF
 } SemanticType;
+
+
+    /*binarni operatory*/
+const SemanticType ValueToSemanticType[typeString+1] = {
+    [typeUndefined] = TYPE_UNDEFINED,
+    [typeNil] = TYPE_NIL,
+    [typeBoolean] = TYPE_BOOLEAN,
+    [typeNumeric] = TYPE_NUMERIC,
+    [typeString] = TYPE_STRING
+}
 
 typedef enum    //necht existuji semanticke binarni operace
 {
