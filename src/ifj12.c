@@ -116,6 +116,10 @@ int main(int argc, char**argv)
             fprintf( stderr, "ValueError: Bylo použito záporné číslo tam kde nemělo!\n" );
             exit( 5 );
         }
+        on( DividingByZero, e ){
+            fprintf( stderr, "Došlo k pokusu o dělení nulou!\n" );
+            exit( 10 );
+        }
         on( VariableIsNotFunction, e ){
             fprintf( stderr, "Pokus použít funkci jako proměnnou!\n" );
             exit( 11 );

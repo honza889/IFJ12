@@ -31,6 +31,7 @@ typedef enum
     UndefinedFunction,		// exit 4
     UnexpectedValueType,	// exit 5
     NegativeNumeric,		// exit 5
+    DividingByZero,		// exit 10
     VariableIsNotFunction,	// exit 11
     FunctionIsNotVariable,	// exit 11
     IncompatibleComparison,	// exit 11
@@ -97,6 +98,7 @@ typedef struct
 typedef int UndefinedVariableException;
 typedef int UndefinedFunctionException;
 typedef Value NegativeNumericException;
+typedef bool DividingByZeroException;
 typedef Value VariableIsNotFunctionException;
 typedef Value FunctionIsNotVariableException;
 typedef bool IncompatibleComparisonException;
@@ -122,6 +124,7 @@ typedef struct
         EXCEPTION( UndefinedFunction );
         EXCEPTION( UnexpectedValueType );
         EXCEPTION( NegativeNumeric );
+        EXCEPTION( DividingByZero );
         EXCEPTION( VariableIsNotFunction );
         EXCEPTION( FunctionIsNotVariable );
         EXCEPTION( IncompatibleComparison );

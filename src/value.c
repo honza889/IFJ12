@@ -522,7 +522,14 @@ Value divideValue( Value* a, Value* b )
 {
     if( a->type == typeNumeric && b->type == typeNumeric )
     {
-        return newValueNumeric( getValueNumeric( a ) / getValueNumeric( b ) );
+        if( getValueNumeric( b ) != 0.0 )
+        {
+            return newValueNumeric( getValueNumeric( a ) / getValueNumeric( b ) );
+        }
+        else
+        {
+            throw( DividingByZero, 0 );
+        }
     }
     else if( a->type == typeUndefined || b->type == typeUndefined )
     {
