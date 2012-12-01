@@ -23,18 +23,18 @@ void validateFunction( Function* f )
         /* INICIALIZACE types*/
         for( int i = 0; i < f->paramCount; i++ ){  // zacatek pole vyhrazen pro parametry funkce
 
-            ctx->types[i] = TYPE_ALL;
+            ctx.types[i] = TYPE_ALL;
         }
 
-        for( int i = paramCount; i < f->value.userDefined.variableCount ;i++)
+        for( int i = f->paramCount; i < f->value.userDefined.variableCount ;i++)
         {
-            ctx->types[i] = 0;
+            ctx.types[i] = 0;
         }
 
         /* VYHODNOCENI statements (error == except.)*/
         for( int i = 0; i < f->value.userDefined.statements.count; i++ )
         {
-            validateStatement( &f->value.userDefined.statements.item[i], ctx );
+            validateStatement( &f->value.userDefined.statements.item[i], &ctx );
         }
     }
 }
@@ -58,6 +58,7 @@ void validateStatement( Statement* stmt, SemCtx* ctx )
         case RETURN: validateReturn( &stmt->value.ret, ctx );
             break;
         default :
+            break;
     }
 }
 
@@ -74,7 +75,7 @@ void validateAssignment( Assignment* assgn, SemCtx* ctx )
 
         if( ctx->mode == FULL_VALIDATION )
         {
-            ctx->types[ assgn->destination ] = validateExpression( assgn->source, ctx );
+            ctx->types[ assgn->destination ] = validateExpression( &assgn->source, ctx );
         }
         else
         {
@@ -97,7 +98,7 @@ SemanticType result;
 
         if( ctx->mode == FULL_VALIDATION ){
 
-            if((result = validateExpression( substring->source, ctx )) == TYPE_STRING){
+            if((result = validateExpression( &substring->source, ctx )) == TYPE_STRING){
                 ctx->types[ substring->destination ] = result;
             }else{
 
@@ -118,7 +119,7 @@ void validateLoop(Loop* loop, SemCtx* ctx ){
 
     for( int i = 0; i < loop->statements.count; i++ )
     {
-        validateStatement( &loop->statements.item[i], &ctx );
+        validateStatement( &loop->statements.item[i], ctx );
     }
 
     ctx->mode = FULL_VALIDATION;
@@ -134,7 +135,7 @@ void validateCondition(Condition* condition, SemCtx* ctx ){
     SemCtx ctxIf = { typesIf, ctx->varCount, ctx->mode };
     SemCtx ctxElse = { typesElse, ctx->varCount, ctx->mode };
 
-    for( int i = 0; i < f->ifTrue.count; i++ )
+    for( int i = 0; i < condition->ifTrue.count; i++ )
     {
         validateStatement( &condition->ifTrue.item[i], &ctxIf );
     }
@@ -148,7 +149,7 @@ void validateCondition(Condition* condition, SemCtx* ctx ){
     }
 }
 
-void validateReturn(Return ret, SemCtx* ctx ){
+void validateReturn(Return* ret, SemCtx* ctx ){
 
     validateExpression( ret, ctx );
 
@@ -163,6 +164,9 @@ SemanticType validateExpression( Expression* expr, SemCtx* ctx )
         case FUNCTION_CALL: return validateFunctionCall( &expr->value.functionCall, ctx );
         case CONSTANT: return validateConstant( &expr->value.constant, ctx );
         default:
+            break;
+    }
+    return TYPE_UNDEFINED;    //sem by se to nikdy dostat nemelo!
 }
 
 
@@ -190,22 +194,28 @@ SemanticType validateOperator( Operator* op, SemCtx* ctx )
         case BINARYOP: return validateBinaryOp( &op->value.binary, ctx );
         case UNARYOP: return validateUnaryOp( &op->value.unary, ctx );
         default:
+            break;
     }
+    return TYPE_UNDEFINED;    //sem by se to nikdy dostat nemelo!
 }
 
 
 SemanticType validateFunctionCall( FunctionCall* functionCall, SemCtx* ctx ){
 
-    if( functionCall->type == USER_DEFINED ){   //vestavene funkce validovat nebudeme
+    if( functionCall->function >= 0 ){
 
-        for( int i = 0; i < functionCall->value.userDefined.statements.count; i++ ){
+        throw( InvalidExpression, functionCall->function );
 
-            validateStatement( &functionCall->value.userDefined.statements.item[i], ctx );
+    }else{
+        for( int i = 0; i < functionCall->params.count; i++ ){
+
+            validateExpression( &functionCall->params.expressions[i], ctx );
         }
     }
+    return TYPE_ALL;
 }
 
-SemanticType validateConstant( Constatn* constant, SemCtx* ctx ){
+SemanticType validateConstant( Constant* constant, SemCtx* ctx ){
 
     return ValueToSemanticType[constant->type];  //prevedeme typ na semanticType
 }
@@ -238,6 +248,7 @@ SemanticType validateBinaryOp( BinaryOp* op, SemCtx* ctx )
         // Vysledek operace neni definovany, hodime chybu
         throw( InvalidExpression, 0 );
     }
+    return resType;
 }
 
 
@@ -246,17 +257,17 @@ SemanticType validateUnaryOp( UnaryOp* op, SemCtx* ctx )
     SemanticUnaryOperator opType = astUnaryOperatorConvTable[op->type];
     SemanticType unaryType = validateExpression( op->operand, ctx );
     SemanticType resType = 0;
-    for( int i = 0; i < 4; i++ )
-    {
-            if( ( ( 1 << i ) & unaryType ){
+    for( int i = 0; i < 4; i++ ){
+
+            if( ( 1 << i ) & unaryType ){
                 resType |= unaryOperatorTypeTable[opType][i];
             }
-        }
     }
 
     if( resType == 0 ){
 
         throw( InvalidExpression, 0 );
     }
+    return resType;
 }
 

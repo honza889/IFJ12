@@ -44,12 +44,11 @@ typedef enum    //necht existuji semanticke typy
 
     /*Pro prevod valueType -> semanticType*/
 const SemanticType ValueToSemanticType[typeString+1] = {
-    [typeUndefined] = TYPE_UNDEFINED,
     [typeNil] = TYPE_NIL,
     [typeBoolean] = TYPE_BOOLEAN,
     [typeNumeric] = TYPE_NUMERIC,
     [typeString] = TYPE_STRING
-}
+};
 
 typedef enum    //necht existuji semanticke binarni operace
 {
@@ -198,11 +197,12 @@ const SemanticType unaryOperatorTypeTable[UNARYOP_MAXVALUE][4] = {
 
 
     [UNARYOP_NOT] = {
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN }
+         TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN
     },
 
     [UNARYOP_MINUS] = {
-        { 0, 0, TYPE_NUMERIC, 0 }
+         0, 0, TYPE_NUMERIC, 0
+    }
 };
 
 typedef struct
@@ -227,7 +227,7 @@ void validateLoop(Loop* loop, SemCtx* ctx );
 
 void validateCondition(Condition* condition, SemCtx* ctx );
 
-void validateReturn(Return ret, SemCtx* ctx );
+void validateReturn(Return* ret, SemCtx* ctx );
 
 
 SemanticType validateExpression( Expression* expr, SemCtx* ctx );
@@ -242,7 +242,7 @@ SemanticType validateBinaryOp( BinaryOp* op, SemCtx* ctx );
 
 SemanticType validateFunctionCall( FunctionCall* functionCall, SemCtx* ctx );
 
-SemanticType validateConstant( Constatn* constant, SemCtx* ctx );
+SemanticType validateConstant( Constant* constant, SemCtx* ctx );
 
 SemanticType validateUnaryOp( UnaryOp* op, SemCtx* ctx );
 

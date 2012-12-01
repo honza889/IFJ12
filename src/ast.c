@@ -117,10 +117,10 @@ Value evalExpression( Expression* expr, Context* context )
 {
   switch( expr->type )
   {
-    case CONSTANT: 
+    case CONSTANT:
       return evalConstant( &expr->value.constant );
     case VARIABLE:
-      return evalVariable( &expr->value.variable, context ); 
+      return evalVariable( &expr->value.variable, context );
     case OPERATOR:
       return evalOperator( &expr->value.operator, context );
     case FUNCTION_CALL:
@@ -140,7 +140,7 @@ void evalSubstring( Substring* substring, Context* context )
     Value val = evalExpression( &substring->source, context );
     RCString r = getValueString( testValue( &val, typeString ) );
     freeValue( &val );
-    
+
     int offset,length;
     if(substring->offset.type==CONSTANT && substring->offset.value.constant.type==typeUndefined){
         offset = 0;
@@ -156,7 +156,7 @@ void evalSubstring( Substring* substring, Context* context )
         length = (int)getValueNumeric( testValuePositiveNumeric( &lengthValue ) );
         freeValue(&lengthValue);
     }
-    
+
     if (offset >= length || length > RCStringLength(&r) || offset < 0) {
         deleteRCString(&r);
         r = makeEmptyRCString();
@@ -164,7 +164,7 @@ void evalSubstring( Substring* substring, Context* context )
         length -= offset;
         RCStringSubstring( &r, offset, length );
     }
-    
+
     setVariable( &substring->destination, context, newValueString( r ) );
     deleteRCString( &r );
 }
@@ -172,7 +172,7 @@ void evalSubstring( Substring* substring, Context* context )
 ReturnData evalLoop( Loop* loop, Context* context )
 {
     Value condition;
-    while( condition = evalExpression( &loop->condition, context ), 
+    while( condition = evalExpression( &loop->condition, context ),
            getValueBoolean( &condition ) )
     {
         ReturnData r = evalStatementList( loop->statements, context );
@@ -216,15 +216,15 @@ ReturnData evalStatement( Statement* statement, Context* context )
 {
     switch( statement->type )
     {
-        case ASSIGNMENT: 
+        case ASSIGNMENT:
             evalAssignment( &statement->value.assignment, context ); break;
-        case SUBSTRING: 
+        case SUBSTRING:
             evalSubstring( &statement->value.substring, context ); break;
-        case LOOP: 
+        case LOOP:
             return evalLoop( &statement->value.loop, context );
-        case CONDITION: 
+        case CONDITION:
             return evalCondition( &statement->value.condition, context );
-        case RETURN: 
+        case RETURN:
             return evalReturn( &statement->value.ret, context );
     }
     return (ReturnData){false};
@@ -246,7 +246,7 @@ ReturnData evalStatementList( StatementList sl, Context* context )
 Value evalFunction( Function* func, ExpressionList params, Context* context )
 {
     int variableCount;
-    
+
     if( func->paramCount < 0 )
     {
         variableCount = params.count;
@@ -259,7 +259,7 @@ Value evalFunction( Function* func, ExpressionList params, Context* context )
             params.count = func->paramCount;
         }
     }
-    
+
     if( func->type == USER_DEFINED )
     {
         variableCount += func->value.userDefined.variableCount;
@@ -281,33 +281,33 @@ Value evalFunction( Function* func, ExpressionList params, Context* context )
             variables[i]=(Value){.type=typeUndefined};
         }
     }
-    
+
     if( func->type == BUILTIN )
     {
         Value ret = func->value.builtin( variables, params.count );
-        
+
         for( int i = 0; i < variableCount; i++ )
         {
             freeValue( variables + i );
         }
-        
+
         return ret;
     }
     else
     {
         ReturnData r = evalStatementList( func->value.userDefined.statements, &nestedContext );
-        
+
         for( int i = 0; i < variableCount; i++ )
         {
             freeValue( variables + i );
         }
-        
+
         if( r.returned )
         {
             return r.ret;
         }
     }
-    
+
     return newValueUndefined();
 }
 
@@ -361,7 +361,7 @@ void deleteExpression( Expression* expr )
 {
     switch( expr->type )
     {
-        case CONSTANT: 
+        case CONSTANT:
             deleteConstant( &expr->value.constant ); break;
         case VARIABLE:
             deleteVariable( &expr->value.variable ); break;
@@ -410,15 +410,15 @@ void deleteStatementList( StatementList sl )
     {
         switch( sl.item[i].type )
         {
-            case ASSIGNMENT: 
+            case ASSIGNMENT:
                 deleteAssignment( &sl.item[i].value.assignment ); break;
-            case SUBSTRING: 
+            case SUBSTRING:
                 deleteSubstring( &sl.item[i].value.substring ); break;
-            case LOOP: 
+            case LOOP:
                 deleteLoop( &sl.item[i].value.loop ); break;
-            case CONDITION: 
+            case CONDITION:
                 deleteCondition( &sl.item[i].value.condition ); break;
-            case RETURN: 
+            case RETURN:
                 deleteReturn( &sl.item[i].value.ret ); break;
         }
     }

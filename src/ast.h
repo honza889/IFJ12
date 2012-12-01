@@ -59,10 +59,10 @@ typedef enum {
  * Hodnota promenne generickeho datoveho typu
  */
 struct SValue {
- 
+
     // Aktualni typ
     ValueType type;
- 
+
     // Hodnota
     union {
         bool boolean;
@@ -78,7 +78,7 @@ struct SFunction
         USER_DEFINED,
         BUILTIN
     } type;
-    
+
     union{
         struct{
             StatementList statements;
@@ -90,6 +90,8 @@ struct SFunction
 
     int paramCount; // zaporne cislo znamena volitelny pocet argumentu
 };
+
+#define SBINARYOP_TYPE_MAXVALUE 0x52
 
 struct SBinaryOp
 {
@@ -108,24 +110,27 @@ struct SBinaryOp
     MULTIPLY=0x41,
     DIVIDE=0x42,
     POWER=0x51,
-    SBINARYOP_TYPE_MAXVALUE // nepouzivat jako operator! slouzi pro definici poli
+    // !!!pozor, konstanta..davam hodnotu 0x52 SBINARYOP_TYPE_MAXVALUE nepouzivat jako operator! slouzi pro definici poli
   } type;
-  
+
   Expression* left;
   Expression* right;
 };
 
+#define SUNARYOP_TYPE_MAXVALUE 0x2
 struct SUnaryOp
 {
   enum
   {
     MINUS,
     NOT
+    // !!!pozor, konstanta..davam hodnotu 0x2 SUNARYOP_TYPE_MAXVALUE nepouzivat jako operator! slouzi pro definici poli
+
   } type;
-  
+
   Expression* operand;
 };
-    
+
 
 struct SOperator
 {
@@ -134,7 +139,7 @@ struct SOperator
     BINARYOP,
     UNARYOP
   } type;
-  
+
   union
   {
     BinaryOp binary;
@@ -147,7 +152,7 @@ struct SFunctionCall
   ExpressionList params;
   Variable function;
 };
-  
+
 struct SExpression
 {
   enum
@@ -157,7 +162,7 @@ struct SExpression
     OPERATOR,
     FUNCTION_CALL
   } type;
-  
+
   union
   {
     Constant constant;
@@ -170,7 +175,7 @@ struct SExpression
 };
 
 /// Popisuje přiřazení z výrazu \a source do proměnné \a destination
-struct SAssignment 
+struct SAssignment
 {
   Variable destination;
   Expression source;
@@ -207,7 +212,7 @@ struct SStatement
     CONDITION,
     RETURN
   } type;
-  
+
   union
   {
     Assignment assignment;

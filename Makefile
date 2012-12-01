@@ -5,7 +5,7 @@ LDB=-g3
 # Parametry slinkování
 LINK=-lm
 
-SOURCES=ifj12 value ast exceptions rcstring bif scanner syntax ial alloc parsexp
+SOURCES=ifj12 value ast exceptions rcstring bif scanner syntax ial alloc parsexp semantics
 
 ifj12: $(addprefix obj/,$(addsuffix .o,$(SOURCES)))
 	gcc -o $@ $^ $(CFLAGS) $(LINK)
