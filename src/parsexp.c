@@ -106,11 +106,11 @@ void removeFromExpStack(ExpStack* stack, int i){
         {
             if( stack->array[ii].val.term.type == tokId )
             {
-                //deleteRCString( &stack->array[i].val.term.data.id ); // TODO: uvolnovani
+                deleteRCString( &stack->array[ii].val.term.data.id );
             }
             if( stack->array[ii].val.term.type == tokLiteral )
             {
-                //freeValue( &stack->array[i].val.term.data.val ); // TODO: uvolnovani
+                freeValue( &stack->array[ii].val.term.data.val );
             }
         }
     }
