@@ -14,6 +14,7 @@
 #include "global.h"
 #include "ial.h"
 #include "value.h"
+#include "exceptions.h"
 
 typedef struct
 {
@@ -146,6 +147,9 @@ void evalSubstring( Substring* substring, Context* context )
         offset = 0;
     }else{
         Value offsetValue = evalExpression(&substring->offset,context);
+        if( offsetValue.type != typeNumeric ){
+            throw( BadArgumentType, "operator []" );
+        }
         offset = (int)getValueNumeric( testValuePositiveNumeric( &offsetValue ) );
         freeValue(&offsetValue);
     }
@@ -153,6 +157,9 @@ void evalSubstring( Substring* substring, Context* context )
         length = RCStringLength(&r);
     }else{
         Value lengthValue = evalExpression(&substring->length,context);
+        if( lengthValue.type != typeNumeric ){
+            throw( BadArgumentType, "operator []" );
+        }
         length = (int)getValueNumeric( testValuePositiveNumeric( &lengthValue ) );
         freeValue(&lengthValue);
     }
