@@ -8,8 +8,8 @@
  * @author Tretter Zdeněk <xtrett00@stud.fit.vutbr.cz>
  */
 
-#ifndef VALUE_H
-#define VALUE_H
+#ifndef SEMANTICS_H
+#define SEMANTICS_H
 
 
 #include <stdbool.h>
@@ -32,6 +32,7 @@ typedef enum
     PERMISSIVE_VALIDATION
 } ValidationMode;
 
+
 typedef enum    //necht existuji semanticke typy
 {
     TYPE_UNDEFINED = 0x0,
@@ -42,13 +43,6 @@ typedef enum    //necht existuji semanticke typy
     TYPE_ALL = 0xF
 } SemanticType;
 
-    /*Pro prevod valueType -> semanticType*/
-const SemanticType ValueToSemanticType[typeString+1] = {
-    [typeNil] = TYPE_NIL,
-    [typeBoolean] = TYPE_BOOLEAN,
-    [typeNumeric] = TYPE_NUMERIC,
-    [typeString] = TYPE_STRING
-};
 
 typedef enum    //necht existuji semanticke binarni operace
 {
@@ -68,116 +62,6 @@ typedef enum    //necht existuji semanticke binarni operace
     BINARYOP_MAXVALUE   //nepouzivat, uzcuje pouze velikost
 } SemanticBinaryOperator;
 
-    /*binarni operatory*/
-const SemanticBinaryOperator astOperatorConvTable[SBINARYOP_TYPE_MAXVALUE] = {
-    [AND]=BINARYOP_AND,
-    [OR]=BINARYOP_OR,
-    [EQUALS]=BINARYOP_EQUALS,
-    [NOTEQUALS]=BINARYOP_NOTEQUALS,
-    [LESS]=BINARYOP_LESS,
-    [GREATER]=BINARYOP_GREATER,
-    [LEQUAL]=BINARYOP_LEQUAL,
-    [GEQUAL]=BINARYOP_GEQUAL,
-    [ADD]=BINARYOP_ADD,
-    [SUBTRACT]=BINARYOP_SUBTRACT,
-    [MULTIPLY]=BINARYOP_MULTIPLY,
-    [DIVIDE]=BINARYOP_DIVIDE,
-    [POWER]=BINARYOP_POWER,
-};
-
-/// Definuje typ vysledku aplikovani binarniho operatoru, ktery je jako
-/// prvni index na typy druheho indexu a tretiho indexu (druhy je levy, treti je pravy)
-const SemanticType binaryOperatorTypeTable[BINARYOP_MAXVALUE][4][4] = {
-    /*[SemanticType] = {
-                                    pravy, treti index
-                    TYPE_NIL, TYPE_BOOLEAN, TYPE_NUMERIC, TYPE_STRING
-        TYPE_NIL    {   X,          X,           X,            X },
-levy    TYPE_BOOLEAN{   X,          X,           X,            X },
-druhy   TYPE_NUMERIC{   X,          X,           X,            X },
-        TYPE_STRING {   X,          X,           X,            X }
-    }*/
-
-    [BINARYOP_AND] = {
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN }
-    },
-    [BINARYOP_OR] = {
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN }
-    },
-    [BINARYOP_EQUALS] = {
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN }
-    },
-    [BINARYOP_NOTEQUALS] = {
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN },
-        { TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN }
-    },
-    [BINARYOP_LESS] = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, TYPE_BOOLEAN, 0 },
-        { 0, 0, 0, TYPE_BOOLEAN }
-    },
-    [BINARYOP_GREATER] = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, TYPE_BOOLEAN, 0 },
-        { 0, 0, 0, TYPE_BOOLEAN }
-    },
-    [BINARYOP_LEQUAL] = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, TYPE_BOOLEAN, 0 },
-        { 0, 0, 0, TYPE_BOOLEAN }
-    },
-    [BINARYOP_GEQUAL] = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, TYPE_BOOLEAN, 0 },
-        { 0, 0, 0, TYPE_BOOLEAN }
-    },
-    [BINARYOP_ADD] = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, TYPE_NUMERIC, 0 },
-        { TYPE_STRING, TYPE_STRING, TYPE_STRING, TYPE_STRING }
-    },
-    [BINARYOP_SUBTRACT] = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, TYPE_NUMERIC, 0 },
-        { 0, 0, 0, 0 }
-    },
-    [BINARYOP_MULTIPLY] = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, TYPE_NUMERIC, 0 },
-        { 0, 0, TYPE_STRING, 0 }
-    },
-    [BINARYOP_DIVIDE] = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, TYPE_NUMERIC, 0 },
-        { 0, 0, 0, 0 }
-    },
-    [BINARYOP_POWER] = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, TYPE_NUMERIC, 0 },
-        { 0, 0, 0, 0 }
-    },
-
-};
-
 
 typedef enum    //necht existuji semanticke binarni operace
 {
@@ -186,24 +70,6 @@ typedef enum    //necht existuji semanticke binarni operace
     UNARYOP_MAXVALUE   //nepouzivat, uzcuje pouze velikost
 } SemanticUnaryOperator;
 
-    /*binarni operatory*/
-const SemanticUnaryOperator astUnaryOperatorConvTable[SUNARYOP_TYPE_MAXVALUE] = {
-    [NOT]=UNARYOP_NOT,
-    [MINUS]=UNARYOP_MINUS
-
-};
-
-const SemanticType unaryOperatorTypeTable[UNARYOP_MAXVALUE][4] = {
-
-
-    [UNARYOP_NOT] = {
-         TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN, TYPE_BOOLEAN
-    },
-
-    [UNARYOP_MINUS] = {
-         0, 0, TYPE_NUMERIC, 0
-    }
-};
 
 typedef struct
 {

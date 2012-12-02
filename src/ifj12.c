@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "syntax.h"
 #include "exceptions.h"
+#include "semantics.h"
 #include "ast.h"
 
 int main(int argc, char**argv)
@@ -87,12 +88,33 @@ int main(int argc, char**argv)
     int countOfFunctions = syntaxcontext.globalSymbols->count;
     destroyDefaultSyntaxContext( &syntaxcontext );
     
-    /****************************** Interpretace ******************************/
-    
     Context context = {
         .globals=syntaxcontext.functions,
         .locals=NULL
     };
+    
+    /*************************** Semanticka analyza ***************************/
+    
+    try{
+        validateFunction( &mainFunction );
+        for(int i=0; i<countOfFunctions; i++){
+            if( context.globals[i].type==typeFunction && context.globals[i].data.function->type==USER_DEFINED ){
+                validateFunction( context.globals[i].data.function );
+            }
+        }
+    }
+    catch{
+        on( InvalidExpression, e ){
+            fprintf( stderr, "Nevalidní výraz nalezený v průbehu sématické analýzy! (parametr vyjímky: %d)\n", *e );
+            exit( 5 );
+        }
+        onAll{
+            fprintf( stderr, "Nastala neočekávaná vyjímka v průběhu sémantické analýzy!\n" );
+            exit( 99 );
+        }
+    }
+    
+    /****************************** Interpretace ******************************/
     
     try{
         // Spusteni hlavni funkce programu (bez parametru)
@@ -151,7 +173,7 @@ int main(int argc, char**argv)
         }
         onAll{
             fprintf( stderr, "Nastala neočekávaná vyjímka v průběhu vykonávání programu!\n" );
-            exit( 2 );
+            exit( 99 );
         }
     }
     
