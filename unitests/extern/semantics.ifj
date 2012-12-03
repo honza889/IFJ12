@@ -1,0 +1,63 @@
+// test semanticke analyzy
+
+// Semanticka analyza musi byt tolerantni vuci promennym neznameho typu
+function neznamePrirazeni(s,a,b,c)
+  x = s[b:c]
+  x = a + b
+  x = a - b
+  x = a * b
+  x = a / b
+  x = a ** b
+  x = a and b
+  x = a or b
+  x = not a
+  x = a < b
+  x = a <= b
+  x = a == b
+  x = a != b
+  x = a >= b
+  x = a > b
+end
+
+// Semanticka analyza musi dovolit to co je povolene
+function konstantniVstup()
+
+  x = "text"[0.0:0.0]
+
+  x = "" + ""
+  x = "" + 0.0
+  x = 0.0 + 0.0
+
+  x = 0.0 - 0.0
+
+  x = 0.0 * 0.0
+  x = "" * 0.0
+
+  x = 0.0 / 0.0
+
+  x = true and true
+  x = "" and ""
+  x = 0.0 and 0.0
+  x = true and ""
+  x = "" and true
+  x = 0.0 and true
+  x = true and 0.0
+  x = "" and 0.0
+  x = 0.0 and ""
+
+  x = true or true
+  x = "" or ""
+  x = 0.0 or 0.0
+  x = true or ""
+  x = "" or true
+  x = 0.0 or true
+  x = true or 0.0
+  x = "" or 0.0
+  x = 0.0 or ""
+
+  x = not 0.0
+  x = not true
+  x = not ""
+end
+
+
