@@ -9,3 +9,10 @@ dep
 xbiber00.tar.gz
 pack/*.*
 
+doc/*.aux
+doc/*.dvi
+doc/*.log
+doc/*.out
+doc/*.pdf
+doc/*.backup
+doc/*.toc
