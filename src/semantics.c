@@ -235,15 +235,13 @@ SemanticType result;
 
         if( ctx->mode == FULL_VALIDATION ){
 
-            if((result = validateExpression( &substring->source, ctx )) == TYPE_STRING){
+            if( (result = validateExpression( &substring->source, ctx )) & (TYPE_STRING | TYPE_ALL) ){
                 ctx->types[ substring->destination ] = result;
             }else{
-
                 throw( InvalidExpression, substring->destination );
-
             }
-        }else{
 
+        }else{
             ctx->types[ substring->destination ] |= TYPE_STRING;
         }
     }
