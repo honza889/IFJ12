@@ -60,4 +60,50 @@ function konstantniVstup()
   x = not ""
 end
 
+// Semanticka analyza musi dovolit to co je povolene
+function variabilniVstup()
+  s = "text"
+  n = 0.0
+  t = true
+
+  x = s[n:n]
+
+  x = s + s
+  x = s + n
+  x = n + n
+
+  x = n - n
+
+  x = n * n
+  x = s * n
+
+  x = n / n
+
+  x = t and t
+  x = s and s
+  x = n and n
+  x = t and s
+  x = s and t
+  x = n and t
+  x = t and n
+  x = s and n
+  x = n and s
+
+  x = t or t
+  x = s or s
+  x = n or n
+  x = t or s
+  x = s or t
+  x = n or t
+  x = t or n
+  x = s or n
+  x = n or s
+
+  x = not n
+  x = not t
+  x = not s
+end
+
+// Pokud se zacne interpretovat, je OK
+x=print("unitests/extern/semantics.ifj: OK\n")
 

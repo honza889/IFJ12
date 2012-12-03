@@ -40,6 +40,10 @@ echo
 
 echo "Test function, if, while:"
 eval $DOVALGRIND './ifj12-dbg unitests/extern/blocks.ifj'
+echo
+
+echo "Test semantiky - validnich vyrazu:"
+eval $DOVALGRIND './ifj12-dbg unitests/extern/semantics.ifj'
 echo; pause
 
 # echo "Test nacteni dlouheho zrojaku:"
