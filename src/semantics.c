@@ -9,6 +9,7 @@
  */
 
 #include "semantics.h"
+#include <assert.h>
 
 /** Pro prevod valueType -> semanticType **/
 const SemanticType ValueToSemanticType[typeString+1] = {
@@ -232,6 +233,11 @@ SemanticType result;
         throw( InvalidExpression, substring->destination );
 
     }else{
+        
+        if( !( validateExpression( &substring->length, ctx ) & TYPE_NUMERIC ) )
+            throw( InvalidExpression, 0 );
+        if( !( validateExpression( &substring->offset, ctx ) & TYPE_NUMERIC ) )
+            throw( InvalidExpression, 0 );
 
         if( ctx->mode == FULL_VALIDATION ){
 
@@ -301,6 +307,7 @@ SemanticType validateExpression( Expression* expr, SemCtx* ctx )
         default:
             break;
     }
+    assert( 0 );
     return TYPE_UNDEFINED;    //sem by se to nikdy dostat nemelo!
 }
 
@@ -331,6 +338,7 @@ SemanticType validateOperator( Operator* op, SemCtx* ctx )
         default:
             break;
     }
+    assert( 0 ); 
     return TYPE_UNDEFINED;    //sem by se to nikdy dostat nemelo!
 }
 
