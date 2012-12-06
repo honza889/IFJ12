@@ -330,6 +330,8 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     assert(getTok(s).type == tokLBracket);	// V kontextu s detectAssignment().
     consumeTok(s);
     
+    testTok( s, tokId | tokLiteral | tokColon );
+    
     if (getTok(s).type & (tokId | tokLiteral)) {
         if (getTok(s).type == tokLiteral){
             valueBuffer = getTok(s).data.val;
@@ -340,10 +342,12 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
         consumeTok(s);
     }
     else if (getTok(s).type == tokColon) {
-        substr.offset = (Expression){ .type=CONSTANT, .value.constant=newValueUndefined() };
+        substr.offset = (Expression){ .type=CONSTANT, .value.constant=newValueNumeric(0.0) };
     }
     
     expectTok(s, tokColon);
+    
+    testTok( s, tokId | tokLiteral | tokRBracket );                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
     
     if (getTok(s).type & (tokId | tokLiteral)) {
         if (getTok(s).type == tokLiteral){
@@ -404,248 +408,6 @@ void parseWhile( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     expectTok( s, tokEndOfLine );
     addStatementToStatementList(sl,&stmt);
 }
-
-bool compareOperators(Operator op1, Operator op2){
-    // unární operátory jsou prioritnější
-    if(op2.type==UNARYOP) return true;
-    if(op1.type==UNARYOP) return false;
-    // jinak je prioritnejší operátor s vyšší hodnotou prvních 4 bitů
-    return ( (op1.value.binary.type & 0xF0) >= (op2.value.binary.type & 0xF0) );
-}
-
-/*
-void parseExpression( Scanner* s, Expression* wholeExpression, SyntaxContext* ctx )
-{
-    // Porad mam dojem, ze tohle lze napsat lepe, ale co se da delat... --Biba
-    // Porad mam dojem ze vzdycky kdyz to zkusim vylepsit, je vysledkem segfault nebo nahodne chovani --JK
-    Token current;
-    Expression *newExp, *prevExp=NULL, *oldWholeExp=NULL;
-    enum {
-        wasStart, // zatim nebylo nic, zacatek expression
-        wasValue, // byla promenna, literal nebo zavorka (uzavrena)
-        wasOperator, // byl binarni operator
-        wasUnaryOperator // byl unarni operator
-    } past;
-    past = wasStart;
-    while(true){
-        current=getTok(s);
-        switch(current.type){
-            case tokId:
-                if(past==wasValue){ // dve hodnoty hned za sebou?
-                  throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
-                }
-                if(past==wasStart){
-                    newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
-                }else if(past==wasOperator){
-                    newExp = new(Expression);
-                    prevExp->value.operator.value.binary.right = newExp;
-                }else if(past==wasUnaryOperator){
-                    newExp = new(Expression);
-                    prevExp->value.operator.value.unary.operand = newExp;
-                }else{
-                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
-                }
-                newExp->parent=prevExp;
-                
-                // id( - Volani funkce
-                if(getTokN(s,1).type==tokLParen){
-                    newExp->type=FUNCTION_CALL;
-                    newExp->value.functionCall.function = getFunctionId( ctx, &current.data.id );
-                    newExp->value.functionCall.params = (ExpressionList){NULL,0};
-                    consumeTok(s); // zkonzumovat id
-                    consumeTok(s); // zkonzumovat '('
-                    Expression subExp;
-                    TokenType next = getTok(s).type;
-                    while(next!=tokRParen){
-                        parseExpression(s,&subExp,ctx);
-                        addExpressionToExpressionList(&newExp->value.functionCall.params,&subExp);
-                        // musi nasledovat ',' nebo ')'
-                        next = getTok(s).type;
-                        if(next!=tokComma && next!=tokRParen){
-                            throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
-                        }else if(next==tokComma){
-                            consumeTok(s); // zkonzumovat ','
-                        }
-                    }
-                // id - Promenna
-                }else{
-                    newExp->type=VARIABLE;
-                    newExp->value.variable = getSymbol(current.data.id,ctx->globalSymbols,ctx->localSymbols);
-                }
-                past = wasValue;
-            break;
-            case tokLiteral:
-                if(past==wasStart){
-                    newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu)
-                }else if(past==wasOperator){
-                    newExp = new(Expression);
-                    prevExp->value.operator.value.binary.right = newExp;
-                }else if(past==wasUnaryOperator){
-                    newExp = new(Expression);
-                    prevExp->value.operator.value.unary.operand = newExp;
-                }else{
-                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
-                }
-                newExp->type=CONSTANT;
-                newExp->value.constant=copyValue(&current.data.val);
-                newExp->parent=prevExp;
-                past = wasValue;
-            break;
-            case tokOp:
-                if(past==wasStart){ // prvnim tokenem vyrazu?
-                    if(current.data.op==opMinus || current.data.op==opNOT){
-                        newExp = wholeExpression; // do korene (je prvnim prvkem vyrazu - unarni minus)
-                        *newExp = (Expression){ .type=OPERATOR };
-                        newExp->parent = NULL;
-                        newExp->value.operator.type = UNARYOP;
-                        if(current.data.op==opMinus){
-                            newExp->value.operator.value.unary.type = MINUS;
-                        }else{
-                            newExp->value.operator.value.unary.type = NOT;
-                        }
-                        past = wasUnaryOperator;
-                    }else{
-                        throw(SyntaxError,((SyntaxErrorException){.type=BinaryOperatorAtBegin, .line_num=current.line_num}));
-                    }
-                }else if(past==wasUnaryOperator){ // za unarnim operatorem
-                    if(current.data.op==opMinus || current.data.op==opNOT){
-                        newExp = new(Expression);
-                        prevExp->value.operator.value.unary.operand = newExp;
-                        *newExp = (Expression){ .type=OPERATOR };
-                        newExp->parent = prevExp;
-                        newExp->value.operator.type = UNARYOP;
-                        if(current.data.op==opMinus){
-                            newExp->value.operator.value.unary.type = MINUS;
-                        }else{
-                            newExp->value.operator.value.unary.type = NOT;
-                        }
-                        past = wasUnaryOperator;
-                    }else{
-                        throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther, .line_num=current.line_num}));
-                    }
-                }else if(past==wasOperator){ // pred timto operatorem je dalsi binarni operator - nepripustne
-                    throw(SyntaxError,((SyntaxErrorException){.type=TwoOperatorsNextToEachOther, .line_num=current.line_num}));
-                }else{ // ve vyrazu je pred timto operatorem promenna/konstanta
-                    
-                    Operator tmpOp;
-                    tmpOp.type = BINARYOP;
-                    switch(current.data.op){
-                        case opPlus:     tmpOp.value.binary.type = ADD; break;
-                        case opMinus:    tmpOp.value.binary.type = SUBTRACT; break;
-                        case opMultiple: tmpOp.value.binary.type = MULTIPLY; break;
-                        case opDivide:   tmpOp.value.binary.type = DIVIDE; break;
-                        case opPower:    tmpOp.value.binary.type = POWER; break;
-                        case opEQ:       tmpOp.value.binary.type = EQUALS; break;
-                        case opNE:       tmpOp.value.binary.type = NOTEQUALS; break;
-                        case opLT:       tmpOp.value.binary.type = LESS; break;
-                        case opGT:       tmpOp.value.binary.type = GREATER; break;
-                        case opLE:       tmpOp.value.binary.type = LEQUAL; break;
-                        case opGE:       tmpOp.value.binary.type = GEQUAL; break;
-                        case opAND:      tmpOp.value.binary.type = AND; break;
-                        case opOR:       tmpOp.value.binary.type = OR; break;
-                        default: break;
-                    }
-                    
-                    Expression *parentExp;
-                    parentExp = prevExp->parent;
-                    // Je-li operace mene prioritni nez predchozi, misto predchozi operace
-                    // pujdeme na misto jeste predchodnejsi (parentnejsi) operace
-                    while(
-                      parentExp!=NULL &&
-                      compareOperators(prevExp->parent->value.operator, tmpOp)
-                    ){
-                      parentExp = parentExp->parent;
-                    }
-                    // parentExp je rodic newExp (nebo NULL)
-                    // prevExp je levy potomek newExp
-                    
-                    if(parentExp==NULL){ // je novym korenem
-                      // oldWholeExp je nove umisteni byvaleho korene (wholeExpression)
-                      oldWholeExp = new(Expression);
-                      *oldWholeExp = *wholeExpression;
-                      // pokud byl byvaly koren operator, opravime odkazy z jeho potomku
-                      if(oldWholeExp->type==OPERATOR){
-                          if(oldWholeExp->value.operator.type==BINARYOP){ // binarni
-                              if(oldWholeExp->value.operator.value.binary.left!=NULL){
-                                  oldWholeExp->value.operator.value.binary.left->parent = oldWholeExp;
-                              }
-                              if(oldWholeExp->value.operator.value.binary.right!=NULL){
-                                  oldWholeExp->value.operator.value.binary.right->parent = oldWholeExp;
-                              }
-                          }else{ // unarni
-                              oldWholeExp->value.operator.value.unary.operand->parent = oldWholeExp;
-                          }
-                      }
-                      newExp = wholeExpression;
-                      newExp->parent = NULL;
-                      
-                      newExp->type = OPERATOR;
-                      newExp->value.operator = tmpOp;
-                      newExp->value.operator.value.binary.left = oldWholeExp;
-                      newExp->value.operator.value.binary.left->parent = newExp;
-                      newExp->value.operator.value.binary.right = NULL;
-                      
-                    }else{
-                      newExp = new(Expression);
-                      newExp->parent = parentExp;
-                      
-                      assert(newExp->parent!=NULL);
-                      assert(newExp->parent->type==OPERATOR);
-                      
-                      if(newExp->parent->value.operator.type==BINARYOP){
-                        newExp->parent->value.operator.value.binary.right = newExp;
-                      }else{
-                        newExp->parent->value.operator.value.unary.operand = newExp;
-                      }
-                      
-                      newExp->type = OPERATOR;
-                      newExp->value.operator = tmpOp;
-                      newExp->value.operator.value.binary.left = prevExp;
-                      newExp->value.operator.value.binary.left->parent = newExp;
-                      newExp->value.operator.value.binary.right = NULL;
-                    }
-                    past = wasOperator;
-                }
-            break;
-            case tokLParen:
-                if(past==wasStart){ // na zacatku vyrazu
-                    newExp = wholeExpression; // do korene
-                    newExp->parent = NULL;
-                }else if(past==wasOperator){ // za binarnim operatorem
-                    newExp = new(Expression);
-                    prevExp->value.operator.value.binary.right = newExp; // pripojit za nejnovejsi operator
-                    newExp->parent = prevExp;
-                }else if(past==wasUnaryOperator){ // za unarnim operatorem
-                    newExp = new(Expression);
-                    prevExp->value.operator.value.unary.operand = newExp; // pripojit za nejnovejsi operator
-                    newExp->parent = prevExp;
-                }else{
-                    throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=current.line_num}));
-                }
-                consumeTok(s); // odstrani '('
-                parseExpression(s,newExp,ctx);
-                if(getTok(s).type!=tokRParen){ // byl exp ukoncen ')' ?
-                    throw(SyntaxError,((SyntaxErrorException){.type=UnterminatedParentheses, .line_num=current.line_num}));
-                }
-                past = wasValue;
-            break;
-            case tokRParen: case tokComma: case tokEndOfLine:
-                if(past==wasOperator || past==wasUnaryOperator){ // na konci vyrazu nesmi byt operator
-                  throw(SyntaxError,((SyntaxErrorException){.type=OperatorAtTheEnd, .line_num=current.line_num}));
-                }
-                if(past==wasStart){ // vyraz nesmi byt prazdny
-                  throw(SyntaxError,((SyntaxErrorException){.type=BlankExpression, .line_num=current.line_num}));
-                }
-                return; // konec parsovani expression, nekonzumuji - ukoncujici token zustane
-            break;
-            default:
-                throw(SyntaxError,((SyntaxErrorException){.type=BadTokenInExpression, .line_num=current.line_num}));
-            break;
-        } // endswitch
-        prevExp = newExp;
-        consumeTok(s);
-    } // endwhile
-}*/
 
 void parseIdentifier( Scanner* s, Variable* id, SyntaxContext* ctx )
 {
