@@ -20,6 +20,7 @@
 \usepackage[dvipdf]{graphicx}
 % velikost stranky
 \usepackage[top=3.5cm, left=2.5cm, text={17cm, 24cm}, ignorefoot]{geometry}
+\usepackage{lscape}
 
 \begin{document}
 
@@ -82,5 +83,14 @@ BLACKBURN, B.~J.; HOLFORD-STREVENS, L.: \emph{The Oxford Companion to the
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % přílohy
 \appendix
+
+
+\begin{landscape} % tabulku na sirku stranky
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Příloha: Precedenční tabulka} \label{precedencnitabulka}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{prectab.tex}
+\end{landscape}
+
 
 \end{document}
