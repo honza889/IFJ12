@@ -6,7 +6,7 @@ $(NAME).pdf: $(NAME).dvi
 $(NAME).dvi: title.tex prectab.tex $(NAME).tex
 	make -C img
 	latex -halt-on-error $(NAME).tex
-	latex -halt-on-error $(NAME).tex	# Znova pro vygenerování obsahu.
+	latex -halt-on-error $(NAME).tex	# Znovu pro vygenerování obsahu (seznamu sekcí)
 
 prectab.tex: prectab.csv
 	type csv2latex >/dev/null	# Aby se nevytvořil prázdný soubor prectab.tex, když není nainstalovaný balík csv2latex
