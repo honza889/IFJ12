@@ -15,6 +15,7 @@
 #include "value.h"
 #include "global.h"
 #include "exceptions.h"
+#include "ial.h"
 
 // Maximalni delka cisla (ve znacich) pro prevod na retezec
 #define BUFFERSIZE 128
@@ -585,4 +586,23 @@ Value notValue( Value* a )
 {
     return newValueBoolean( ! getValueBoolean( a ) );
 }
+
+/**
+ * Operace in: a in b
+ */
+Value inValue( Value* a, Value* b )
+{
+    Value vlist[] = { *b, *a };
+    return newValueBoolean( find((ValueList)&vlist,2).data.numeric != -1.0 );
+}
+
+/**
+ * Operace notin: a notin b
+ */
+Value notInValue( Value* a, Value* b )
+{
+    Value in = inValue( a, b );
+    return notValue( &in );
+}
+
 

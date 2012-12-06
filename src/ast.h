@@ -105,6 +105,8 @@ struct SBinaryOp
     GREATER=0x24,
     LEQUAL=0x25,
     GEQUAL=0x26,
+    IN=0x27,
+    NOTIN=0x28,
     ADD=0x31,
     SUBTRACT=0x32,
     MULTIPLY=0x41,

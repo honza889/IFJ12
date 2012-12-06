@@ -89,6 +89,8 @@ Value evalBinaryOp( BinaryOp* op, Context* context )
         case GREATER: ret = newValueBoolean( greaterValue( &left, &right ) ); break;
         case LEQUAL: ret = newValueBoolean( lesserEqualValue( &left, &right ) ); break;
         case GEQUAL: ret = newValueBoolean( greaterEqualValue( &left, &right ) ); break;
+        case IN: ret = inValue( &left, &right ); break;
+        case NOTIN: ret = notInValue( &left, &right ); break;
     }
     freeValue( &left );
     freeValue( &right );

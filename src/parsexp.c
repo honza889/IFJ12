@@ -149,38 +149,41 @@ typedef enum {
     oPower=4,
     oLParen=5, oRParen=6,
     oLT=7, oGT=8, oLE=9, oGE=10, oNE=11, oEQ=12,
-    oAND=13, oOR=14, oNOT=15,
-    oId=16, oEOF=17,
-    oUminus=18
+    oIn=13, oNotIn=14,
+    oAND=15, oOR=16, oNOT=17,
+    oId=18, oEOF=19,
+    oUminus=20
 } tableOp;
 
 /** Precedencni tabulka */ // (majitele eee PC mne budou nenavidet)
-tableRel precTable[19][18] = {
-             /*  +      -      *      /     **      (      )      <      >     <=     >=     !=     ==     and    or     not    id     EOF */
- /*    +  */ { close, minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
- /*    -  */ { close, minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
- /*    *  */ { close, minus, close, close, open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
- /*    /  */ { close, minus, close, close, open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   **  */ { close, minus, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+tableRel precTable[21][20] = {
+             /*  +      -      *      /     **      (      )      <      >     <=     >=     !=     ==     in    notin   and    or     not    id     EOF */
+ /*    +  */ { close, minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    -  */ { close, minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    *  */ { close, minus, close, close, open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    /  */ { close, minus, close, close, open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   **  */ { close, minus, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
 
- /*    (  */ { open,  minus, open,  open,  open,  open,  equal, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
- /*    )  */ { close, minus, close, close, close, blank, close, close, close, close, close, close, close, close, close, close, blank, close },
+ /*    (  */ { open,  minus, open,  open,  open,  open,  equal, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
+ /*    )  */ { close, minus, close, close, close, blank, close, close, close, close, close, close, close, close, close, close, close, close, blank, close },
 
- /*    <  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
- /*    >  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   <=  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   >=  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   !=  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   ==  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    <  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    >  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   <=  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   >=  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   !=  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   ==  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   in  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /* notin */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
 
- /*  and  */ { open,  minus, open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
- /*   or  */ { open,  minus, open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
- /*  not  */ { open,  minus, open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
+ /*  and  */ { open,  minus, open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
+ /*   or  */ { open,  minus, open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
+ /*  not  */ { open,  minus, open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
 
- /*   id  */ { close, close, close, close, close, func,  close, close, close, close, close, close, close, close, close, close, blank, close },
- /*  EOF  */ { open,  minus, open,  open,  open,  open,  blank, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
+ /*   id  */ { close, close, close, close, close, func,  close, close, close, close, close, close, close, close, close, close, close, close, blank, close },
+ /*  EOF  */ { open,  minus, open,  open,  open,  open,  blank, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
 
- /*  u -  */ { close, minus, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*  u -  */ { close, minus, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
 };
 
 tableOp token2tableOp(Token t){
@@ -205,6 +208,8 @@ tableOp token2tableOp(Token t){
                 case opGE: return oGE;
                 case opNE: return oNE;
                 case opEQ: return oEQ;
+                case opIn: return oIn;
+                case opNotIn: return oNotIn;
                 case opAND: return oAND;
                 case opOR: return oOR;
                 case opNOT: return oNOT;
@@ -212,7 +217,7 @@ tableOp token2tableOp(Token t){
             }
         break;
         default:
-            printf("nelze pretypovat token typu %x\n",t.type);
+            //printf("nelze pretypovat token typu %x\n",t.type);
             throw(SyntaxError,((SyntaxErrorException){.type=BadTokenInExpression, .line_num=t.line_num}));
     }
     return oEOF; // jen pro kompilator nechapajici vyjimky
@@ -285,6 +290,8 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
             case opGE: E.value.operator.value.binary.type = GEQUAL; break;
             case opNE: E.value.operator.value.binary.type = NOTEQUALS; break;
             case opEQ: E.value.operator.value.binary.type = EQUALS; break;
+            case opIn: E.value.operator.value.binary.type = IN; break;
+            case opNotIn: E.value.operator.value.binary.type = NOTIN; break;
             case opAND: E.value.operator.value.binary.type = AND; break;
             case opOR: E.value.operator.value.binary.type = OR; break;
             default: assert(false);
