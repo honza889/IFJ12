@@ -349,7 +349,7 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
         return true;
     }
     
-    printf("zadne pouzitelne pravidlo!\n"); // DEBUG
+    //printf("zadne pouzitelne pravidlo!\n"); // DEBUG
     return false; // Nastala syntakticka chyba
 }
 
@@ -415,7 +415,7 @@ void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx ){
                 }
             break;
             case blank: // prazdne policko: chyba
-                printf("prazdne pole v tabulce! [%d,%d]\n",token2tableOp(a),token2tableOp(b)); // DEBUG
+                //printf("prazdne pole v tabulce! [%d,%d]\n",token2tableOp(a),token2tableOp(b)); // DEBUG
                 throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=b.line_num}));
             break;
             case func: // volani funkce (precteno id( )
