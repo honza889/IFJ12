@@ -233,15 +233,15 @@ SemanticType result;
         throw( InvalidExpression, substring->destination );
 
     }else{
-        
-        if( !( validateExpression( &substring->length, ctx ) & TYPE_NUMERIC ) )
-            throw( InvalidExpression, 0 );
         if( !( validateExpression( &substring->offset, ctx ) & TYPE_NUMERIC ) )
+            throw( InvalidExpression, 0 );
+        if( !( substring->length.type == CONSTANT && substring->length.value.constant.type == typeUndefined ) &&
+            !( validateExpression( &substring->length, ctx ) & TYPE_NUMERIC ) )
             throw( InvalidExpression, 0 );
 
         if( ctx->mode == FULL_VALIDATION ){
 
-            if( (result = validateExpression( &substring->source, ctx )) & (TYPE_STRING | TYPE_UNDEFINED) ){
+            if( (result = validateExpression( &substring->source, ctx )) & TYPE_STRING ){
                 ctx->types[ substring->destination ] = result;
             }else{
                 throw( InvalidExpression, substring->destination );
