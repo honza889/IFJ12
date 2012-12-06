@@ -1,26 +1,3 @@
 // primitivní test, nic moc netestuje
 
-a = 2.0 - 1.0
-h = print( a, "\n" )
-
-a = 1.0 - - 1.0
-h = print( a, "\n" )
-
-a = -1.0 + 4.0
-h = print( a, "\n" )
-
-a = 3.0 - ( - 1.0 )
-h = print( a, "\n" )
-
-if "cd" in "abcde"
- x=print(":)\n")
-else
- x=print(":(\n")
-end
-
-if "xx" in "abcde"
- x=print(":(\n")
-else
- x=print(":)\n")
-end
-
+a = (1.0 + 2.0)

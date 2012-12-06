@@ -139,8 +139,7 @@ typedef enum {
     close, // >
     equal, // =
     blank, // -
-    func,  // volani funkce
-    minus  // zacatek unarniho nebo binarniho minus (zatim nevime)
+    func   // volani funkce
 } tableRel;
 
 typedef enum {
@@ -158,32 +157,32 @@ typedef enum {
 /** Precedencni tabulka */ // (majitele eee PC mne budou nenavidet)
 tableRel precTable[21][20] = {
              /*  +      -      *      /     **      (      )      <      >     <=     >=     !=     ==     in    notin   and    or     not    id     EOF */
- /*    +  */ { close, minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /*    -  */ { close, minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /*    *  */ { close, minus, close, close, open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /*    /  */ { close, minus, close, close, open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   **  */ { close, minus, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    +  */ { close, close, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    -  */ { close, close, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    *  */ { close, close, close, close, open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    /  */ { close, close, close, close, open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   **  */ { close, close, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
 
- /*    (  */ { open,  minus, open,  open,  open,  open,  equal, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
- /*    )  */ { close, minus, close, close, close, blank, close, close, close, close, close, close, close, close, close, close, close, close, blank, close },
+ /*    (  */ { open,  open,  open,  open,  open,  open,  equal, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
+ /*    )  */ { close, close, close, close, close, blank, close, close, close, close, close, close, close, close, close, close, close, close, blank, close },
 
- /*    <  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /*    >  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   <=  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   >=  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   !=  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   ==  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /*   in  */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
- /* notin */ { open,  minus, open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    <  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*    >  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   <=  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   >=  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   !=  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   ==  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*   in  */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /* notin */ { open,  open,  open,  open,  open,  open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
 
- /*  and  */ { open,  minus, open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
- /*   or  */ { open,  minus, open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
- /*  not  */ { open,  minus, open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
+ /*  and  */ { open,  open,  open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
+ /*   or  */ { open,  open,  open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
+ /*  not  */ { open,  open,  open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
 
  /*   id  */ { close, close, close, close, close, func,  close, close, close, close, close, close, close, close, close, close, close, close, blank, close },
- /*  EOF  */ { open,  minus, open,  open,  open,  open,  blank, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
+ /*  EOF  */ { open,  open,  open,  open,  open,  open,  blank, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
 
- /*  u -  */ { close, minus, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*  u -  */ { close, close, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
 };
 
 tableOp token2tableOp(Token t){
@@ -396,6 +395,19 @@ void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx ){
             break;
         }
         
+        if(b.type==tokOp && b.data.op==opMinus){
+            if( // pokud to je unarni minus
+              (itemFromStack(&stack,1)->type==term && itemFromStack(&stack,1)->val.term.type==tokEndOfFile) ||
+              (itemFromStack(&stack,1)->type==term && itemFromStack(&stack,1)->val.term.type==tokLParen) ||
+              (itemFromStack(&stack,1)->type==term && itemFromStack(&stack,1)->val.term.type==tokOp)
+            ){ // pridej na zasobnik "<-" a cti dalsi token
+                addToExpStack(&stack, (ExpItem){.type=bracket}); // push(bracket)
+                addToExpStack(&stack, (ExpItem){.type=term, .val.term.type=tokOp, .val.term.data.op=opUMinus}); // push(-)
+                consumeTok(s); // precti dalsi symbol ze vstupu
+                continue;
+            }
+        }
+        
         switch(precTable[token2tableOp(a)][token2tableOp(b)]){
             case equal: // =
                 //printf("=\n");
@@ -422,33 +434,6 @@ void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx ){
                 //printf("func\n");
                 if(!replaceByFunctionCall(&stack,s,ctx)){
                     throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=b.line_num}));
-                }
-            break;
-            case minus: // unarni minus (<) nebo binarni minus (>)
-                //printf("minus\n");
-                // pokud minus nasleduje po $ nebo po operatoru, je unarni
-                if(
-                  (itemFromStack(&stack,1)->type==term && itemFromStack(&stack,1)->val.term.type==tokEndOfFile) ||
-                  (itemFromStack(&stack,1)->type==term && itemFromStack(&stack,1)->val.term.type==tokLParen) ||
-                  (itemFromStack(&stack,1)->type==term && itemFromStack(&stack,1)->val.term.type==tokOp)
-                ){ // unarni
-                    //printf("U\n");
-                    addToExpStack(&stack, (ExpItem){.type=bracket}); // push(bracket)
-                    addToExpStack(&stack, (ExpItem){.type=term, .val.term.type=tokOp, .val.term.data.op=opUMinus}); // push(-)
-                    consumeTok(s); // precti dalsi symbol ze vstupu
-                }else{ // binarni
-                    //printf("B\n");
-                    if(a.type==tokEndOfFile){ // po $ - <
-                        //printf("-<\n");
-                        addToAfterTermExpStack(&stack, (ExpItem){.type=bracket}); // vlozit < za a
-                        addToExpStack(&stack, (ExpItem){.type=term, .val.term=b}); // push(b)
-                        consumeTok(s); // precti dalsi symbol ze vstupu
-                    }else{ // po jinem operatoru - >
-                        //printf("->\n");
-                        if(!tryUseRules(&stack,ctx)){
-                            throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=b.line_num}));
-                        }
-                    }
                 }
             break;
         }

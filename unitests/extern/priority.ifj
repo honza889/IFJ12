@@ -121,6 +121,20 @@ if 10.0 != a
 else
 end
 
+a = 10.0-1.0
+if 9.0 != a
+  x=print("9.0==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = (10.0-2.0)
+if 8.0 != a
+  x=print("8.0==",a,": ERROR\n")
+  isOK=false
+else
+end
+
 a = true and not not true
 if true != a
   x=print("true==",a,": ERROR\n")
