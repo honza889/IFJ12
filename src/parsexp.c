@@ -180,9 +180,8 @@ tableRel precTable[21][20] = {
  /*  not  */ { open,  open,  open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
 
  /*   id  */ { close, close, close, close, close, func,  close, close, close, close, close, close, close, close, close, close, close, close, blank, close },
- /*  EOF  */ { open,  open,  open,  open,  open,  open,  blank, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
-
  /*  u -  */ { close, close, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
+ /*  EOF  */ { open,  open,  open,  open,  open,  open,  blank, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
 };
 
 tableOp token2tableOp(Token t){
