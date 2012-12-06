@@ -12,7 +12,7 @@ nainstalovanym balikem texlive-latex.
 #
 ### Potrebne baliky #########################################################
 #----------------------------------------------------------------------------
-aptitude -R install texlive-latex-base texlive-lang-czechslovak \
+aptitude -R install texlive-latex-base texlive-lang-czechslovak csv2latex \
                     texlive-latex-extra texlive-latex-recommended
 #
 ### Jako editor doporucuji Kile #############################################
@@ -24,13 +24,14 @@ aptitude -R install kile
 POSTUP
 ======
 
-1. Obrazky muzete vytvorit ve formatu PNG, JPG nebo FIG. Obrazky ulozte do
-adresare img/ a upravte soubor img/makefile (inspirujte se jeho aktualnim
-obsahem). Pro prevod do pozadovaneho EPS formatu budete pravdepodobne
-potrebovat sadu nastroju ImageMagick nebo transfig (stejne tak se bude
-pravdepodobne jmenovat balik ve vasi linuxove distribuci).
+1. Obrazky muzete vytvorit ve formatu PNG, JPG, FIG nebo EPS. Obrazky ulozte
+do adresare img/ a upravte soubor img/Makefile, pokud jste nevytvorili primo
+EPS (inspirujte se jeho aktualnim obsahem). Pro prevod do pozadovaneho EPS
+formatu budete pravdepodobne potrebovat sadu nastroju ImageMagick nebo
+transfig (stejne tak se bude pravdepodobne jmenovat balik ve vasi linuxove
+distribuci).
 
-2. Seznam literatury najdete ke konci souboru proj2.tex. Tento seznam upravte
+2. Seznam literatury najdete ke konci souboru ifj12.tex. Tento seznam upravte
 pro ucely vasi dokumentace.
 
 3. Vyskladejte zdrojovou dokumentaci do formatu PDF prikazem:

@@ -16,3 +16,4 @@ doc/*.out
 doc/*.pdf
 doc/*.backup
 doc/*.toc
+doc/prectab.tex
