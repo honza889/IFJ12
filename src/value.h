@@ -111,6 +111,8 @@ Value powerValue( Value* a, Value* b );
 Value andValue( Value* a, Value* b );
 Value orValue( Value* a, Value* b );
 Value notValue( Value* a );
+Value inValue( Value* a, Value* b );
+Value notInValue( Value* a, Value* b );
 
 static inline int typeOfValue(Value *object){
   return (int)object->type;

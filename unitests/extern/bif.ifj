@@ -160,7 +160,65 @@ else
   isOK=false
 end
 
-//x = neexistujici("")
+/**************/
+/* IN / NOTIN */
+/**************/
+a = "cd" in "abcde"
+if a != true
+  x=print("true==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = "xx" in "abcde"
+if a != false
+  x=print("false==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = "ab" in "ab"
+if a != true
+  x=print("true==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = "" in "ab"
+if a != true
+  x=print("true==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = "" in ""
+if a != true
+  x=print("true==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = "ab" in ""
+if a != false
+  x=print("false==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = "cd" notin "abcde"
+if a != false
+  x=print("false==",a,": ERROR\n")
+  isOK=false
+else
+end
+
+a = "xx" notin "abcde"
+if a != true
+  x=print("true==",a,": ERROR\n")
+  isOK=false
+else
+end
+
 
 if isOK
   x=print("unitests/extern/bif.ifj: OK\n")

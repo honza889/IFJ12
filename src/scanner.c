@@ -536,6 +536,12 @@ bool det_key_word(RCString lexeme, Token *token, unsigned line_num)
     } else if (! strcmp("not", RCStringGetBuffer(&cmp_lexeme))) {
       token->type = tokOp;
       token->data.op = opNOT;
+    } else if (! strcmp("in", RCStringGetBuffer(&cmp_lexeme))) {
+      token->type = tokOp;
+      token->data.op = opIn;
+    } else if (! strcmp("notin", RCStringGetBuffer(&cmp_lexeme))) {
+      token->type = tokOp;
+      token->data.op = opNotIn;
     } else if (! strcmp("true", RCStringGetBuffer(&cmp_lexeme))) {
       token->type = tokLiteral;
       token->data.val = newValueBoolean(true);

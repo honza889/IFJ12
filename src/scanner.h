@@ -53,6 +53,7 @@ typedef struct {
             opPlus, opMinus, opMultiple, opDivide, opPower,
             opLT, opGT, opLE, opGE, opNE, opEQ,
             opAND, opOR, opNOT,
+            opIn, opNotIn,
             opUMinus // unarni minus, neni produkovan scannerem, pouziva se v zasobniku syntakticke analyzy
         } op;
         KeyWord keyw;	/** Klíčová slova */

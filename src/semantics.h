@@ -63,7 +63,7 @@ typedef enum    //necht existuji semanticke binarni operace
 } SemanticBinaryOperator;
 
 
-typedef enum    //necht existuji semanticke binarni operace
+typedef enum    //necht existuji semanticke unarni operace
 {
     UNARYOP_NOT,
     UNARYOP_MINUS,
