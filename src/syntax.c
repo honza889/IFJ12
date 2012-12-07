@@ -303,7 +303,7 @@ void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Assignment assgn;
     RCString name = getTok(s).data.id;		// DE-BUG: původ
-    assgn.destination = getSymbol(name,ctx->globalSymbols, ctx->localSymbols );
+    assgn.destination = getSymbol(name,NULL, ctx->localSymbols );
     consumeTok(s);
     parseExpression(s, &assgn.source, ctx);
     expectTok(s, tokEndOfLine);
@@ -318,7 +318,7 @@ void parseSubstring( Scanner* s, StatementList* sl, SyntaxContext* ctx )
     Substring substr;
     Value valueBuffer;
     RCString name = getTok(s).data.id;
-    substr.destination = getSymbol(name,ctx->globalSymbols, ctx->localSymbols );
+    substr.destination = getSymbol(name,NULL, ctx->localSymbols );
     consumeTok(s);
 
     if (getTok(s).type == tokLiteral){
