@@ -67,6 +67,14 @@ typedef struct {
  */
 bool setNewSymbol( RCString name, SymbolTable *table );
 
+
+/**
+ * Vyhledani uzlu (uzel=root/greater/lesser)
+ * Vstupem ukazatel na ukazatel na vrchol stromu (Symbol**)
+ * Vystupem ukazatel na uzel pro symbol (Symbol**)
+ */
+Symbol** searchSymbol(Symbol **destination, RCString name, bool *exist);
+
 /**
  * Vrati index symbolu daneho jmena, pokud neexistuje, vytvori ho
  */

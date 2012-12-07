@@ -148,8 +148,19 @@ const SemanticType unaryOperatorTypeTable[UNARYOP_MAXVALUE][4] = {
     }
 };
 
-void validateFunction( Function* f )
+void validateFunction( Function* f , SyntaxContext* synCtx)
 {
+    bool exist;
+
+    for(int i = 0; i < f->value.userDefined.variableCount; i++){    //kontrola jmen funkce a promennych
+
+        searchSymbol(&(synCtx->globalSymbols->root),f->value.userDefined.variableNames[i],&exist);
+
+        if(exist == true){  //jmeno promenne se shoduje se jmenem funkce
+            throw( VariableOverridesFunction, copyRCString( &f->value.userDefined.variableNames[i]) );
+        }
+    }
+
     if( f->type == USER_DEFINED )   //vestavene funkce validovat nebudeme
     {
         SemanticType types[ f->value.userDefined.variableCount ];   //tabulka pro propojeni promene(vyrazu) a nejakeho datoveho typu (i vice zaroven)
@@ -338,7 +349,7 @@ SemanticType validateOperator( Operator* op, SemCtx* ctx )
         default:
             break;
     }
-    assert( 0 ); 
+    assert( 0 );
     return TYPE_UNDEFINED;    //sem by se to nikdy dostat nemelo!
 }
 

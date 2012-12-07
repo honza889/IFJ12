@@ -16,32 +16,32 @@
 
 int main(int argc, char**argv)
 {
-    
+
     /****************************** Inicializace ******************************/
-    
+
     exceptions_init();
     if(argc!=2){
         fprintf( stderr, "Chybný způsob volání interpretru!\nPoužití: %s program.ifj\n\n", argv[0] );
         exit( 13 );
     }
-    
+
     FILE* f=fopen(argv[1],"r");
     if(f==NULL){
         fprintf( stderr, "Program k interpretaci (%s) se nepodařilo otevřít!\n\n", argv[1] );
         exit( 13 );
     }
-    
+
     Scanner s;
     SyntaxContext syntaxcontext;
     Function mainFunction;
-    
+
     try{
-    
-        
+
+
         initScanner(&s,f);
         initDefaultSyntaxContext(&syntaxcontext);
-        
-    
+
+
         /***************************** Překlad do AST *****************************/
         parseProgram(&s, &syntaxcontext, &mainFunction);
     }
@@ -81,25 +81,24 @@ int main(int argc, char**argv)
             exit( 2 );
         }
     }
-    
-    /*************************** Uklid po prekladu ****************************/
-    
+
+
     fclose( f );
+
     int countOfFunctions = syntaxcontext.globalSymbols->count;
-    destroyDefaultSyntaxContext( &syntaxcontext );
-    
+
     Context context = {
         .globals=syntaxcontext.functions,
         .locals=NULL
     };
-    
+
     /*************************** Semanticka analyza ***************************/
-    
+
     try{
-        validateFunction( &mainFunction );
+        validateFunction( &mainFunction, &syntaxcontext);
         for(int i=0; i<countOfFunctions; i++){
             if( context.globals[i].type==typeFunction && context.globals[i].data.function->type==USER_DEFINED ){
-                validateFunction( context.globals[i].data.function );
+                validateFunction( context.globals[i].data.function, &syntaxcontext);
             }
         }
     }
@@ -108,14 +107,18 @@ int main(int argc, char**argv)
             fprintf( stderr, "Nevalidní výraz nalezený v průbehu sématické analýzy! (parametr vyjímky: %d)\n", *e );
             exit( 5 );
         }
+        on( VariableOverridesFunction, e ){
+            fprintf( stderr, "Promenna '"); RCStringPrint(e, stderr); fprintf( stderr, "' se shoduje se jmenem funkce!\n");
+            exit( 5 );
+        }
         onAll{
             fprintf( stderr, "Nastala neočekávaná vyjímka v průběhu sémantické analýzy!\n" );
             exit( 99 );
         }
     }
-    
+
     /****************************** Interpretace ******************************/
-    
+
     try{
         // Spusteni hlavni funkce programu (bez parametru)
         Value ret = evalFunction( &mainFunction, (ExpressionList){NULL,0}, &context );
@@ -176,16 +179,33 @@ int main(int argc, char**argv)
             exit( 99 );
         }
     }
-    
+
     /********************************* Uklid **********************************/
-    
+
     fflush(NULL); // aby vystup programu nemusel cekat na dokonceni uklidu
-    
+
+    /* uvolneni variableNames */
+        for(int i=0; i<syntaxcontext.globalSymbols->count; i++){
+            if( context.globals[i].type==typeFunction){
+                for(int j = 0; j<context.globals[i].data.function->value.userDefined.variableCount; j++){
+                    //deleteRCString(&(context.globals[i].data.function->value.userDefined.variableNames[j]));
+                }
+                //free(context.globals[i].data.function->value.userDefined.variableNames);
+            }
+        }
+        for(int j = 0; j<mainFunction.value.userDefined.variableCount; j++){
+            //deleteRCString(&(mainFunction.value.userDefined.variableNames[j]));
+        }
+        //free(mainFunction.value.userDefined.variableNames);
+
+
+
+    destroyDefaultSyntaxContext( &syntaxcontext );
     // Uvolneni vsech funkci
     deleteFunction( mainFunction );
 //    freeFunctionsTable( context.globals, countOfFunctions );
     freeValueTable( context.globals, countOfFunctions );
-    
+
     return 0;
 }
 

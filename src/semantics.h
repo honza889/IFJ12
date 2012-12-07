@@ -19,6 +19,8 @@
 #include <math.h>
 #include <errno.h>
 #include "exceptions.h"
+#include "syntax.h"
+#include "ial.h"
 
 
 
@@ -79,7 +81,7 @@ typedef struct
 } SemCtx;
 
 
-void validateFunction( Function* f );
+void validateFunction( Function* f, SyntaxContext* ctx);
 
 void validateStatement( Statement* stmt, SemCtx* ctx );
 
