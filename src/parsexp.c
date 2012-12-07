@@ -180,8 +180,8 @@ tableRel precTable[21][20] = {
  /*  not  */ { open,  open,  open,  open,  open,  open,  close, open,  open,  open,  open,  open,  open,  open,  open,  close, close, open,  open,  close },
 
  /*   id  */ { close, close, close, close, close, func,  close, close, close, close, close, close, close, close, close, close, close, close, blank, close },
- /*  u -  */ { close, close, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
  /*  EOF  */ { open,  open,  open,  open,  open,  open,  blank, open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  open,  blank },
+ /*  u -  */ { close, close, close, close, close, open,  close, close, close, close, close, close, close, close, close, close, close, close, open,  close },
 };
 
 tableOp token2tableOp(Token t){
@@ -356,7 +356,8 @@ bool tryUseRules( ExpStack* stack, SyntaxContext* ctx ){
  * tokenu volani funkce vyrazem Expression, ktery vrati na zasobnik
  */
 bool replaceByFunctionCall( ExpStack* stack, Scanner* s, SyntaxContext* ctx ){
-
+    if(itemFromStack(stack,1)->type!=term || itemFromStack(stack,1)->val.term.type!=tokId) return false;
+    
     Expression E, subExp;
     E.type = FUNCTION_CALL;
     E.value.functionCall.function = getFunctionId( ctx, &itemFromStack(stack,1)->val.term.data.id );

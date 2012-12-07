@@ -4,42 +4,42 @@ a = 6.0
 b = 2.0
 c = (a + b)
 if c != 8.0
-    x = print( "c = ", a, "\n" )
+    x = print( "c1 = ", a, "\n" )
     isOk = false
 else
 end
 
 c = (a - b)
-if c != 2.0
-    x = print( "c = ", a, "\n" )
+if c != 4.0
+    x = print( "c2 = ", a, "\n" )
     isOk = false
 else
 end
 
 c = (a * b)
 if c != 12.0
-    x = print( "c = ", a, "\n" )
+    x = print( "c3 = ", a, "\n" )
     isOk = false
 else
 end
 
 c = (a / b)
 if c != 3.0
-    x = print( "c = ", a, "\n" )
+    x = print( "c4 = ", a, "\n" )
     isOk = false
 else
 end
 
 c = (a + b) * (a + b) - (a + b) * (a + b)
 if c != 0.0
-    x = print( "c = ", a, "\n" )
+    x = print( "c5 = ", a, "\n" )
     isOk = false
 else
 end
 
 c = (a + b) * ((a + b) / ((a + b) * (a + b)))
 if c != 1.0
-    x = print( "c = ", a, "\n" )
+    x = print( "c6 = ", a, "\n" )
     isOk = false
 else
 end

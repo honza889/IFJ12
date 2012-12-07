@@ -87,13 +87,42 @@ BLACKBURN, B.~J.; HOLFORD-STREVENS, L.: \emph{The Oxford Companion to the
 
 \begin{landscape} % tabulku na sirku stranky
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Příloha: Precedenční tabulka} \label{precedencnitabulka}
+\section{Příloha: Tabulka a pravidla precedenční syntaktické analýzy} \label{precedencnitabulka}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{minipage}{\linewidth} % obal tabulky pro poznamky pod carou
+\begin{minipage}{0.83\linewidth} % obal tabulky pro poznamky pod carou
 \begin{large} % vetsi velikost pisma, aby tabulka vyplnila stranku
 \input{prectab.tex}
 \end{large}
+\end{minipage}
+\qquad
+\begin{minipage}{0.17\linewidth} % obal tabulky pro poznamky pod carou
+\begin{math}
+G = (N,T,P,E) \\
+N = \{ E \} \\
+T = \{ \\ +, -, *, /, **, (, ), <, >, <=, >=, \text{!=}, \text{==}, \text{in}, \text{notin}, \text{and}, \text{or}, \text{not}, \text{i} \\ \} \\
+P = \{ \\
+1: E \rightarrow E + E \\
+2: E \rightarrow E - E \\
+3: E \rightarrow E * E \\
+4: E \rightarrow E / E \\
+5: E \rightarrow E ** E \\
+6: E \rightarrow E < E \\
+7: E \rightarrow E > E \\
+8: E \rightarrow E <= E \\
+9: E \rightarrow E >= E \\
+10: E \rightarrow E \text{ != } E \\
+11: E \rightarrow E \text{ == } E \\
+12: E \rightarrow E \text{ in } E \\
+13: E \rightarrow E \text{ notin } E \\
+14: E \rightarrow E \text{ and } E \\
+15: E \rightarrow E \text{ or } E \\
+16: E \rightarrow \text{ not } E \\
+17: E \rightarrow -E \\
+18: E \rightarrow (E) \\
+19: E \rightarrow \text{i} \\
+\} \\ \\ \\
+\end{math}
 \end{minipage}
 \end{landscape}
 

@@ -96,6 +96,9 @@ echo 'a = "123"' > /tmp/exceptions.ifj
 echo 'x = numeric(a)' >> /tmp/exceptions.ifj
 line_num=$LINENO; ( ./ifj12-dbg /tmp/exceptions.ifj; expectResult 12 )	|| result=$?
 
+echo 'x = 1.0(5.0)' >> /tmp/exceptions.ifj
+line_num=$LINENO; ( ./ifj12-dbg /tmp/exceptions.ifj; expectResult 2 )	|| result=$?
+
 # Ostatní běhové chyby:
 #echo 'a = ""' > /tmp/exceptions.ifj
 #echo 'x = numeric(a)' >> /tmp/exceptions.ifj
