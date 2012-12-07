@@ -32,9 +32,9 @@ test:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 tests:  $(addprefix unitests/,$(addsuffix /test,$(TESTS)))
 	unitests/tests.sh valgrind "$?"
 
-unitests/value/test: obj/dbg/value.o obj/dbg/exceptions.o obj/dbg/alloc.o obj/dbg/ast.o
+unitests/value/test: obj/dbg/value.o obj/dbg/exceptions.o obj/dbg/alloc.o obj/dbg/ast.o obj/dbg/ial.o
 unitests/symbols/test: obj/dbg/ial.o obj/dbg/value.o obj/dbg/exceptions.o obj/dbg/alloc.o obj/dbg/ast.o
-unitests/ast/test: obj/dbg/value.o obj/dbg/ast.o obj/dbg/exceptions.o obj/dbg/alloc.o
+unitests/ast/test: obj/dbg/value.o obj/dbg/ast.o obj/dbg/exceptions.o obj/dbg/alloc.o obj/dbg/ial.o
 unitests/exceptions/test: obj/dbg/exceptions.o obj/dbg/alloc.o
 unitests/scanner/test: obj/dbg/scanner.o obj/dbg/rcstring.o obj/dbg/alloc.o
 unitests/syntax/test: obj/dbg/syntax.o obj/dbg/parsexp.o obj/dbg/scanner.o obj/dbg/rcstring.o obj/dbg/value.o obj/dbg/ast.o obj/dbg/alloc.o obj/dbg/bif.o obj/dbg/ial.o

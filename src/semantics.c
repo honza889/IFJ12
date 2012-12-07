@@ -34,6 +34,8 @@ const SemanticBinaryOperator astOperatorConvTable[SBINARYOP_TYPE_MAXVALUE] = {
     [MULTIPLY]=BINARYOP_MULTIPLY,
     [DIVIDE]=BINARYOP_DIVIDE,
     [POWER]=BINARYOP_POWER,
+    [IN]=BINARYOP_IN,
+    [NOTIN]=BINARYOP_NOTIN
 };
 
 /// Definuje typ vysledku aplikovani binarniho operatoru, ktery je jako
@@ -126,7 +128,18 @@ druhy   TYPE_NUMERIC{   X,          X,           X,            X },
         { 0, 0, TYPE_NUMERIC, 0 },
         { 0, 0, 0, 0 }
     },
-
+    [BINARYOP_IN] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, TYPE_BOOLEAN }
+    },
+    [BINARYOP_NOTIN] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, TYPE_BOOLEAN }
+    }
 };
 
 /** Binarni operatory **/
@@ -148,8 +161,19 @@ const SemanticType unaryOperatorTypeTable[UNARYOP_MAXVALUE][4] = {
     }
 };
 
-void validateFunction( Function* f )
+void validateFunction( Function* f , SyntaxContext* synCtx)
 {
+    bool exist;
+
+    for(int i = 0; i < f->value.userDefined.variableCount; i++){    //kontrola jmen funkce a promennych
+
+        searchSymbol(&(synCtx->globalSymbols->root),f->value.userDefined.variableNames[i],&exist);
+
+        if(exist == true){  //jmeno promenne se shoduje se jmenem funkce
+            throw( VariableOverridesFunction, copyRCString( &f->value.userDefined.variableNames[i]) );
+        }
+    }
+
     if( f->type == USER_DEFINED )   //vestavene funkce validovat nebudeme
     {
         SemanticType types[ f->value.userDefined.variableCount ];   //tabulka pro propojeni promene(vyrazu) a nejakeho datoveho typu (i vice zaroven)
@@ -338,7 +362,7 @@ SemanticType validateOperator( Operator* op, SemCtx* ctx )
         default:
             break;
     }
-    assert( 0 ); 
+    assert( 0 );
     return TYPE_UNDEFINED;    //sem by se to nikdy dostat nemelo!
 }
 

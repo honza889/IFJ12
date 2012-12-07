@@ -19,6 +19,8 @@
 #include <math.h>
 #include <errno.h>
 #include "exceptions.h"
+#include "syntax.h"
+#include "ial.h"
 
 
 
@@ -59,6 +61,8 @@ typedef enum    //necht existuji semanticke binarni operace
     BINARYOP_MULTIPLY,
     BINARYOP_DIVIDE,
     BINARYOP_POWER,
+    BINARYOP_IN,
+    BINARYOP_NOTIN,
     BINARYOP_MAXVALUE   //nepouzivat, uzcuje pouze velikost
 } SemanticBinaryOperator;
 
@@ -79,7 +83,7 @@ typedef struct
 } SemCtx;
 
 
-void validateFunction( Function* f );
+void validateFunction( Function* f, SyntaxContext* ctx);
 
 void validateStatement( Statement* stmt, SemCtx* ctx );
 
