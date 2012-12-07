@@ -426,3 +426,13 @@ void deleteStatementList( StatementList sl )
     }
     free( sl.item );
 }
+
+void deleteFunction( Function func ){
+    if( func.type == USER_DEFINED ){
+        deleteStatementList( func.value.userDefined.statements );
+        for( int j = 0; j < func.value.userDefined.variableCount; j++ ){
+            deleteRCString( &( func.value.userDefined.variableNames[j] ) );
+        }
+        free( func.value.userDefined.variableNames );
+    }
+}
