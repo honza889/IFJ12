@@ -61,6 +61,8 @@ typedef enum    //necht existuji semanticke binarni operace
     BINARYOP_MULTIPLY,
     BINARYOP_DIVIDE,
     BINARYOP_POWER,
+    BINARYOP_IN,
+    BINARYOP_NOTIN,
     BINARYOP_MAXVALUE   //nepouzivat, uzcuje pouze velikost
 } SemanticBinaryOperator;
 

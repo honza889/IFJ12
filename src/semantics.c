@@ -34,6 +34,8 @@ const SemanticBinaryOperator astOperatorConvTable[SBINARYOP_TYPE_MAXVALUE] = {
     [MULTIPLY]=BINARYOP_MULTIPLY,
     [DIVIDE]=BINARYOP_DIVIDE,
     [POWER]=BINARYOP_POWER,
+    [IN]=BINARYOP_IN,
+    [NOTIN]=BINARYOP_NOTIN
 };
 
 /// Definuje typ vysledku aplikovani binarniho operatoru, ktery je jako
@@ -126,7 +128,18 @@ druhy   TYPE_NUMERIC{   X,          X,           X,            X },
         { 0, 0, TYPE_NUMERIC, 0 },
         { 0, 0, 0, 0 }
     },
-
+    [BINARYOP_IN] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, TYPE_BOOLEAN }
+    },
+    [BINARYOP_NOTIN] = {
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, 0 },
+        { 0, 0, 0, TYPE_BOOLEAN }
+    }
 };
 
 /** Binarni operatory **/
