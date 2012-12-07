@@ -440,7 +440,9 @@ void parseExpression( Scanner* s, Expression* expr, SyntaxContext* ctx ){
     }
     
     ExpItem* ret = itemFromStack(&stack,1);
-    assert(ret->type==exp);
+    if(ret->type!=exp){
+        throw(SyntaxError,((SyntaxErrorException){.type=StrangeSyntax, .line_num=b.line_num}));
+    }
     *expr=ret->val.exp;
     freeExpStack(&stack);
 }

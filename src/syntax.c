@@ -428,7 +428,7 @@ void syntaxErrorPrint(SyntaxErrorException e) {
     case BadTokenInExpression:		fprintf(stderr,"Parse error: Bad token in expression"); break;
     case BadTokenAtBeginOfStatement:	fprintf(stderr,"Parse error: Bad begin of statement"); break;
     case AssignWithoutAssignOperator:	fprintf(stderr,"Parse error: Assign without assign operator"); break;
-    case StrangeSyntax:			fprintf(stderr,"Parse error: StrangeSyntax"); break;
+    case StrangeSyntax:			fprintf(stderr,"Parse error: Your syntax is strange"); break;
     case BinaryOperatorAtBegin:		fprintf(stderr,"Parse error: Binary operator at begin of expression"); break;
     case OperatorAtTheEnd:		fprintf(stderr,"Parse error: Operator at the end of the expression"); break;
     case TwoOperatorsNextToEachOther:	fprintf(stderr,"Parse error: Two operators next to each other"); break;

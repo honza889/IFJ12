@@ -100,7 +100,8 @@ BLACKBURN, B.~J.; HOLFORD-STREVENS, L.: \emph{The Oxford Companion to the
 \begin{math}
 G = (N,T,P,E) \\
 N = \{ E \} \\
-T = \{ \\ +, -, *, /, **, (, ), <, >, <=, >=, \text{!=}, \text{==}, \text{in}, \text{notin}, \text{and}, \text{or}, \text{not}, \text{i} \\ \} \\
+T = \{ \\ +, -, *, /, **, (, ), <, >, <=, >=, \text{!=}, \text{==}, \text{in},
+        \text{notin}, \text{and}, \text{or}, \text{not}, \text{i} \\ \} \\
 P = \{ \\
 1: E \rightarrow E + E \\
 2: E \rightarrow E - E \\
@@ -126,5 +127,53 @@ P = \{ \\
 \end{minipage}
 \end{landscape}
 
+\begin{landscape} % tabulku na sirku stranky
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Příloha: Rekurzivní sestup - LL(2) tabulka} \label{rekurzivnisestup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{minipage}{\linewidth} % obal tabulky pro poznamky pod carou
+\begin{large}
+
+\begin{math}
+G = (N,T,R,P) \\
+N = \{ P, S, P', S', L, E', E \} \\
+T = \{ =, [, ], \text{ i }, \text{ if }, \text{ else }, \text{ while }, \text{ end }, \text{ function }, (, ), \text{ , }, \text{ EOL } \} \\
+\end{math}
+
+\begin{minipage}{0.2\linewidth}
+\begin{math}
+1.  P  \rightarrow \varepsilon \\
+2.  P  \rightarrow SP \\
+3.  S  \rightarrow S' \\
+4.  P' \rightarrow \varepsilon \\
+5.  P' \rightarrow S'P' \\
+6.  S' \rightarrow id = A \text{ EOL } \\
+\end{math}
+\end{minipage}
+\begin{minipage}{0.42\linewidth}
+\begin{math}
+7.  A \rightarrow E \\
+8.  A \rightarrow id[E':E'] \\
+9.  S' \rightarrow \text{ if } E \text{ EOL } P' \text{ end } \text{ EOL } \\
+10. S' \rightarrow \text{ while } E \text{ EOL } P' \text{ end } \text{ EOL } \\
+11. S' \rightarrow \text{ return } E \text{ EOL } \\
+12. S  \rightarrow \text{ function } id ( E' L ) \text{ EOL } P' \text{ end } \text{ EOL } \\
+\end{math}
+\end{minipage}
+\begin{minipage}{0.4\linewidth}
+\begin{math}
+13. L  \rightarrow \varepsilon \\
+14. L  \rightarrow E L \\
+15. E' \rightarrow E \\
+16. E' \rightarrow \varepsilon \\
+\\ \\
+\end{math}
+\end{minipage}
+
+\input{rectab.tex}
+\end{large}
+\end{minipage}
+\end{landscape}
 
 \end{document}
