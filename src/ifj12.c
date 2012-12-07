@@ -105,16 +105,23 @@ int main(int argc, char**argv)
     catch{
         on( InvalidExpression, e ){
             fprintf( stderr, "Nevalidní výraz nalezený v průbehu sématické analýzy! (parametr vyjímky: %d)\n", *e );
+            deleteFunction( mainFunction );
+            freeValueTable( context.globals, countOfFunctions );
             destroyDefaultSyntaxContext( &syntaxcontext );
             exit( 5 );
         }
         on( VariableOverridesFunction, e ){
             fprintf( stderr, "Promenna '"); RCStringPrint(e, stderr); fprintf( stderr, "' se shoduje se jmenem funkce!\n");
+            deleteRCString( e );
+            deleteFunction( mainFunction );
+            freeValueTable( context.globals, countOfFunctions );
             destroyDefaultSyntaxContext( &syntaxcontext );
             exit( 5 );
         }
         onAll{
             fprintf( stderr, "Nastala neočekávaná vyjímka v průběhu sémantické analýzy!\n" );
+            deleteFunction( mainFunction );
+            freeValueTable( context.globals, countOfFunctions );
             destroyDefaultSyntaxContext( &syntaxcontext );
             exit( 99 );
         }
@@ -194,7 +201,6 @@ int main(int argc, char**argv)
     
     // Uvolneni vsech funkci
     deleteFunction( mainFunction );
-    //freeFunctionsTable( context.globals, countOfFunctions );
     freeValueTable( context.globals, countOfFunctions );
     destroyDefaultSyntaxContext( &syntaxcontext );
 
