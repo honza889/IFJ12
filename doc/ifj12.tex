@@ -46,44 +46,173 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Úvod} \label{uvod}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla,
-bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla,
-bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla, bla...
+~ ~ ~Tato dokumentace popisuje tvorbu interpretu imperativního jazyka IFJ12. 
+Popisuje, nejen způsob implementace interpretu, ale i~jeho testování a~také práci v~týmu.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Analýza problému a princip jeho řešení} \label{analyza}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Bla, bla...
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                                                             
 %=============================================================================
-\subsection{Zadání problému}
+\subsection{Rozbor zadání}
+~ ~ ~Úkolem je vytvořit již zmíněný interpret imperativního jazyka IFJ12. Interpret 
+musí navíc nabízet několik vestavěných funkcí a musí být napsán v jazyce C. Součástí 
+zadání jsou i dílčí úkoly do předmětu IAL. Z varianty a/4/I vyplývá, že vyhledávácí 
+algoritmus bude \textbf{Knuth-Moris-Prattův}, řadící algoritmus bude \textbf{Merge sort} 
+a tabulka symbolů bude implementována pomocí \textbf{binárního vyhledávacího stromu}. 
+%=============================================================================
+\subsection{Princip řešení}
+~ ~ ~Tady bude jen nějaký obecný pricnip, že LA načte token, da to Syn.A ten z toho vyrobí 
+nevím co, pak to probehne Sem.A, a pak se to interpretuje. Kde a jak se používají tabulky
+symbolů atd. Zkrátka nějaký hodně obecný pohled na celou strukturu interpretu. 
+%=============================================================================
 
-Bla, bla...
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Práce v týmu} \label{prace_v_tymu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+~ ~ ~K~úspěšnému dokončení interpretu nebyly potřeba jen dobré programátorské 
+znalosti~a nadšení, ale bylo potřeba zvládnout i~spolupráci v pětičlenném týmu. 
+Bylo potřeba najít efektivní způsob komunikace a~rozdělení práce abychom interpret
+dokončili včas.
+%=============================================================================
+\subsection{Komunikace}
+~ ~ ~Ke sdílení zdrojových souborů mezi členy týmu jsme používali systém pro 
+správu verzí Git. Celotýmové schůzky proběhly dvě, jedna na začátku semestru 
+a~druhá v polovině semestru. Ostatní komunikace probíhala už jen dle potřeby mezi 
+jednotlivými členy pomocí některého z~IM klientů.
+%=============================================================================
+\subsection{Rozdělení práce}
+~ ~ ~Práci jsme si v týmu rozdělovali tak, že si každý vybíral víceméně dobrovolně 
+něco z~toho, co bylo zrovna potřeba udělat, tak abychom se pokud možno nikde 
+nezasekli čekáním na dokončení některé z~částí potřebné pro implementaci části jiné.
+\newline\newline
+Výsledné rozdělení práce dopadlo přibližně takto: \medskip
+
+\begin{tabular}{llp{12.4cm}}
+Zdeněk Biberle & - & \\
+Jan Doležal    & - & \\
+Martin Fryč    & - & \\
+Jan Kalina     & - & \\
+Zdeněk Tretter & - & vestavěné funkce, merge sort, dokumentace\\
+\end{tabular}
+%=============================================================================
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementace} \label{implementace}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%=============================================================================
+\subsection{Lexikální analyzátor}
+~ ~ ~Jádrem lexikálního analizátoru je funkce \texttt{scan}, která čte lexémy ze zdrojového 
+textu a převádí je na tokeny pomocí konečného automatu znázorněného v příloze 1.
+
+Token je reprezentován strukturou \texttt{Token}, ta obsahuje typ tokenu, data, a číslo 
+řádku na kterém se token nachází. Položka data může obsahovat název symbolu, hodnotu ze 
+zdrojového souboru, operátor nebo klíčové slovo. Lexikální analizátor nabízí syntaktickému 
+analizátoru až 4 tokeny naráz pomocí struktury \texttt{Scanner}.
+%=============================================================================
+\subsection{Syntaktický analyzátor}
+~ ~ ~bla\\ bla
+%=============================================================================
+\subsection{Sémantický analyzátor}
+~ ~ ~bla
+%=============================================================================
+\subsection{Interpretace}
+~ ~ ~bla
+%=============================================================================
+\subsection{Modul ial}
+\subsubsection{Vyhledávací algoritmus - Knuth-Moris-Pratt}
+~ ~ ~bla
+\subsubsection{Řadící algoritmus - Merge sort}
+~ ~ ~Merge sort se skládá ze dvou funkcí. Funkce \texttt{mergesort} rekurzivně dělí 
+řetězec na dvě poloviny, dokud jí nezbydou jen dva znaky. Tyto poloviny  předává funkci
+\texttt{merge}, která oba subřetězce seřadí a~vrátí. Funkce \texttt{mergesort} skončí 
+a~o~úroveň výš se seřadí dva již seřazené subřetězce do jednoho. To se opakuje dokud 
+není celý řetězec seřazený.
+
+Protože merge sort kromě prvního řazení seřazuje vždy dva už seřazené subřetězce, 
+tak se ve funkci \texttt{merge} subřetězce seřazují do nového jen do doby než, 
+je jeden ze subřetězců zařazen, poté se už zbytek druhého jen přilepí na konec nově 
+seřazeného řetězce.  
+\subsubsection{Tabulka symbolů - Binární vyhledávací strom}
+~ ~ ~Jeden uzel stromu (prvek tabulky) je reprezentován strukturou \texttt{Symbol}.
+Ta obsahuje název symbolu, který je zároveň klíčem, podle kterého se ve stromu vyhledává. 
+Obsahuje také index symbolu v tabulce, který je kladný v případě, že symbol je 
+v~lokální tabulce symbolů a~záporný v~případě, že je v~globální tabulce. Poslední dvě 
+položky jsou ukazatele na menší a~větší symbol. Struktura \texttt{SymbolTable} osahuje 
+ukazatel na kořen binárního vyhledávacího stromu reprezentující tabulku symbolů a~počet 
+symbolů v~tabulce.\newline\newline Pro operace nad stromem jsou implementovány tyto funkce:
+\medskip
+
+\begin{tabular}{llp{11.9cm}}
+\texttt{newSymbolTable}  & - & Inicializuje ukazatel na kořen na \texttt{null} a počet symbolu na 0.\\
+\texttt{setNewSymbol}    & - & Prohledá strom a pokud vkládaný symbol ve stromě není, 
+                               tak vytvoří pro symbol uzel a vloží ho do stromu.\\                        
+\texttt{getSymbol}       & - & Prohledá strom s globalní tabulkou, pokud tam symbol nenajde,  
+                               tak prohledá strom s lokální tabulkou, pokud existuje.  
+                               Pokud v jedné z tabulek symbol najde, vrátí jeho index, 
+                               jinak uzel se symbolem vytvoří a vloží do lokální tabulky, 
+                               pokud existuje, jinak do globální tabulky a vrátí index.\\
+\texttt{freeSymbolTable} & - & Uvolní prvky stromu.\\
+\end{tabular}
+%=============================================================================
+\subsection{Rozšíření}
+\subsubsection{FUNEXP}
+~ ~ ~bla
+\subsubsection{LOGOP}
+~ ~ ~bla
+\subsubsection{MINUS}
+~ ~ ~bla
+%=============================================================================
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Testování} \label{testovani}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+~ ~ ~Testování je nedílnou součástí vývoje software. Už od začátku jsme proto začali
+psát krátké testy pro každý modul, který jsme vytvořili. Tyto testy ověřovali,
+zdali námi implementované funkce v modulech vrací očekávané výstupy. Ověřovali 
+jsme kromě běžných případů i~různé okrajové případy. Smyslem těchto krátkých testů 
+bylo zajistit, abychom během upravování modulů nezanesli do kódu nechtěné chyby.
+
+Dalším druhem testů byly už testy samotného interpretu, napsané v~jazyce IFJ12, 
+kterými jsme mohli zjišťovat, které konstrukce jazyka IFJ12 už interpretujeme 
+správně a~které ještě musíme doladit. K~těmto testům jsme použili, jak zdrojové 
+texty ze zadání, tak i~některé vlastní.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Závěr} \label{zaver}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+~ ~ ~Vytvořený interpret funguje tak, jak je požadováno v~zadání. Správně interpretuje 
+všechny zdrojové texty ze zadání a~splňuje požadavky na formát výstupů. Dále zvládl 
+správně interpretovat i~naše vlastní testy. Naše implementace interpretu také zvládá 
+velmi rychlé kopírování řetězců mezi proměnnými. Také jsme implementovali navíc tři 
+rozšíření, které rozšiřují funkcionalitu interpretu o~možnost použítí unárního mínus, 
+úplných logických výrazů a~výrazů v~parametrech funkcí nebo použití funkcí ve výrazech.
 
-Bla, bla...
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Metriky kódu} \label{metriky}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tabular}{ll}
+  Počet souborů: & 24 \\
+  Počet řádků: & 9001 \\
+  Velikost spustitelného souboru: & 42 kB \\
+\end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % seznam citované literatury: každá položka je definována příkazem
 % \bibitem{xyz}, kde xyz je identifikátor citace (v textu použij: \cite{xyz})
-\begin{thebibliography}{1}
-
+%\begin{thebibliography}{1}
+%
 % jedna citace:
-\bibitem{kalendar}
-BLACKBURN, B.~J.; HOLFORD-STREVENS, L.: \emph{The Oxford Companion to the
-  Year}. Oxford: Oxford University Press, 1999, ISBN 0-19-214231-3.
-
-
-\end{thebibliography}
+%\bibitem{kalendar}
+%BLACKBURN, B.~J.; HOLFORD-STREVENS, L.: \emph{The Oxford Companion to the
+%  Year}. Oxford: Oxford University Press, 1999, ISBN 0-19-214231-3.
+%
+%
+%\end{thebibliography}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % přílohy
 \appendix
 
+\newpage Tady bude automat LA
 
 \begin{landscape} % tabulku na sirku stranky
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
