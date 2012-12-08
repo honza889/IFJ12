@@ -88,10 +88,10 @@ nezasekli čekáním na dokončení některé z~částí potřebné pro implemen
 Výsledné rozdělení práce dopadlo přibližně takto: \medskip
 
 \begin{tabular}{llp{12.4cm}}
-Zdeněk Biberle & - & \\
-Jan Doležal    & - & \\
-Martin Fryč    & - & \\
-Jan Kalina     & - & \\
+Zdeněk Biberle & - & AST, syntaktický analyzátor, sémantický analyzátor\\
+Jan Doležal    & - & lexikální analyzátor, ještě něco, nevim co :P\\
+Martin Fryč    & - & řetězcový vyhledávací algoritmus, sémantický analyzátor\\
+Jan Kalina     & - & syntaktický analyzátor, operátory, spousta dalších věcí, něco si sem dopiš\\
 Zdeněk Tretter & - & vestavěné funkce, merge sort, dokumentace\\
 \end{tabular}
 %=============================================================================
@@ -101,13 +101,14 @@ Zdeněk Tretter & - & vestavěné funkce, merge sort, dokumentace\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %=============================================================================
 \subsection{Lexikální analyzátor}
-~ ~ ~Jádrem lexikálního analizátoru je funkce \texttt{scan}, která čte lexémy ze zdrojového 
+~ ~ ~Jádrem lexikálního analyzátoru je funkce \texttt{scan}, která čte lexémy ze zdrojového 
 textu a převádí je na tokeny pomocí konečného automatu znázorněného v příloze 1.
 
-Token je reprezentován strukturou \texttt{Token}, ta obsahuje typ tokenu, data, a číslo 
-řádku na kterém se token nachází. Položka data může obsahovat název symbolu, hodnotu ze 
-zdrojového souboru, operátor nebo klíčové slovo. Lexikální analizátor nabízí syntaktickému 
-analizátoru až 4 tokeny naráz pomocí struktury \texttt{Scanner}.
+Token je reprezentován strukturou \texttt{Token}. Ta obsahuje typ tokenu, data, a číslo 
+řádku na kterém se token nachází. Položka data může obsahovat název symbolu, literál ze 
+zdrojového souboru, operátor nebo klíčové slovo. Lexikální analyzátor nabízí syntaktickému 
+analyzátoru až 4 tokeny naráz pomocí struktury \texttt{Scanner} a přidružených funkcí
+\texttt{getTok}, \texttt{getTokN}, \texttt{consumeTok} a \texttt{consumeTokN}.
 %=============================================================================
 \subsection{Syntaktický analyzátor}
 ~ ~ ~bla\\ bla

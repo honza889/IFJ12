@@ -155,7 +155,6 @@ void parseProgram( Scanner* s, SyntaxContext* ctx, Function* main )
         }
     }
     main->value.userDefined.variableCount = ctx->localSymbols->count;
-    // BUG: Následující dva zakomentované řádky způsobovaly leak a ani nevím k čemu byli. (Jan Doležal)
     main->value.userDefined.variableNames = newArray( RCString, ctx->localSymbols->count );
     fillNameListFromSymbolTree( main->value.userDefined.variableNames, ctx->localSymbols->root );
 }
