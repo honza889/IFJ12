@@ -46,7 +46,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Úvod} \label{uvod}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-~ ~ ~Tato dokumentace popisuje tvorbu interpretu imperativního jazyka IFJ12. 
+Tato dokumentace popisuje tvorbu interpretu imperativního jazyka IFJ12. 
 Popisuje, nejen způsob implementace interpretu, ale i~jeho testování a~také práci v~týmu.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,46 +54,16 @@ Popisuje, nejen způsob implementace interpretu, ale i~jeho testování a~také 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                                                                             
 %=============================================================================
 \subsection{Rozbor zadání}
-~ ~ ~Úkolem je vytvořit již zmíněný interpret imperativního jazyka IFJ12. Interpret 
+Úkolem je vytvořit již zmíněný interpret imperativního jazyka IFJ12. Interpret 
 musí navíc nabízet několik vestavěných funkcí a musí být napsán v jazyce C. Součástí 
 zadání jsou i dílčí úkoly do předmětu IAL. Z varianty a/4/I vyplývá, že vyhledávácí 
 algoritmus bude \textbf{Knuth-Moris-Prattův}, řadící algoritmus bude \textbf{Merge sort} 
-a tabulka symbolů bude implementována pomocí \textbf{binárního vyhledávacího stromu}. 
+a~tabulka symbolů bude implementována pomocí \textbf{binárního vyhledávacího stromu}. 
 %=============================================================================
 \subsection{Princip řešení}
-~ ~ ~Tady bude jen nějaký obecný pricnip, že LA načte token, da to Syn.A ten z toho vyrobí 
+Tady bude jen nějaký obecný pricnip, že LA načte token, da to Syn.A ten z toho vyrobí 
 nevím co, pak to probehne Sem.A, a pak se to interpretuje. Kde a jak se používají tabulky
 symbolů atd. Zkrátka nějaký hodně obecný pohled na celou strukturu interpretu. 
-%=============================================================================
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Práce v týmu} \label{prace_v_tymu}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-~ ~ ~K~úspěšnému dokončení interpretu nebyly potřeba jen dobré programátorské 
-znalosti~a nadšení, ale bylo potřeba zvládnout i~spolupráci v pětičlenném týmu. 
-Bylo potřeba najít efektivní způsob komunikace a~rozdělení práce abychom interpret
-dokončili včas.
-%=============================================================================
-\subsection{Komunikace}
-~ ~ ~Ke sdílení zdrojových souborů mezi členy týmu jsme používali systém pro 
-správu verzí Git. Celotýmové schůzky proběhly dvě, jedna na začátku semestru 
-a~druhá v polovině semestru. Ostatní komunikace probíhala už jen dle potřeby mezi 
-jednotlivými členy pomocí některého z~IM klientů.
-%=============================================================================
-\subsection{Rozdělení práce}
-~ ~ ~Práci jsme si v týmu rozdělovali tak, že si každý vybíral víceméně dobrovolně 
-něco z~toho, co bylo zrovna potřeba udělat, tak abychom se pokud možno nikde 
-nezasekli čekáním na dokončení některé z~částí potřebné pro implementaci části jiné.
-\newline\newline
-Výsledné rozdělení práce dopadlo přibližně takto: \medskip
-
-\begin{tabular}{llp{12.4cm}}
-Zdeněk Biberle & - & AST, syntaktický analyzátor, sémantický analyzátor\\
-Jan Doležal    & - & lexikální analyzátor, ještě něco, nevim co :P\\
-Martin Fryč    & - & řetězcový vyhledávací algoritmus, sémantický analyzátor\\
-Jan Kalina     & - & syntaktický analyzátor, operátory, spousta dalších věcí, něco si sem dopiš\\
-Zdeněk Tretter & - & vestavěné funkce, merge sort, dokumentace\\
-\end{tabular}
 %=============================================================================
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -101,48 +71,46 @@ Zdeněk Tretter & - & vestavěné funkce, merge sort, dokumentace\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %=============================================================================
 \subsection{Lexikální analyzátor}
-~ ~ ~Jádrem lexikálního analyzátoru je funkce \texttt{scan}, která čte lexémy ze zdrojového 
-textu a převádí je na tokeny pomocí konečného automatu znázorněného v příloze 1.
+Jádrem lexikálního analyzátoru je funkce \texttt{scan}, která čte lexémy ze zdrojového 
+textu a~převádí je na tokeny pomocí konečného automatu znázorněného v příloze A.
 
-Token je reprezentován strukturou \texttt{Token}. Ta obsahuje typ tokenu, data, a číslo 
+Token je reprezentován strukturou \texttt{Token}. Ta obsahuje typ tokenu, data, a~číslo 
 řádku na kterém se token nachází. Položka data může obsahovat název symbolu, literál ze 
 zdrojového souboru, operátor nebo klíčové slovo. Lexikální analyzátor nabízí syntaktickému 
 analyzátoru až 4 tokeny naráz pomocí struktury \texttt{Scanner} a přidružených funkcí
 \texttt{getTok}, \texttt{getTokN}, \texttt{consumeTok} a \texttt{consumeTokN}.
 %=============================================================================
 \subsection{Syntaktický analyzátor}
-~ ~ ~bla\\ bla
+bla
 %=============================================================================
 \subsection{Sémantický analyzátor}
-~ ~ ~bla
+bla
 %=============================================================================
 \subsection{Interpretace}
-~ ~ ~Interpretace je prováděna rekurzivním čtením abstraktního syntaktického stromu
+Interpretace je prováděna rekurzivním čtením abstraktního syntaktického stromu 
 a~prováděním činností popisovaných jednotlivými uzly stromu. 
-
-~ ~ ~Hlavní interpretační funkcí je \texttt{evalFunction}, jejímž účelem je 
-vytvoření prostoru pro proměnné předané funkce a poté evaluace jednotlivých
-příkazů této funkce, které jsou reprezentovány jako seznam struktur \texttt{Statement},
-funkcí \texttt{evalStatement}, která dále předává řízení funkcím
+Hlavní interpretační funkcí je \texttt{evalFunction}, jejímž účelem je 
+vytvoření prostoru pro proměnné předané funkce a~poté evaluace jednotlivých 
+příkazů této funkce, které jsou reprezentovány jako seznam struktur \texttt{Statement}, 
+funkcí \texttt{evalStatement}, která dále předává řízení funkcím 
 \texttt{evalAssignment}, \texttt{evalSubstring}, \texttt{evalLoop}, 
-\texttt{evalCondition} a \texttt{evalReturn} podle druhu příkazu.
+\texttt{evalCondition} a \texttt{evalReturn} podle druhu příkazu. 
 
-~ ~ ~Tyto funkce již přímo vykonávají činnosti popsané daným příkazem 
-s využitím funkce \texttt{evalExpression}, která s využitím několika
-dalších funkcí (\texttt{evalOperator}, \texttt{evalBinaryOp}, 
-\texttt{evalUnaryOp}, \texttt{evalConstant}, \texttt{evalVariable} a 
-\texttt{evalFunctionCall}) evaluuje libovolný výraz popsaný stromem, 
-jehož kořenem je struktura \texttt{Expression}.
+Tyto funkce již přímo vykonávají činnosti popsané daným příkazem 
+s využitím funkce \texttt{evalExpression}, která s~využitím funkcí \texttt{evalOperator}, 
+\texttt{evalBinaryOp}, \texttt{evalUnaryOp} nebo \texttt{evalConstant}, \texttt{evalVariable} 
+a~\texttt{evalFunctionCall} evaluuje libovolný výraz popsaný stromem, 
+jehož kořenem je struktura \texttt{Expression}. 
 
-~ ~ ~\texttt{evalCondition} a \texttt{evalLoop} taktéž využívají funkce
+Funkce \texttt{evalCondition} a~\texttt{evalLoop} taktéž využívají funkce 
 \texttt{evalStatement} pro provádění do nich vnořených příkazů.
 
 %=============================================================================
 \subsection{Modul ial}
 \subsubsection{Vyhledávací algoritmus - Knuth-Moris-Pratt}
-~ ~ ~bla
+bla
 \subsubsection{Řadící algoritmus - Merge sort}
-~ ~ ~Merge sort se skládá ze dvou funkcí. Funkce \texttt{mergesort} rekurzivně dělí 
+Merge sort se skládá ze dvou funkcí. Funkce \texttt{mergesort} rekurzivně dělí 
 řetězec na dvě poloviny, dokud jí nezbydou jen dva znaky. Tyto poloviny  předává funkci
 \texttt{merge}, která oba subřetězce seřadí a~vrátí. Funkce \texttt{mergesort} skončí 
 a~o~úroveň výš se seřadí dva již seřazené subřetězce do jednoho. To se opakuje dokud 
@@ -153,7 +121,7 @@ tak se ve funkci \texttt{merge} subřetězce seřazují do nového jen do doby n
 je jeden ze subřetězců zařazen, poté se už zbytek druhého jen přilepí na konec nově 
 seřazeného řetězce.  
 \subsubsection{Tabulka symbolů - Binární vyhledávací strom}
-~ ~ ~Jeden uzel stromu (prvek tabulky) je reprezentován strukturou \texttt{Symbol}.
+Jeden uzel stromu (prvek tabulky) je reprezentován strukturou \texttt{Symbol}.
 Ta obsahuje název symbolu, který je zároveň klíčem, podle kterého se ve stromu vyhledává. 
 Obsahuje také index symbolu v tabulce, který je kladný v případě, že symbol je 
 v~lokální tabulce symbolů a~záporný v~případě, že je v~globální tabulce. Poslední dvě 
@@ -176,17 +144,17 @@ symbolů v~tabulce.\newline\newline Pro operace nad stromem jsou implementovány
 %=============================================================================
 \subsection{Rozšíření}
 \subsubsection{FUNEXP}
-~ ~ ~bla
+bla
 \subsubsection{LOGOP}
-~ ~ ~bla
+bla
 \subsubsection{MINUS}
-~ ~ ~bla
+bla
 %=============================================================================
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Testování} \label{testovani}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-~ ~ ~Testování je nedílnou součástí vývoje software. Už od začátku jsme proto začali
+Testování je nedílnou součástí vývoje software. Už od začátku jsme proto začali
 psát krátké testy pro každý modul, který jsme vytvořili. Tyto testy ověřovali,
 zdali námi implementované funkce v modulech vrací očekávané výstupy. Ověřovali 
 jsme kromě běžných případů i~různé okrajové případy. Smyslem těchto krátkých testů 
@@ -198,9 +166,39 @@ správně a~které ještě musíme doladit. K~těmto testům jsme použili, jak 
 texty ze zadání, tak i~některé vlastní.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Práce v týmu} \label{prace_v_tymu}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+K~úspěšnému dokončení interpretu nebyly potřeba jen dobré programátorské 
+znalosti~a nadšení, ale bylo potřeba zvládnout i~spolupráci v~pětičlenném týmu. 
+Bylo potřeba najít efektivní způsob komunikace a~rozdělení práce abychom interpret
+dokončili včas.
+%=============================================================================
+\subsection{Komunikace}
+Ke sdílení zdrojových souborů mezi členy týmu jsme používali systém pro 
+správu verzí Git. Celotýmové schůzky proběhly dvě, jedna na začátku semestru 
+a~druhá v polovině semestru. Ostatní komunikace probíhala už jen dle potřeby mezi 
+jednotlivými členy pomocí některého z~IM klientů.
+%=============================================================================
+\subsection{Rozdělení práce}
+Práci jsme si v týmu rozdělovali tak, že si každý vybíral víceméně dobrovolně 
+něco z~toho, co bylo zrovna potřeba udělat, tak abychom se pokud možno nikde 
+nezasekli čekáním na dokončení některé z~částí potřebné pro implementaci části jiné.
+\newline\newline
+Výsledné rozdělení práce dopadlo přibližně takto: \medskip
+
+\begin{tabular}{llp{12.4cm}}
+Zdeněk Biberle & - & AST, syntaktický analyzátor, sémantický analyzátor\\
+Jan Doležal    & - & lexikální analyzátor, ještě něco, nevim co :P\\
+Martin Fryč    & - & Knuth-Moris-Pratt, sémantický analyzátor\\
+Jan Kalina     & - & syntaktický analyzátor, operátory, spousta dalších věcí, něco si sem dopiš\\
+Zdeněk Tretter & - & vestavěné funkce, merge sort, dokumentace\\
+\end{tabular}
+%=============================================================================
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Závěr} \label{zaver}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-~ ~ ~Vytvořený interpret funguje tak, jak je požadováno v~zadání. Správně interpretuje 
+Vytvořený interpret funguje tak, jak je požadováno v~zadání. Správně interpretuje 
 všechny zdrojové texty ze zadání a~splňuje požadavky na formát výstupů. Dále zvládl 
 správně interpretovat i~naše vlastní testy. Naše implementace interpretu také zvládá 
 velmi rychlé kopírování řetězců mezi proměnnými. Také jsme implementovali navíc tři 
@@ -232,7 +230,12 @@ rozšíření, které rozšiřují funkcionalitu interpretu o~možnost použít�
 % přílohy
 \appendix
 
-\newpage Tady bude automat LA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Příloha: Lexikální analyzátor - konečný automat} \label{lexautomat}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{center}
+\scalebox{0.4}{\includegraphics{img/FSM.eps}}
+\end{center}
 
 \begin{landscape} % tabulku na sirku stranky
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
