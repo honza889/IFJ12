@@ -117,7 +117,26 @@ analyzátoru až 4 tokeny naráz pomocí struktury \texttt{Scanner} a přidruže
 ~ ~ ~bla
 %=============================================================================
 \subsection{Interpretace}
-~ ~ ~bla
+~ ~ ~Interpretace je prováděna rekurzivním čtením abstraktního syntaktického stromu
+a~prováděním činností popisovaných jednotlivými uzly stromu. 
+
+~ ~ ~Hlavní interpretační funkcí je \texttt{evalFunction}, jejímž účelem je 
+vytvoření prostoru pro proměnné předané funkce a poté evaluace jednotlivých
+příkazů této funkce, které jsou reprezentovány jako seznam struktur \texttt{Statement},
+funkcí \texttt{evalStatement}, která dále předává řízení funkcím
+\texttt{evalAssignment}, \texttt{evalSubstring}, \texttt{evalLoop}, 
+\texttt{evalCondition} a \texttt{evalReturn} podle druhu příkazu.
+
+~ ~ ~Tyto funkce již přímo vykonávají činnosti popsané daným příkazem 
+s využitím funkce \texttt{evalExpression}, která s využitím několika
+dalších funkcí (\texttt{evalOperator}, \texttt{evalBinaryOp}, 
+\texttt{evalUnaryOp}, \texttt{evalConstant}, \texttt{evalVariable} a 
+\texttt{evalFunctionCall}) evaluuje libovolný výraz popsaný stromem, 
+jehož kořenem je struktura \texttt{Expression}.
+
+~ ~ ~\texttt{evalCondition} a \texttt{evalLoop} taktéž využívají funkce
+\texttt{evalStatement} pro provádění do nich vnořených příkazů.
+
 %=============================================================================
 \subsection{Modul ial}
 \subsubsection{Vyhledávací algoritmus - Knuth-Moris-Pratt}
