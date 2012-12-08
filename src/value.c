@@ -362,14 +362,16 @@ void freeValue(Value *object){
 /**
  * Zjisti, zda je \a value typu \a expected.
  * Pokud ne, haze vyjimku UnexpectedValueType.
+ * Do \a type zadejte typ zdroje {CONSTANT, VARIABLE}.
  */
-Value* testValue( Value* value, ValueType expected )
+Value* testValue( Value* value, ValueType expected, int type )
 {
     if ( value->type != expected )
     {
         throw( UnexpectedValueType, ((UnexpectedValueTypeException){ 
             .expected = expected,
-            .got = value->type
+            .got = value->type,
+            .type = type
         }));
     }
     
@@ -379,12 +381,13 @@ Value* testValue( Value* value, ValueType expected )
 /**
  * Zjisti, zda je \a value typu typeNumeric a zda je nezáporné číslo.
  * Pokud ne, haze vyjimku NegativeNumeric nebo UnexpectedValueType.
+ * Do \a type zadejte typ zdroje {CONSTANT, VARIABLE}.
  */
-Value* testValuePositiveNumeric( Value* value )
+Value* testValuePositiveNumeric( Value* value, int type )
 {
-    if ( getValueNumeric(testValue( value, typeNumeric )) < 0 )
+    if ( getValueNumeric(testValue( value, typeNumeric, type )) < 0 )
     {
-        throw( NegativeNumeric, *value);
+        throw( NegativeNumeric, type);
     }
     
     return value;

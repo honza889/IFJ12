@@ -140,7 +140,7 @@ inline void evalAssignment( Assignment* assgn, Context* context )
 void evalSubstring( Substring* substring, Context* context )
 {
     Value val = evalExpression( &substring->source, context );
-    RCString r = getValueString( testValue( &val, typeString ) );
+    RCString r = getValueString( testValue( &val, typeString, CONSTANT ) );
     freeValue( &val );
 
     int offset,length;
@@ -148,14 +148,14 @@ void evalSubstring( Substring* substring, Context* context )
         offset = 0;
     }else{
         Value offsetValue = evalExpression(&substring->offset,context);
-        offset = (int)getValueNumeric( testValuePositiveNumeric( &offsetValue ) );
+        offset = (int)getValueNumeric( testValuePositiveNumeric( &offsetValue, VARIABLE ) );
         freeValue(&offsetValue);
     }
     if(substring->length.type==CONSTANT && substring->length.value.constant.type==typeUndefined){
         length = RCStringLength(&r);
     }else{
         Value lengthValue = evalExpression(&substring->length,context);
-        length = (int)getValueNumeric( testValuePositiveNumeric( &lengthValue ) );
+        length = (int)getValueNumeric( testValuePositiveNumeric( &lengthValue, VARIABLE ) );
         freeValue(&lengthValue);
     }
 

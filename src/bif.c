@@ -24,6 +24,9 @@ Value BIFinput(ValueList param, int count)
     int c;
     while((c = getchar()) != EOF && c != '\n')
     {
+        if (c == '\0') {
+            throw(OtherRunsErrors, 0);
+        }
         RCStringAppendChar(&str, c);
     }
     Value ret = newValueString(str);

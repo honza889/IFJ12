@@ -30,7 +30,7 @@ void fillNameListFromSymbolTree( RCString* nl, Symbol* st )
     // a pokud bude, tak ma spatnej kod a je to jeho chyba :P
     if( !st ) return;
 
-    nl[ st->index ] = copyRCString( &st->name );		// DE-BUG: 2. kopie
+    nl[ st->index ] = copyRCString( &st->name );
     fillNameListFromSymbolTree( nl, st->lesser );
     fillNameListFromSymbolTree( nl, st->greater );
 }
@@ -301,7 +301,7 @@ void detectAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 void parseAssignment( Scanner* s, StatementList* sl, SyntaxContext* ctx )
 {
     Assignment assgn;
-    RCString name = getTok(s).data.id;		// DE-BUG: původ
+    RCString name = getTok(s).data.id;
     assgn.destination = getSymbol(name,NULL, ctx->localSymbols );
     consumeTok(s);
     parseExpression(s, &assgn.source, ctx);

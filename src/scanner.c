@@ -58,7 +58,12 @@ Token testTok( Scanner* scanner, TokenType tok )
     assert(scanner->count > 0);
     if( ! ( getTok( scanner ).type & tok ) )
     {
-        // BUG: Může způsobit leak!
+        Token badTok = getTok( scanner );
+        if (badTok.type == tokId)
+          deleteRCString( &badTok.data.id );
+        else if (badTok.type == tokLiteral && badTok.data.val.type == typeString)
+          deleteRCString( &badTok.data.val.data.string );
+        
         throw( UnexpectedToken, ((UnexpectedTokenException){ 
             .expected = tok, 
             .got = getTok( scanner ).type,
@@ -91,7 +96,12 @@ void testKeyw( Scanner* scanner, KeyWord keyw )
     }
     else
     {
-        // BUG: Může způsobit leak!
+        Token badTok = getTok( scanner );
+        if (badTok.type == tokId)
+          deleteRCString( &badTok.data.id );
+        else if (badTok.type == tokLiteral && badTok.data.val.type == typeString)
+          deleteRCString( &badTok.data.val.data.string );
+        
         throw( UnexpectedToken, ((UnexpectedTokenException){
             .expected = tokKeyW, 
             .got = getTok( scanner ).type,
@@ -165,7 +175,11 @@ Token testTokN( Scanner* scanner, TokenType tok, unsigned index )
     
     if( ! ( current.type & tok ) )
     {
-        // BUG: Může způsobit leak!
+        if (current.type == tokId)
+          deleteRCString( &current.data.id );
+        else if (current.type == tokLiteral && current.data.val.type == typeString)
+          deleteRCString( &current.data.val.data.string );
+        
         throw( UnexpectedToken, ((UnexpectedTokenException){ 
             .expected = tok, 
             .got = current.type,
@@ -472,6 +486,10 @@ bool det_esc_sequence(FILE *f, char *last_letter, RCString *lexeme, unsigned lin
           deleteRCString(lexeme);
           throw(ScannerError,((ScannerErrorException){.type=UnterminatedString, .line_num=start_line_num}));
         }
+        else if (*last_letter == '\0') {
+          deleteRCString(lexeme);
+          throw(ScannerError,((ScannerErrorException){.type=BadLetter, .line_num=line_num}));
+        }
         hex_char[i] = *last_letter;
       }
       hex_char[LEN_HEX_CHAR-1] = '\0';		// Nakonec řetězce musí přijít '\0'
@@ -722,9 +740,18 @@ Token scan(FILE *f)
         if (last_letter == '\\') {
           // Pokud det_esc_sequence neuspěje narazilo se na špatnou escape sekvenci.
           if (! det_esc_sequence(f, &last_letter, &lexeme, line_num, start_line_num)) {
+            if (last_letter == '\0') {
+              deleteRCString(&lexeme);
+              throw(ScannerError,((ScannerErrorException){.type=BadLetter, .line_num=line_num}));
+            }
             deleteRCString(&lexeme);
             throw(ScannerError,((ScannerErrorException){.type=BadEscSequence, .line_num=line_num}));
           }
+        }
+        
+        else if (last_letter == '\0') {
+          deleteRCString(&lexeme);
+          throw(ScannerError,((ScannerErrorException){.type=BadLetter, .line_num=line_num}));
         }
         
         else {
@@ -768,6 +795,7 @@ void scannerErrorPrint(ScannerErrorException e) {
     case UnterminatedComment:	fprintf(stderr,"Scan error: Neukonceny komentar"); break;
     case UnterminatedString:	fprintf(stderr,"Scan error: Neukonceny retezec"); break;
     case BadEscSequence:	fprintf(stderr,"Scan error: Chybna escapovaci sekvence v retezci"); break;
+    case BadLetter:		fprintf(stderr,"Scan error: Nedovoleny znak v retezci"); break;
   }
   fprintf(stderr," na radku %d.\n", e.line_num);
 }

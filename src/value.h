@@ -25,14 +25,16 @@ void freeValue(Value *object);
 /**
  * Zjisti, zda je \a value typu \a expected.
  * Pokud ne, haze vyjimku UnexpectedValueType.
+ * Do \a type zadejte typ zdroje {CONSTANT, VARIABLE}.
  */
-Value* testValue( Value* value, ValueType expected );
+Value* testValue( Value* value, ValueType expected, int type );
 
 /**
  * Zjisti, zda je \a value typu typeNumeric a zda je nezáporné číslo.
  * Pokud ne, haze vyjimku NegativeNumeric nebo UnexpectedValueType.
+ * Do \a type zadejte typ zdroje {CONSTANT, VARIABLE}.
  */
-Value* testValuePositiveNumeric( Value* value );
+Value* testValuePositiveNumeric( Value* value, int type );
 
 // Konstruktory Value...
 static inline Value newValueUndefined(){ 

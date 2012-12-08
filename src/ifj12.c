@@ -16,32 +16,32 @@
 
 int main(int argc, char**argv)
 {
-
+    
     /****************************** Inicializace ******************************/
-
+    
     exceptions_init();
     if(argc!=2){
         fprintf( stderr, "Chybný způsob volání interpretru!\nPoužití: %s program.ifj\n\n", argv[0] );
-        exit( 13 );
+        exit( 99 );
     }
-
+    
     FILE* f=fopen(argv[1],"r");
     if(f==NULL){
         fprintf( stderr, "Program k interpretaci (%s) se nepodařilo otevřít!\n\n", argv[1] );
-        exit( 13 );
+        exit( 99 );
     }
-
+    
     Scanner s;
     SyntaxContext syntaxcontext;
     Function mainFunction;
-
+    
     try{
-
-
+    
+        
         initScanner(&s,f);
         initDefaultSyntaxContext(&syntaxcontext);
-
-
+        
+    
         /***************************** Překlad do AST *****************************/
         parseProgram(&s, &syntaxcontext, &mainFunction);
     }
@@ -81,19 +81,19 @@ int main(int argc, char**argv)
             exit( 2 );
         }
     }
-
-
+    
+    
     fclose( f );
 
     int countOfFunctions = syntaxcontext.globalSymbols->count;
-
+    
     Context context = {
         .globals=syntaxcontext.functions,
         .locals=NULL
     };
-
+    
     /*************************** Semanticka analyza ***************************/
-
+    
     try{
         validateFunction( &mainFunction, &syntaxcontext);
         for(int i=0; i<countOfFunctions; i++){
@@ -126,9 +126,9 @@ int main(int argc, char**argv)
             exit( 99 );
         }
     }
-
+    
     /****************************** Interpretace ******************************/
-
+    
     int exitVal = 0;
 
     try{
@@ -147,11 +147,17 @@ int main(int argc, char**argv)
         }
         on( UnexpectedValueType, e ){
             UnexpectedValueTypePrint(*e);
-            exitVal = 5;
+            if ( e->type == CONSTANT )
+              exitVal = 5;
+            else
+              exitVal = 11;
         }
         on( NegativeNumeric, e ){
             fprintf( stderr, "ValueError: Bylo použito záporné číslo tam kde nemělo!\n" );
-            exitVal = 5;
+            if ( e == CONSTANT )
+              exitVal = 5;
+            else
+              exitVal = 11;
         }
         on( DividingByZero, e ){
             fprintf( stderr, "Došlo k pokusu o dělení nulou!\n" );
@@ -182,6 +188,10 @@ int main(int argc, char**argv)
             fprintf( stderr, "Index mimo pole!\n" );
             exitVal = 13;
         }
+        on( OtherRunsErrors, e ){
+            fprintf( stderr, "Nastala jina behova chyba!\n" );
+            exitVal = 13;
+        }
         on(OutOfMemory, typename){
             fprintf( stderr, "Nezdařila se alokace paměti pro typ \"%s\"!\n", *typename );
             exitVal = 99;
@@ -191,9 +201,9 @@ int main(int argc, char**argv)
             exitVal = 99;
         }
     }
-
+    
     /********************************* Uklid **********************************/
-
+    
     fflush(NULL); // aby vystup programu nemusel cekat na dokonceni uklidu
     
 
@@ -203,7 +213,7 @@ int main(int argc, char**argv)
     deleteFunction( mainFunction );
     freeValueTable( context.globals, countOfFunctions );
     destroyDefaultSyntaxContext( &syntaxcontext );
-
+    
     return exitVal;
 }
 

@@ -29,8 +29,8 @@ typedef enum
     /* Semanticka analyza/behove chyby */
     UndefinedVariable,		// exit 3
     UndefinedFunction,		// exit 4
-    UnexpectedValueType,	// exit 5
-    NegativeNumeric,		// exit 5
+    UnexpectedValueType,	// exit 5 nebo 11 (podle zdroje {CONSTANT, VARIABLE})
+    NegativeNumeric,		// exit 5 nebo 11 (podle zdroje {CONSTANT, VARIABLE})
     DividingByZero,		// exit 10
     VariableIsNotFunction,	// exit 11
     FunctionIsNotVariable,	// exit 11
@@ -42,6 +42,7 @@ typedef enum
     InvalidExpression, // naplatny vyraz (napr. cteni globalni promenne)
     
     IndexOutOfBounds, // exit 13
+    OtherRunsErrors,  // exit 13
     OutOfMemory, // exit 99 (chyba alokace pameti)
 } ExceptionType;
 
@@ -53,7 +54,8 @@ typedef struct {
     UndefinedKeyword,
     UnterminatedComment,
     UnterminatedString,
-    BadEscSequence
+    BadEscSequence,
+    BadLetter
   } type;
   unsigned line_num;
 } ScannerErrorException;
@@ -93,11 +95,13 @@ typedef struct
 {
     int expected;
     int got;
+    int type;	// zdroj {CONSTANT, VARIABLE}
 } UnexpectedValueTypeException;
 
 typedef int UndefinedVariableException;
 typedef int UndefinedFunctionException;
-typedef Value NegativeNumericException;
+typedef int NegativeNumericException;	// int je zdroj {CONSTANT, VARIABLE}
+typedef bool OtherRunsErrorsException;
 typedef bool DividingByZeroException;
 typedef Value VariableIsNotFunctionException;
 typedef Value FunctionIsNotVariableException;
@@ -124,6 +128,7 @@ typedef struct
         EXCEPTION( UndefinedFunction );
         EXCEPTION( UnexpectedValueType );
         EXCEPTION( NegativeNumeric );
+        EXCEPTION( OtherRunsErrors );
         EXCEPTION( DividingByZero );
         EXCEPTION( VariableIsNotFunction );
         EXCEPTION( FunctionIsNotVariable );
