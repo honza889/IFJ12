@@ -21,13 +21,13 @@ int main(int argc, char**argv)
     
     exceptions_init();
     if(argc!=2){
-        fprintf( stderr, "Chybný způsob volání interpretru!\nPoužití: %s program.ifj\n\n", argv[0] );
+        fprintf( stderr, "Chybny zpusob volani interpretru!\nPouziti: %s program.ifj\n\n", argv[0] );
         exit( 99 );
     }
     
     FILE* f=fopen(argv[1],"r");
     if(f==NULL){
-        fprintf( stderr, "Program k interpretaci (%s) se nepodařilo otevřít!\n\n", argv[1] );
+        fprintf( stderr, "Program k interpretaci (%s) se nepodarilo otevrit!\n\n", argv[1] );
         exit( 99 );
     }
     
@@ -67,17 +67,17 @@ int main(int argc, char**argv)
             exit( 2 );
         }
         on(MultipleFunctionDefinitions, value){
-            fprintf( stderr, "Nejednou definovaná funkce \""); RCStringPrint(value, stderr); fprintf( stderr, "\"!\n");
+            fprintf( stderr, "Nejednou definovana funkce \""); RCStringPrint(value, stderr); fprintf( stderr, "\"!\n");
             fclose( f );
             exit( 5 );
         }
         on(OutOfMemory, typename){
-            fprintf( stderr, "Nezdařila se alokace paměti pro typ '%s'", *typename );
+            fprintf( stderr, "Nezdarila se alokace pameti pro typ '%s'", *typename );
             fclose( f );
             exit( 99 );
         }
         onAll{
-            fprintf( stderr, "Nastala neočekávaná vyjímka v průběhu syntaktické analýzy programu!\n" );
+            fprintf( stderr, "Nastala neocekavana vyjimka v prubehu syntakticke analyzy programu!\n" );
             exit( 2 );
         }
     }
@@ -104,7 +104,7 @@ int main(int argc, char**argv)
     }
     catch{
         on( InvalidExpression, e ){
-            fprintf( stderr, "Nevalidní výraz nalezený v průbehu sématické analýzy! (parametr vyjímky: %d)\n", *e );
+            fprintf( stderr, "Nevalidni vyraz nalezeny v prubehu sematicke analyzy! (parametr vyjimky: %d)\n", *e );
             deleteFunction( mainFunction );
             freeValueTable( context.globals, countOfFunctions );
             destroyDefaultSyntaxContext( &syntaxcontext );
@@ -119,7 +119,7 @@ int main(int argc, char**argv)
             exit( 5 );
         }
         onAll{
-            fprintf( stderr, "Nastala neočekávaná vyjímka v průběhu sémantické analýzy!\n" );
+            fprintf( stderr, "Nastala neocekavana vyjimka v prubehu semanticke analyzy!\n" );
             deleteFunction( mainFunction );
             freeValueTable( context.globals, countOfFunctions );
             destroyDefaultSyntaxContext( &syntaxcontext );
@@ -138,11 +138,11 @@ int main(int argc, char**argv)
     }
     catch{
         on( UndefinedVariable, e ){
-            fprintf( stderr, "Byla použita proměnná bez definování její hodnoty!\n" );
+            fprintf( stderr, "Byla pouzita promenna bez definovani jeji hodnoty!\n" );
             exitVal = 3;
         }
         on( UndefinedFunction, e ){
-            fprintf( stderr, "Byla použita nedefinovaná funkce!\n" );
+            fprintf( stderr, "Byla pouzita nedefinovana funkce!\n" );
             exitVal = 4;
         }
         on( UnexpectedValueType, e ){
@@ -153,35 +153,35 @@ int main(int argc, char**argv)
               exitVal = 11;
         }
         on( NegativeNumeric, e ){
-            fprintf( stderr, "ValueError: Bylo použito záporné číslo tam kde nemělo!\n" );
+            fprintf( stderr, "ValueError: Bylo pouzito zaporne cislo tam kde nemelo!\n" );
             if ( e == CONSTANT )
               exitVal = 5;
             else
               exitVal = 11;
         }
         on( DividingByZero, e ){
-            fprintf( stderr, "Došlo k pokusu o dělení nulou!\n" );
+            fprintf( stderr, "Doslo k pokusu o deleni nulou!\n" );
             exitVal = 10;
         }
         on( VariableIsNotFunction, e ){
-            fprintf( stderr, "Pokus použít funkci jako proměnnou!\n" );
+            fprintf( stderr, "Pokus pouzit funkci jako promennou!\n" );
             exitVal = 11;
         }
         on( FunctionIsNotVariable, e ){
-            fprintf( stderr, "Pokus použít proměnnou jako funkci!\n" );
+            fprintf( stderr, "Pokus pouzit promennou jako funkci!\n" );
             exitVal = 11;
         }
         on( IncompatibleComparison, e ){
-            fprintf( stderr, "Nekompatibilní porovnávání - rozdílné datové typy porovnávaných hodnot!\n" );
+            fprintf( stderr, "Nekompatibilni porovnavani - rozdilne datove typy porovnavanych hodnot!\n" );
             exitVal = 11;
         }
         on( BadArgumentType, e ){
-            fprintf( stderr, "Funkce %s byla zavolána s parametrem chybného typu!\n", *e );
+            fprintf( stderr, "Funkce %s byla zavolana s parametrem chybneho typu!\n", *e );
             exitVal = 11;
         }
         on( InvalidConversion, value ){
             RCString buf = getValueString(value);
-            fprintf( stderr, "Nezdařil se převod hodnoty \""); RCStringPrint(&buf, stderr); fprintf( stderr, "\" na typ numeric!\n");
+            fprintf( stderr, "Nezdaril se prevod hodnoty \""); RCStringPrint(&buf, stderr); fprintf( stderr, "\" na typ numeric!\n");
             exitVal = 12;
         }
         on( IndexOutOfBounds, e ){
@@ -193,11 +193,11 @@ int main(int argc, char**argv)
             exitVal = 13;
         }
         on(OutOfMemory, typename){
-            fprintf( stderr, "Nezdařila se alokace paměti pro typ \"%s\"!\n", *typename );
+            fprintf( stderr, "Nezdarila se alokace pameti pro typ \"%s\"!\n", *typename );
             exitVal = 99;
         }
         onAll{
-            fprintf( stderr, "Nastala neočekávaná vyjímka v průběhu vykonávání programu!\n" );
+            fprintf( stderr, "Nastala neocekavana vyjimka v prubehu vykonavani programu!\n" );
             exitVal = 99;
         }
     }

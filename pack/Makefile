@@ -10,7 +10,7 @@
 
 # PRODUKCNI MAKEFILE
 
-SOURCES=ifj12 value symbols ast exceptions rcstring bif scanner syntax ial alloc
+SOURCES=ifj12 value ast exceptions rcstring bif scanner syntax ial alloc parsexp semantics
 
 CFLAGS=-std=c99 -Wall -Wno-unused-variable -pedantic -DNDEBUG -lm
 
