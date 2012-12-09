@@ -56,7 +56,7 @@ Popisuje, nejen způsob implementace interpretu, ale i~jeho testování a~také 
 \subsection{Rozbor zadání}
 Úkolem je vytvořit již zmíněný interpret imperativního jazyka IFJ12. Interpret 
 musí navíc nabízet několik vestavěných funkcí a musí být napsán v jazyce C. Součástí 
-zadání jsou i dílčí úkoly do předmětu IAL. Z varianty a/4/I vyplývá, že vyhledávácí 
+zadání jsou i dílčí úkoly do předmětu IAL. Z varianty a/4/I vyplývá, že vyhledávací 
 algoritmus bude \textbf{Knuth-Moris-Prattův}, řadící algoritmus bude \textbf{merge sort} 
 a~tabulka symbolů bude implementována pomocí \textbf{binárního vyhledávacího stromu}. 
 %=============================================================================
@@ -131,7 +131,7 @@ končí chybou.
 \subsection{Sémantický analyzátor}
 Po vygenerování abstraktního syntaktického stromu (AST) pomocí syntaktického analyzátoru 
 je AST procházen sémantickým analyzátorem, který slouží k~nalezení sémanticky 
-neplatných operací, jako je například dělení řetězce číslem či sčítání dvou nilů.
+neplatných operací, jako je například dělení řetězce číslem či sčítání dvou hodnot Nil.
 
 Pro tuto činnost využívá sémantický analyzátor několik tabulek, které 
 popisují datové typy výstupních hodnot pro všechny možné kombinace 
@@ -181,7 +181,7 @@ vyhledávání se posune doprava podle opravy, která byla spočítána.
 
 \subsubsection{Řadící algoritmus - Merge sort}
 Merge sort se skládá ze dvou funkcí. Funkce \texttt{mergesort} rekurzivně dělí 
-řetězec na dvě poloviny, dokud jí nezbydou jen dva znaky. Tyto poloviny předává funkci
+řetězec na dvě poloviny, dokud jí nezbudou jen dva znaky. Tyto poloviny předává funkci
 \texttt{merge}, která oba podřetězce seřadí a~vrátí. Funkce \texttt{mergesort} skončí 
 a~o~úroveň výš se seřadí dva již seřazené podřetězce do jednoho. To se opakuje, dokud 
 není celý řetězec seřazený.
@@ -196,7 +196,7 @@ Jeden uzel stromu (prvek tabulky) je reprezentován strukturou \texttt{Symbol}.
 Ta obsahuje název symbolu, který je zároveň klíčem, podle kterého se ve stromu vyhledává. 
 Obsahuje také index symbolu v tabulce, který je kladný v případě, že symbol je 
 v~lokální tabulce symbolů a~záporný v~případě, že je v~globální tabulce. Poslední dvě 
-položky jsou ukazatele na menší a~větší symbol. Struktura \texttt{SymbolTable} osahuje 
+položky jsou ukazatele na menší a~větší symbol. Struktura \texttt{SymbolTable} obsahuje 
 ukazatel na kořen binárního vyhledávacího stromu reprezentující tabulku symbolů a~počet 
 symbolů v~tabulce.\newline\newline Pro operace nad stromem jsou implementovány tyto funkce:
 \medskip
@@ -205,7 +205,7 @@ symbolů v~tabulce.\newline\newline Pro operace nad stromem jsou implementovány
 \texttt{newSymbolTable}  & - & Inicializuje ukazatel na kořen na \texttt{null} a počet symbolu na 0.\\
 \texttt{setNewSymbol}    & - & Prohledá strom a pokud vkládaný symbol ve stromě není, 
                                tak vytvoří pro symbol uzel a vloží ho do stromu.\\                        
-\texttt{getSymbol}       & - & Prohledá strom s globalní tabulkou, pokud tam symbol nenajde,  
+\texttt{getSymbol}       & - & Prohledá strom s globální tabulkou, pokud tam symbol nenajde,  
                                tak prohledá strom s lokální tabulkou, pokud existuje.  
                                Pokud v jedné z tabulek symbol najde, vrátí jeho index, 
                                jinak uzel se symbolem vytvoří a vloží do lokální tabulky, 
@@ -215,13 +215,44 @@ symbolů v~tabulce.\newline\newline Pro operace nad stromem jsou implementovány
 %=============================================================================
 \subsection{Rozšíření}
 \subsubsection{FUNEXP}
-bla
+První část tohoto rozšíření umožňuje, aby výrazy obsahovaly volání funkcí. To
+implementujeme pomocí speciální hodnoty v precedenční tabulce\,-\,při vstupu
+posloupnosti tokenů \texttt{id (} je zavolána speciální funkce
+\texttt{replaceByFunctionCall}, která zajistí načtení jednotlivých parametrů
+parametrů volání a celou takovou posloupnost tokenů nahradí jediným
+neterminálem \texttt{E}.
+
+Druhá část rozšíření umožňuje, aby parametry volání funkce obsahovaly výrazy.
+To implementujeme tak, že výše zmíněná funkce \texttt{replaceByFunctionCall},
+jejíž starostí je získat z posloupnosti tokenů volání funkce, volá pro načtení
+každého parametru funkci \texttt{parseExpression}, tedy funkci provádějící
+samotnou precedenční analýzu.
 
 \subsubsection{LOGOP}
-Implementovány stejně, jako veškeré ostatní operátory. % co víc k tomu psat?
+Rozšíření zahrnuje podporu logických operátorů \texttt{and}, \texttt{or} a
+\texttt{not} a relačních operátorů \texttt{in} a \texttt{notin}.
+Implementovány jsou obdobně jako aritmetické a relační operátory. Při pokusu
+o provedení logické operace nad nepravdivostní hodnotou je tato hodnota
+automaticky převedena na pravdivostní hodnotu. (Hodnoty \texttt{Nil}, \texttt{0.0} a
+\texttt{""} jsou převedeny na \texttt{false}, ostatní hodnoty na \texttt{true},
+dle pravidel pro určení pravdivosti výrazu v podmíněném příkazu v zadání.)
+
+Protože neimplementujeme rozšíření \texttt{ARRAY}, relační operátory \texttt{in}
+a \texttt{notin} nezkoumají zda se daná hodnota vyskytuje v poli, ale jen zdali
+je první řetězcová hodnota podřetězcem druhé.
 
 \subsubsection{MINUS}
-bla
+Rozšíření zahrnuje podporu unárního operátoru mínus, který bude mít nejvyšší
+prioritu a bude pravě asociativní.
+
+Implementováno je pomocí speciální podmínky v algoritmu precedenční analýzy.
+Je-li na vstupu token \texttt{-} a zároveň je podle předchozího tokenu (první
+položky na zásobníku) zřejmé, že jde o unární mínus (předchozím tokenem
+je znak konce zásobníku, levá závorka nebo operátor), místo operace určené
+precedenční tabulkou je na zásobník vložena posloupnost \texttt{<-}. Po redukci
+operandu tak na zásobníku zbude \texttt{<-E}, což je nakonec zredukováno
+podle pravidla \texttt{E -> -E}.
+
 %=============================================================================
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -283,8 +314,8 @@ rozšíření, které rozšiřují funkcionalitu interpretu o~možnost použití
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{tabular}{ll}
   Počet souborů: & 24 \\
-  Počet řádků: & 5577 \\
-  Velikost spustitelného souboru: & 74\,659\,B \\
+  Počet řádků: & 5630 \\
+  Velikost spustitelného souboru: & 79\,534\,B \\
 \end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -325,27 +356,27 @@ rozšíření, které rozšiřují funkcionalitu interpretu o~možnost použití
 \begin{math}
 G = (N,T,P,E) \\
 N = \{ E \} \\
-T = \{ \\ +, -, *, /, **, (, ), <, >, <=, >=, \text{!=}, \text{==}, \text{in},
-        \text{notin}, \text{and}, \text{or}, \text{not}, \text{i} \\ \} \\
+T = \{ \\ \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}, \texttt{**}, \texttt{(}, \texttt{)}, \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{>=}, \texttt{!=}, \\
+       \texttt{==}, \texttt{in}, \texttt{notin}, \texttt{and}, \texttt{or}, \texttt{not}, \texttt{i} \\ \} \\
 P = \{ \\
-1: E \rightarrow E + E \\
-2: E \rightarrow E - E \\
-3: E \rightarrow E * E \\
-4: E \rightarrow E / E \\
-5: E \rightarrow E ** E \\
-6: E \rightarrow E < E \\
-7: E \rightarrow E > E \\
-8: E \rightarrow E <= E \\
-9: E \rightarrow E >= E \\
-10: E \rightarrow E \text{ != } E \\
-11: E \rightarrow E \text{ == } E \\
-12: E \rightarrow E \text{ in } E \\
-13: E \rightarrow E \text{ notin } E \\
-14: E \rightarrow E \text{ and } E \\
-15: E \rightarrow E \text{ or } E \\
-16: E \rightarrow \text{ not } E \\
-17: E \rightarrow -E \\
-18: E \rightarrow (E) \\
+1: E \rightarrow E \texttt{ + } E \\
+2: E \rightarrow E \texttt{ - } E \\
+3: E \rightarrow E \texttt{ * } E \\
+4: E \rightarrow E \texttt{ / } E \\
+5: E \rightarrow E \texttt{ ** } E \\
+6: E \rightarrow E \texttt{ < } E \\
+7: E \rightarrow E \texttt{ > } E \\
+8: E \rightarrow E \texttt{ <= } E \\
+9: E \rightarrow E \texttt{ >= } E \\
+10: E \rightarrow E \texttt{ != } E \\
+11: E \rightarrow E \texttt{ == } E \\
+12: E \rightarrow E \texttt{ in } E \\
+13: E \rightarrow E \texttt{ notin } E \\
+14: E \rightarrow E \texttt{ and } E \\
+15: E \rightarrow E \texttt{ or } E \\
+16: E \rightarrow \texttt{ not } E \\
+17: E \rightarrow \texttt{ - } E \\
+18: E \rightarrow \texttt{ ( } E \texttt{ ) } \\
 19: E \rightarrow \text{i} \\
 \} \\ \\ \\
 \end{math}
