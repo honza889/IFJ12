@@ -84,7 +84,21 @@ analyzátoru až 4 tokeny naráz pomocí struktury \texttt{Scanner} a přidruže
 bla
 %=============================================================================
 \subsection{Sémantický analyzátor}
-bla
+Po vygenerování abstraktního syntaktického stromu (AST) pomocí syntaktického
+analyzátoru je AST procházen sémantickým analyzátorem, který slouží k 
+nalezení sémanticky neplatných operací, jako je například dělení
+řetězce číslem či sčítání dvou nilů.
+
+Pro tuto činnost využívá sémantický analyzátor několik tabulek, které 
+popisují datové typy výstupních hodnot pro všechny možné kombinace
+datových typů operandů všech podporovaných operátorů. 
+
+Během své činnosti se tento analyzátor snaží udržovat si informace 
+i~o~datových typech proměnných. To umožňuje nalezení některých sémantických
+chyb ještě před provedením samotného programu, což může být výhodné 
+v~případě, že se takové chyby nachází v části programu, která je prováděna
+pouze v malém množství případů.
+
 %=============================================================================
 \subsection{Interpretace}
 Interpretace je prováděna rekurzivním čtením abstraktního syntaktického stromu 
@@ -146,7 +160,8 @@ symbolů v~tabulce.\newline\newline Pro operace nad stromem jsou implementovány
 \subsubsection{FUNEXP}
 bla
 \subsubsection{LOGOP}
-bla
+Implementovány stejně, jako veškeré ostatní operátory. % co víc k tomu psat?
+
 \subsubsection{MINUS}
 bla
 %=============================================================================
