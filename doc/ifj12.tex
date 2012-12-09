@@ -83,7 +83,30 @@ zdrojového souboru, operátor nebo klíčové slovo. Lexikální analyzátor na
 analyzátoru až 4 tokeny naráz pomocí struktury \texttt{Scanner} a přidružených funkcí
 \texttt{getTok}, \texttt{getTokN}, \texttt{consumeTok} a \texttt{consumeTokN}.
 %=============================================================================
-\subsection{Syntaktický analyzátor - precedenční analýza výrazů}
+\subsection{Syntaktický analyzátor}
+Syntaktická analýza je prováděna dvoumi metodami. Metoda rekurzivního 
+sestupu je použita pro vytváření abstraktního syntaktického stromu (AST)
+z konstrukcí jazyka vyšší úrovně (tj. definice funkcí, podmínky, smyčky
+a příkazy). Pro parsování výrazů je použita precedenční syntaktická 
+analýza.
+
+\subsubsection{Rekurzivní sestup}
+Tato metoda postupně prochází tokeny získávané od lexikálního analyzátoru
+a podle nich volá funkce pro parsování konkrétních konstrukcí jazyka.
+Tyto funkce dále čtou vstupní tokeny a vytváří patřičné uzly AST.
+
+Rekurzivní sestup začíná funkcí \texttt{parseProgram}, která volá
+\texttt{parseStatement} pro parsování příkazů v hlavním těle programu
+a~\texttt{parseFunction}, která taktéž volá \texttt{parseStatement},
+pro parsování funkčních definicí.
+
+Rozhodování o dalším postupu je většinou prováděno na základě jednoho
+aktuálního tokenu. Jedinou výjimkou je přiřazení do proměnné, které
+generuje jiný uzel na základě toho, zda se jedná o příkaz výběru podřetězce
+či přiřazení výrazu do proměnné. Z tohoto důvodu musí znát dva následující
+tokeny. Toto řešení bylo zvoleno především kvůli jednoduchosti implementace.
+
+\subsubsection{Precedenční analýza výrazů}
 V případě, že metoda rekurzivního sestupu narazí na neterminál E, zavolá funkci
 pro interpretaci výrazu, \texttt{parseExpression}, která dále vstupní posloupnost
 tokenů vyhodnocuje podle algoritmu precedenční analýzy.
