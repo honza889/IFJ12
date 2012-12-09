@@ -308,6 +308,10 @@ Value evalFunction( Function* func, ExpressionList params, Context* context )
         {
             return r.ret;
         }
+        else
+        {
+            return newValueNil();
+        }
     }
 
     return newValueUndefined();
