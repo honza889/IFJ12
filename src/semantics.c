@@ -163,19 +163,19 @@ const SemanticType unaryOperatorTypeTable[UNARYOP_MAXVALUE][4] = {
 
 void validateFunction( Function* f , SyntaxContext* synCtx)
 {
-    bool exist;
-
-    for(int i = 0; i < f->value.userDefined.variableCount; i++){    //kontrola jmen funkce a promennych
-
-        searchSymbol(&(synCtx->globalSymbols->root),f->value.userDefined.variableNames[i],&exist);
-
-        if(exist == true){  //jmeno promenne se shoduje se jmenem funkce
-            throw( VariableOverridesFunction, copyRCString( &f->value.userDefined.variableNames[i]) );
-        }
-    }
-
     if( f->type == USER_DEFINED )   //vestavene funkce validovat nebudeme
     {
+        bool exist;
+        
+        for(int i = 0; i < f->value.userDefined.variableCount; i++){    //kontrola jmen funkce a promennych
+
+            searchSymbol(&(synCtx->globalSymbols->root),f->value.userDefined.variableNames[i],&exist);
+
+            if(exist == true){  //jmeno promenne se shoduje se jmenem funkce
+                throw( VariableOverridesFunction, copyRCString( &f->value.userDefined.variableNames[i]) );
+            }
+        }
+        
         SemanticType types[ f->value.userDefined.variableCount ];   //tabulka pro propojeni promene(vyrazu) a nejakeho datoveho typu (i vice zaroven)
                                                                     //index urcuje assgn->destination
 
@@ -375,8 +375,10 @@ SemanticType validateFunctionCall( FunctionCall* functionCall, SemCtx* ctx ){
 
     }else{
         for( int i = 0; i < functionCall->params.count; i++ ){
-
-            validateExpression( &functionCall->params.expressions[i], ctx );
+            if( functionCall->params.expressions[i].type != VARIABLE ) // HACK! (kvuli typeOf, nehoarazne vyjimecne funkci)
+            {
+                validateExpression( &functionCall->params.expressions[i], ctx );
+            }
         }
     }
     return TYPE_ALL;
