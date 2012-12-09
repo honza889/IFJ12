@@ -83,6 +83,29 @@ analyzátoru až 4 tokeny naráz pomocí struktury \texttt{Scanner} a přidruže
 \subsection{Syntaktický analyzátor}
 bla
 %=============================================================================
+\subsection{Syntaktický analyzátor - precedenční analýza výrazů}
+V případě že metoda rekurzivního sestupu narazí na neterminál E, zavolá funkci
+pro interpretaci výrazu, \texttt{parseExpression}, která dále vstupní posloupnost
+tokenů vyhodnocuje podle algoritmu precedenční analýzy.
+
+Precedenční analýza funguje jako rozšířený zásobníkový automat, jehož vstupní
+i zásobníkovou abecedou jsou tokeny. Terminál na vstupu a terminál na zásobníku
+nejbližší vrcholu určují souřadnice do tabulky precedenční analýzy.
+Obsah takto vybrané buňky tabulky precedenční analýzy pak určuje akci, kterou
+by měl automat provést. (Zda přesunout vstupní terminál na vrchol zásobníku a
+načíst nový vstupní terminál, zda za terminál na zásobníku nejbližší vrcholu přidat
+levou závorku \texttt{<} nebo zda redukovat obsah zásobníku použitím pravidel)
+
+Precedenční tabulku jsme se rozhodli implementovat jako fyzickou strukturu v paměti,
+jako dvourozměné pole \texttt{precTable[][]}. Použití pravidel na obsah zásobníku je
+pak implementováno voláním funkce \texttt{tryUseRules()}. Jejím výsledkem by mělo být
+vždy nahrazení několika terminálů a neterminálů na vrcholu zásobníku za jediný
+neterminál. (např. \texttt{<E+E} bude nahrazeno za \texttt{E}) Jestliže vyhodnocování
+výrazu skončí jinak než terminálem ukončujícím výraz (např. koncem řádku) na vstupu a
+značkou konce zásobníku na vrcholu zásobníku, výraz není platný a vyhodnocování
+končí chybou.
+
+%=============================================================================
 \subsection{Sémantický analyzátor}
 bla
 %=============================================================================
@@ -189,8 +212,8 @@ Výsledné rozdělení práce dopadlo přibližně takto: \medskip
 \begin{tabular}{llp{12.4cm}}
 Zdeněk Biberle & - & AST, syntaktický analyzátor, sémantický analyzátor\\
 Jan Doležal    & - & lexikální analyzátor, ještě něco, nevim co :P\\
-Martin Fryč    & - & Knuth-Moris-Pratt, sémantický analyzátor\\
-Jan Kalina     & - & syntaktický analyzátor, operátory, spousta dalších věcí, něco si sem dopiš\\
+Martin Fryč    & - & Knuth-Moris-Prattův algoritmus, sémantický analyzátor\\
+Jan Kalina     & - & syntaktický analyzátor, generický datový typ, tabulka symbolů\\
 Zdeněk Tretter & - & vestavěné funkce, merge sort, dokumentace\\
 \end{tabular}
 %=============================================================================
@@ -281,7 +304,7 @@ P = \{ \\
 
 \begin{landscape} % tabulku na sirku stranky
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Příloha: Rekurzivní sestup - LL(2) tabulka} \label{rekurzivnisestup}
+\section{Příloha: Pravidla a LL(2) tabulka rekurzivního sestupu} \label{rekurzivnisestup}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{minipage}{\linewidth} % obal tabulky pro poznamky pod carou
@@ -290,7 +313,7 @@ P = \{ \\
 \begin{math}
 G = (N,T,R,P) \\
 N = \{ P, S, P', S', L, E', E \} \\
-T = \{ \underline{=}, \underline{[}, \underline{]}, \text{ \underline{i} }, \text{ \underline{-} }, \text{ \underline{not} }, \text{ \underline{if} }, \text{ \underline{else} }, \text{ \underline{while} }, \text{ \underline{end} }, \text{ \underline{function} }, \text{ \underline{(} }, \text{ \underline{)} }, \text{ \underline{,} }, \text{ \underline{EOL} } \} \\
+T = \{ \texttt{=}, \texttt{[}, \texttt{]}, \texttt{i}, \texttt{:}, \texttt{-}, \texttt{not}, \texttt{if}, \texttt{else}, \texttt{while}, \texttt{end}, \texttt{function}, \texttt{(}, \texttt{)}, \texttt{,}, \texttt{EOL} \} \\
 \end{math}
 
 \begin{minipage}{0.2\linewidth}
@@ -300,17 +323,17 @@ T = \{ \underline{=}, \underline{[}, \underline{]}, \text{ \underline{i} }, \tex
 3.  S  \rightarrow S' \\
 4.  P' \rightarrow \varepsilon \\
 5.  P' \rightarrow S'P' \\
-6.  S' \rightarrow i = A \text{ EOL } \\
+6.  S' \rightarrow \texttt{i} \texttt{=} A \texttt{ EOL } \\
 \end{math}
 \end{minipage}
-\begin{minipage}{0.42\linewidth}
+\begin{minipage}{0.5\linewidth}
 \begin{math}
 7.  A \rightarrow E \\
-8.  A \rightarrow i[E':E'] \\
-9.  S' \rightarrow \text{ if } E \text{ EOL } P' \text{ else } \text{ EOL } P' \text{ end } \text{ EOL } \\
-10. S' \rightarrow \text{ while } E \text{ EOL } P' \text{ end } \text{ EOL } \\
-11. S' \rightarrow \text{ return } E \text{ EOL } \\
-12. S  \rightarrow \text{ function } i ( E' L ) \text{ EOL } P' \text{ end } \text{ EOL } \\
+8.  A \rightarrow \texttt{i} \texttt{[} E' \texttt{:} E' \texttt{]} \\
+9.  S' \rightarrow \texttt{ if } E \texttt{ EOL } P' \texttt{ else } \texttt{ EOL } P' \texttt{ end } \texttt{ EOL } \\
+10. S' \rightarrow \texttt{ while } E \texttt{ EOL } P' \texttt{ end } \texttt{ EOL } \\
+11. S' \rightarrow \texttt{ return } E \texttt{ EOL } \\
+12. S  \rightarrow \texttt{ function } \texttt{i} \texttt{(} E' L \texttt{)} \texttt{ EOL } P' \texttt{ end } \texttt{ EOL } \\
 \end{math}
 \end{minipage}
 \begin{minipage}{0.4\linewidth}
