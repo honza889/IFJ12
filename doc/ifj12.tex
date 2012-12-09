@@ -192,13 +192,44 @@ symbolů v~tabulce.\newline\newline Pro operace nad stromem jsou implementovány
 %=============================================================================
 \subsection{Rozšíření}
 \subsubsection{FUNEXP}
-bla
+První část tohoto rozšíření umožňuje, aby výrazy obsahovaly volání funkcí. To
+implementujeme pomocí speciální hodnoty v precedenční tabulce - při vstupu
+posloupnosti tokenů \texttt{id (} je zavolána speciální funkce
+\texttt{replaceByFunctionCall}, která zajistí načtení jednotlivých parametrů
+parametrů volání a celou takovou posloupnost tokenů nahradí jediným
+neterminálem \texttt{E}.
+
+Druhá část rozšíření umožňuje, aby parametry volání funkce obsahovaly výrazy.
+To implementujeme tak, že výše zmíněná funkce \texttt{replaceByFunctionCall},
+jejíž starostí je získat z posloupnosti tokenů volání funkce, volá pro načtení
+každého parametru funkci \texttt{parseExpression}, tedy funkci provádějící
+samotnou precedenční analýzu.
 
 \subsubsection{LOGOP}
-Implementovány stejně, jako veškeré ostatní operátory. % co víc k tomu psat?
+Rozšíření zahrnuje podporu logických operátorů \texttt{and}, \texttt{or} a
+\texttt{not} a relačních operátorů \texttt{in} a \texttt{notin}.
+Implementovány jsou obdobně jako aritmetické a relační operátory. Při pokusu
+o provedení logické operace nad nepravdivostní hodnotou je tato hodnota
+automaticky převedena na pravdivostní hodnotu. (Hodnoty \texttt{Nil}, \texttt{0.0} a
+\texttt{""} jsou převedeny na \texttt{false}, ostatní hodnoty na \texttt{true},
+dle pravidel pro určení pravdivosti výrazu v podmíněném příkazu v zadání.)
+
+Protože neimplementujeme rozšíření \texttt{ARRAY}, relační operátory \texttt{in}
+a \texttt{notin} nezkoumají zda se daná hodnota vyskytuje v poli, ale jen zdali
+je první řetězcová hodnota podřetězcem druhé.
 
 \subsubsection{MINUS}
-bla
+Rozšíření zahrnuje podporu unárního operátoru mínus, který bude mít nejvyšší
+prioritu a bude pravě asociativní.
+
+Implementováno je pomocí speciální podmínky v algoritmu precedenční analýzy.
+Je-li na vstupu token \texttt{-} a zároveň je podle předchozího tokenu (první
+položky na zásobníku) zřejmé, že jde o unární mínus (předchozím tokenem
+je znak konce zásobníku, levá závorka nebo operátor), místo operace určené
+precedenční tabulkou je na zásobník vložena posloupnost \texttt{<-}. Po redukci
+operandu tak na zásobníku zbyde \texttt{<-E}, což je nakonec zredukováno
+podle pravidla \texttt{E -> -E}.
+
 %=============================================================================
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
