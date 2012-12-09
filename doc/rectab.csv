@@ -1,4 +1,4 @@
-  ,i [,i ,not,- ,if,else,while,end,return,function,( ,) ,",",EOL,$
+  ,\texttt{i [},\texttt{i} ,\texttt{not},\texttt{-} ,\texttt{if},\texttt{else},\texttt{while},\texttt{end},\texttt{return},\texttt{function},\texttt{(} ,\texttt{)} ,"\texttt{,}",\texttt{EOL},\texttt{\$}
 P ,   ,2 ,   ,  ,2 ,    ,2    ,   ,2     ,2       ,  ,  ,   ,2  ,1
 S ,   ,3 ,   ,  ,3 ,    ,3    ,   ,3     ,12      ,  ,  ,   ,3  ,18
 P',   ,5 ,   ,  ,5 ,4   ,5    ,4  ,5     ,        ,  ,  ,   ,5  ,
