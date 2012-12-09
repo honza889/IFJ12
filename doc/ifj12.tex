@@ -65,7 +65,7 @@ Jádrem interpretu bude \textbf{syntaktický analyzátor}, který bude zpracová
 dodané \mbox{\textbf{lexikálním analyzátorem}}, který bude zpracovávat lexémy ze zdrojového souboru.
 Syntaktický analyzátor bude z tokenů sestavovat abstraktní syntaktický strom (AST), který poté
 prověří \textbf{sémantický analyzátor}. Pokud nastane při práci v některém z analyzátorů chyba, 
-tak bude vyvolána vyjímka s příslušnou chybou. Když vše proběhne v pořádku, tak se provede 
+tak bude vyvolána výjimka s příslušnou chybou. Když vše proběhne v pořádku, tak se provede 
 interpretace AST. 
 %=============================================================================
                                               
@@ -97,7 +97,7 @@ nový vstupní terminál, zda za terminál na zásobníku nejbližší vrcholu p
 levou závorku \texttt{<} nebo zda redukovat obsah zásobníku použitím pravidel)
 
 Precedenční tabulku jsme se rozhodli implementovat jako fyzickou strukturu v paměti,
-jako dvourozměné pole \texttt{precTable[][]}. Použití pravidel na obsah zásobníku je
+jako dvourozměrné pole \texttt{precTable[][]}. Použití pravidel na obsah zásobníku je
 pak implementováno voláním funkce \texttt{tryUseRules()}. Jejím výsledkem by mělo být
 vždy nahrazení několika terminálů a neterminálů na vrcholu zásobníku za jediný
 neterminál. (např. \texttt{<E+E} bude nahrazeno za \texttt{E}) Jestliže vyhodnocování
@@ -149,7 +149,7 @@ Tohoto využívá algoritmus Knuth-Moris-Pratt (KMP), který bere v úvahu infor
 ze znaků, které již byly zkontrolovány. V případě neshody vzorku s řetězcem se 
 snaží posunout doprava tak, aby se již nemusel vracet v řetězci. 
 
-Aby algoritmus věděl o kolik se může posunout ve vyhledávání v případě neshody, 
+Aby algoritmus věděl, o kolik se může posunout ve vyhledávání v případě neshody, 
 pro každý vzorek se vygeneruje nové pole s opravou. A to tak, že bere v úvahu 
 nejdelší unikátní prefix vzorku, ve kterém se neopakují žádné znaky (v prefixu). 
 Poté tento prefix porovnává se zbytkem vzorku a určuje opravu, pokud nalezne alespoň část. 
@@ -158,14 +158,14 @@ vyhledávání se posune doprava podle opravy, která byla spočítána.
 
 \subsubsection{Řadící algoritmus - Merge sort}
 Merge sort se skládá ze dvou funkcí. Funkce \texttt{mergesort} rekurzivně dělí 
-řetězec na dvě poloviny, dokud jí nezbydou jen dva znaky. Tyto poloviny  předává funkci
-\texttt{merge}, která oba subřetězce seřadí a~vrátí. Funkce \texttt{mergesort} skončí 
-a~o~úroveň výš se seřadí dva již seřazené subřetězce do jednoho. To se opakuje dokud 
+řetězec na dvě poloviny, dokud jí nezbydou jen dva znaky. Tyto poloviny předává funkci
+\texttt{merge}, která oba podřetězce seřadí a~vrátí. Funkce \texttt{mergesort} skončí 
+a~o~úroveň výš se seřadí dva již seřazené podřetězce do jednoho. To se opakuje, dokud 
 není celý řetězec seřazený.
 
-Protože merge sort kromě prvního řazení seřazuje vždy dva už seřazené subřetězce, 
-tak se ve funkci \texttt{merge} subřetězce seřazují do nového jen do doby než, 
-je jeden ze subřetězců zařazen, poté se už zbytek druhého jen přilepí na konec nově 
+Protože merge sort kromě prvního řazení seřazuje vždy dva už seřazené podřetězce, 
+tak se ve funkci \texttt{merge} podřetězce seřazují do nového jen do doby než, 
+je jeden ze podřetězců zařazen, poté se už zbytek druhého jen přilepí na konec nově 
 seřazeného řetězce.  
 
 \subsubsection{Tabulka symbolů - Binární vyhledávací strom}
@@ -204,7 +204,7 @@ bla
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Testování} \label{testovani}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Testování je nedílnou součástí vývoje software. Už od začátku jsme proto začali
+Testování je nedílnou součástí vývoje software. Už od začátku jsme proto začali 
 psát krátké testy pro každý modul, který jsme vytvořili. Tyto testy ověřovali,
 zdali námi implementované funkce v modulech vrací očekávané výstupy. Ověřovali 
 jsme kromě běžných případů i~různé okrajové případy. Smyslem těchto krátkých testů 
@@ -220,7 +220,7 @@ texty ze zadání, tak i~některé vlastní.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 K~úspěšnému dokončení interpretu nebyly potřeba jen dobré programátorské 
 znalosti~a nadšení, ale bylo potřeba zvládnout i~spolupráci v~pětičlenném týmu. 
-Bylo potřeba najít efektivní způsob komunikace a~rozdělení práce abychom interpret
+Bylo potřeba najít efektivní způsob komunikace a~rozdělení práce abychom interpret 
 dokončili včas.
 %=============================================================================
 \subsection{Komunikace}
@@ -252,7 +252,7 @@ Vytvořený interpret funguje tak, jak je požadováno v~zadání. Správně int
 všechny zdrojové texty ze zadání a~splňuje požadavky na formát výstupů. Dále zvládl 
 správně interpretovat i~naše vlastní testy. Naše implementace interpretu také zvládá 
 velmi rychlé kopírování řetězců mezi proměnnými. Také jsme implementovali navíc tři 
-rozšíření, které rozšiřují funkcionalitu interpretu o~možnost použítí unárního mínus, 
+rozšíření, které rozšiřují funkcionalitu interpretu o~možnost použití unárního mínus, 
 úplných logických výrazů a~výrazů v~parametrech funkcí nebo použití funkcí ve výrazech.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
