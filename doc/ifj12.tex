@@ -57,15 +57,18 @@ Popisuje, nejen způsob implementace interpretu, ale i~jeho testování a~také 
 Úkolem je vytvořit již zmíněný interpret imperativního jazyka IFJ12. Interpret 
 musí navíc nabízet několik vestavěných funkcí a musí být napsán v jazyce C. Součástí 
 zadání jsou i dílčí úkoly do předmětu IAL. Z varianty a/4/I vyplývá, že vyhledávácí 
-algoritmus bude \textbf{Knuth-Moris-Prattův}, řadící algoritmus bude \textbf{Merge sort} 
+algoritmus bude \textbf{Knuth-Moris-Prattův}, řadící algoritmus bude \textbf{merge sort} 
 a~tabulka symbolů bude implementována pomocí \textbf{binárního vyhledávacího stromu}. 
 %=============================================================================
 \subsection{Princip řešení}
-Tady bude jen nějaký obecný pricnip, že LA načte token, da to Syn.A ten z toho vyrobí 
-nevím co, pak to probehne Sem.A, a pak se to interpretuje. Kde a jak se používají tabulky
-symbolů atd. Zkrátka nějaký hodně obecný pohled na celou strukturu interpretu. 
+Jádrem interpretu bude \textbf{syntaktický analyzátor}, který bude zpracovávat tokeny 
+dodané \mbox{\textbf{lexikálním analyzátorem}}, který bude zpracovávat lexémy ze zdrojového souboru.
+Syntaktický analyzátor bude z tokenů sestavovat abstraktní syntaktický strom (AST), který poté
+prověří \textbf{sémantický analyzátor}. Pokud nastane při práci v některém z analyzátorů chyba, 
+tak bude vyvolána vyjímka s příslušnou chybou. Když vše proběhne v pořádku, tak se provede 
+interpretace AST. 
 %=============================================================================
-
+                                              
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementace} \label{implementace}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,46 +86,21 @@ analyzátoru až 4 tokeny naráz pomocí struktury \texttt{Scanner} a přidruže
 \subsection{Syntaktický analyzátor}
 bla
 %=============================================================================
-\subsection{Syntaktický analyzátor - precedenční analýza výrazů}
-V případě že metoda rekurzivního sestupu narazí na neterminál E, zavolá funkci
-pro interpretaci výrazu, \texttt{parseExpression}, která dále vstupní posloupnost
-tokenů vyhodnocuje podle algoritmu precedenční analýzy.
-
-Precedenční analýza funguje jako rozšířený zásobníkový automat, jehož vstupní
-i zásobníkovou abecedou jsou tokeny. Terminál na vstupu a terminál na zásobníku
-nejbližší vrcholu určují souřadnice do tabulky precedenční analýzy.
-Obsah takto vybrané buňky tabulky precedenční analýzy pak určuje akci, kterou
-by měl automat provést. (Zda přesunout vstupní terminál na vrchol zásobníku a
-načíst nový vstupní terminál, zda za terminál na zásobníku nejbližší vrcholu přidat
-levou závorku \texttt{<} nebo zda redukovat obsah zásobníku použitím pravidel)
-
-Precedenční tabulku jsme se rozhodli implementovat jako fyzickou strukturu v paměti,
-jako dvourozměné pole \texttt{precTable[][]}. Použití pravidel na obsah zásobníku je
-pak implementováno voláním funkce \texttt{tryUseRules()}. Jejím výsledkem by mělo být
-vždy nahrazení několika terminálů a neterminálů na vrcholu zásobníku za jediný
-neterminál. (např. \texttt{<E+E} bude nahrazeno za \texttt{E}) Jestliže vyhodnocování
-výrazu skončí jinak než terminálem ukončujícím výraz (např. koncem řádku) na vstupu a
-značkou konce zásobníku na vrcholu zásobníku, výraz není platný a vyhodnocování
-končí chybou.
-
-%=============================================================================
 \subsection{Sémantický analyzátor}
-Po vygenerování abstraktního syntaktického stromu (AST) pomocí syntaktického
-analyzátoru je AST procházen sémantickým analyzátorem, který slouží k 
-nalezení sémanticky neplatných operací, jako je například dělení
-řetězce číslem či sčítání dvou nilů.
+Po vygenerování abstraktního syntaktického stromu (AST) pomocí syntaktického analyzátoru 
+je AST procházen sémantickým analyzátorem, který slouží k~nalezení sémanticky 
+neplatných operací, jako je například dělení řetězce číslem či sčítání dvou nilů.
 
 Pro tuto činnost využívá sémantický analyzátor několik tabulek, které 
-popisují datové typy výstupních hodnot pro všechny možné kombinace
+popisují datové typy výstupních hodnot pro všechny možné kombinace 
 datových typů operandů všech podporovaných operátorů. 
 
 Během své činnosti se tento analyzátor snaží udržovat si informace 
-i~o~datových typech proměnných. To umožňuje nalezení některých sémantických
+i~o~datových typech proměnných. To umožňuje nalezení některých sémantických 
 chyb ještě před provedením samotného programu, což může být výhodné 
-v~případě, že se takové chyby nachází v části programu, která je prováděna
-pouze v malém množství případů.
-
-%=============================================================================
+v~případě, že se takové chyby nachází v části programu, která je prováděna 
+pouze v~malém množství případů.
+ %=============================================================================
 \subsection{Interpretace}
 Interpretace je prováděna rekurzivním čtením abstraktního syntaktického stromu 
 a~prováděním činností popisovaných jednotlivými uzly stromu. 
@@ -145,7 +123,20 @@ Funkce \texttt{evalCondition} a~\texttt{evalLoop} taktéž využívají funkce
 %=============================================================================
 \subsection{Modul ial}
 \subsubsection{Vyhledávací algoritmus - Knuth-Moris-Pratt}
-bla
+Klasické vyhledávání podřetězce (vzorku) v řetězci hledající znak po znaku se 
+v případě neshody s některým znakem vrací na první znak a posunou se o jednu 
+pozici v řetězci doprava. Poté začínají hledat znova od prvního znaku vzorku. 
+Tohoto využívá algoritmus Knuth-Moris-Pratt (KMP), který bere v úvahu informaci, 
+ze znaků, které již byly zkontrolovány. V případě neshody vzorku s řetězcem se 
+snaží posunout doprava tak, aby se již nemusel vracet v řetězci. 
+
+Aby algoritmus věděl o kolik se může posunout ve vyhledávání v případě neshody, 
+pro každý vzorek se vygeneruje nové pole s opravou. A to tak, že bere v úvahu 
+nejdelší unikátní prefix vzorku, ve kterém se neopakují žádné znaky (v prefixu). 
+Poté tento prefix porovnává se zbytkem vzorku a určuje opravu, pokud nalezne alespoň část. 
+Pak následuje už samotné vyhledávání. Pokud se nějaký znak neshoduje se vzorkem, 
+vyhledávání se posune doprava podle opravy, která byla spočítána. 
+
 \subsubsection{Řadící algoritmus - Merge sort}
 Merge sort se skládá ze dvou funkcí. Funkce \texttt{mergesort} rekurzivně dělí 
 řetězec na dvě poloviny, dokud jí nezbydou jen dva znaky. Tyto poloviny  předává funkci
@@ -157,6 +148,7 @@ Protože merge sort kromě prvního řazení seřazuje vždy dva už seřazené 
 tak se ve funkci \texttt{merge} subřetězce seřazují do nového jen do doby než, 
 je jeden ze subřetězců zařazen, poté se už zbytek druhého jen přilepí na konec nově 
 seřazeného řetězce.  
+
 \subsubsection{Tabulka symbolů - Binární vyhledávací strom}
 Jeden uzel stromu (prvek tabulky) je reprezentován strukturou \texttt{Symbol}.
 Ta obsahuje název symbolu, který je zároveň klíčem, podle kterého se ve stromu vyhledává. 
@@ -182,6 +174,7 @@ symbolů v~tabulce.\newline\newline Pro operace nad stromem jsou implementovány
 \subsection{Rozšíření}
 \subsubsection{FUNEXP}
 bla
+
 \subsubsection{LOGOP}
 Implementovány stejně, jako veškeré ostatní operátory. % co víc k tomu psat?
 
@@ -227,8 +220,8 @@ Výsledné rozdělení práce dopadlo přibližně takto: \medskip
 \begin{tabular}{llp{12.4cm}}
 Zdeněk Biberle & - & AST, syntaktický analyzátor, sémantický analyzátor\\
 Jan Doležal    & - & lexikální analyzátor, ještě něco, nevim co :P\\
-Martin Fryč    & - & Knuth-Moris-Prattův algoritmus, sémantický analyzátor\\
-Jan Kalina     & - & syntaktický analyzátor, generický datový typ, tabulka symbolů\\
+Martin Fryč    & - & Knuth-Moris-Pratt, sémantický analyzátor\\
+Jan Kalina     & - & syntaktický analyzátor, operátory, spousta dalších věcí, něco si sem dopiš\\
 Zdeněk Tretter & - & vestavěné funkce, merge sort, dokumentace\\
 \end{tabular}
 %=============================================================================
@@ -249,7 +242,7 @@ rozšíření, které rozšiřují funkcionalitu interpretu o~možnost použít�
 \begin{tabular}{ll}
   Počet souborů: & 24 \\
   Počet řádků: & 9001 \\
-  Velikost spustitelného souboru: & 42 kB \\
+  Velikost spustitelného souboru: & 74\,659\,B \\
 \end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -319,7 +312,7 @@ P = \{ \\
 
 \begin{landscape} % tabulku na sirku stranky
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Příloha: Pravidla a LL(2) tabulka rekurzivního sestupu} \label{rekurzivnisestup}
+\section{Příloha: Rekurzivní sestup - LL(2) tabulka} \label{rekurzivnisestup}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{minipage}{\linewidth} % obal tabulky pro poznamky pod carou
@@ -328,7 +321,7 @@ P = \{ \\
 \begin{math}
 G = (N,T,R,P) \\
 N = \{ P, S, P', S', L, E', E \} \\
-T = \{ \texttt{=}, \texttt{[}, \texttt{]}, \texttt{i}, \texttt{:}, \texttt{-}, \texttt{not}, \texttt{if}, \texttt{else}, \texttt{while}, \texttt{end}, \texttt{function}, \texttt{(}, \texttt{)}, \texttt{,}, \texttt{EOL} \} \\
+T = \{ \underline{=}, \underline{[}, \underline{]}, \text{ \underline{i} }, \text{ \underline{-} }, \text{ \underline{not} }, \text{ \underline{if} }, \text{ \underline{else} }, \text{ \underline{while} }, \text{ \underline{end} }, \text{ \underline{function} }, \text{ \underline{(} }, \text{ \underline{)} }, \text{ \underline{,} }, \text{ \underline{EOL} } \} \\
 \end{math}
 
 \begin{minipage}{0.2\linewidth}
@@ -338,17 +331,17 @@ T = \{ \texttt{=}, \texttt{[}, \texttt{]}, \texttt{i}, \texttt{:}, \texttt{-}, \
 3.  S  \rightarrow S' \\
 4.  P' \rightarrow \varepsilon \\
 5.  P' \rightarrow S'P' \\
-6.  S' \rightarrow \texttt{i} \texttt{=} A \texttt{ EOL } \\
+6.  S' \rightarrow i = A \text{ EOL } \\
 \end{math}
 \end{minipage}
-\begin{minipage}{0.5\linewidth}
+\begin{minipage}{0.42\linewidth}
 \begin{math}
 7.  A \rightarrow E \\
-8.  A \rightarrow \texttt{i} \texttt{[} E' \texttt{:} E' \texttt{]} \\
-9.  S' \rightarrow \texttt{ if } E \texttt{ EOL } P' \texttt{ else } \texttt{ EOL } P' \texttt{ end } \texttt{ EOL } \\
-10. S' \rightarrow \texttt{ while } E \texttt{ EOL } P' \texttt{ end } \texttt{ EOL } \\
-11. S' \rightarrow \texttt{ return } E \texttt{ EOL } \\
-12. S  \rightarrow \texttt{ function } \texttt{i} \texttt{(} E' L \texttt{)} \texttt{ EOL } P' \texttt{ end } \texttt{ EOL } \\
+8.  A \rightarrow i[E':E'] \\
+9.  S' \rightarrow \text{ if } E \text{ EOL } P' \text{ else } \text{ EOL } P' \text{ end } \text{ EOL } \\
+10. S' \rightarrow \text{ while } E \text{ EOL } P' \text{ end } \text{ EOL } \\
+11. S' \rightarrow \text{ return } E \text{ EOL } \\
+12. S  \rightarrow \text{ function } i ( E' L ) \text{ EOL } P' \text{ end } \text{ EOL } \\
 \end{math}
 \end{minipage}
 \begin{minipage}{0.4\linewidth}
