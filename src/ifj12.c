@@ -35,50 +35,76 @@ int main(int argc, char**argv)
     SyntaxContext syntaxcontext;
     Function mainFunction;
     
+    int exitVal = 0;
+    
     try{
-    
+        try{
         
-        initScanner(&s,f);
-        initDefaultSyntaxContext(&syntaxcontext);
+            initScanner(&s,f);
+            initDefaultSyntaxContext(&syntaxcontext);
         
-    
-        /***************************** Překlad do AST *****************************/
-        parseProgram(&s, &syntaxcontext, &mainFunction);
+            /***************************** Překlad do AST *****************************/
+            parseProgram(&s, &syntaxcontext, &mainFunction);
+        }
+        catch{
+            on(ScannerError, e){
+                scannerErrorPrint(*e);
+                fclose( f );
+                exitVal = 1;
+                rethrow();
+            }
+            on(SyntaxError, e){
+                syntaxErrorPrint(*e);
+                fclose( f );
+                exitVal = 2;
+                rethrow();
+            }
+            on(UnexpectedToken, e){
+                UnexpectedTokenPrint(*e);
+                fclose( f );
+                exitVal = 2;
+                rethrow();
+            }
+            on(UnexpectedKeyWord, e){
+                UnexpectedKeyWordPrint(*e);
+                fclose( f );
+                exitVal = 2;
+                rethrow();
+            }
+            on(MultipleFunctionDefinitions, value){
+                fprintf( stderr, "Nejednou definovana funkce \""); RCStringPrint(value, stderr); fprintf( stderr, "\"!\n");
+                fclose( f );
+                exitVal = 5;
+                rethrow();
+            }
+            on(OutOfMemory, typename){
+                fprintf( stderr, "Nezdarila se alokace pameti pro typ '%s'", *typename );
+                fclose( f );
+                exitVal = 99;
+                rethrow();
+            }
+            on( RedefinedParameter, name){
+                fprintf( stderr, "Opakovana definice parametru '" );
+                RCStringPrint( name, stderr );
+                deleteRCString( name );
+                fprintf( stderr, "'\n" );
+                fclose( f );
+                exitVal = 99;
+                rethrow();
+            }
+            onAll{
+                fprintf( stderr, "Nastala neocekavana vyjimka v prubehu syntakticke analyzy programu!\n" );
+                exitVal = 2;
+                rethrow();
+            }
+        }
     }
     catch{
-        on(ScannerError, e){
-            scannerErrorPrint(*e);
-            fclose( f );
-            exit( 1 );
-        }
-        on(SyntaxError, e){
-            syntaxErrorPrint(*e);
-            fclose( f );
-            exit( 2 );
-        }
-        on(UnexpectedToken, e){
-            UnexpectedTokenPrint(*e);
-            fclose( f );
-            exit( 2 );
-        }
-        on(UnexpectedKeyWord, e){
-            UnexpectedKeyWordPrint(*e);
-            fclose( f );
-            exit( 2 );
-        }
-        on(MultipleFunctionDefinitions, value){
-            fprintf( stderr, "Nejednou definovana funkce \""); RCStringPrint(value, stderr); fprintf( stderr, "\"!\n");
-            fclose( f );
-            exit( 5 );
-        }
-        on(OutOfMemory, typename){
-            fprintf( stderr, "Nezdarila se alokace pameti pro typ '%s'", *typename );
-            fclose( f );
-            exit( 99 );
-        }
         onAll{
-            fprintf( stderr, "Nastala neocekavana vyjimka v prubehu syntakticke analyzy programu!\n" );
-            exit( 2 );
+            deleteFunction( mainFunction );
+            freeValueTable( syntaxcontext.functions, syntaxcontext.globalSymbols->count );
+            destroyDefaultSyntaxContext( &syntaxcontext );
+            exit( exitVal );
         }
     }
     
@@ -128,8 +154,6 @@ int main(int argc, char**argv)
     }
     
     /****************************** Interpretace ******************************/
-    
-    int exitVal = 0;
 
     try{
         // Spusteni hlavni funkce programu (bez parametru)
@@ -188,7 +212,7 @@ int main(int argc, char**argv)
             fprintf( stderr, "Index mimo pole!\n" );
             exitVal = 13;
         }
-        on( OtherRunsErrors, e ){
+        on( OtherRuntimeErrors, e ){
             fprintf( stderr, "Nastala jina behova chyba!\n" );
             exitVal = 13;
         }

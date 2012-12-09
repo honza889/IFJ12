@@ -22,6 +22,7 @@ typedef enum
 
     /* Syntakticka analyza */
     SyntaxError, // exit 2
+    RedefinedParameter, // dva parametry funkce se stejnym jmenem
     UnexpectedToken,
     UnexpectedKeyWord,
     MultipleFunctionDefinitions, // exit 5 (ostatni semanticke chyby)
@@ -42,7 +43,7 @@ typedef enum
     InvalidExpression, // naplatny vyraz (napr. cteni globalni promenne)
     
     IndexOutOfBounds, // exit 13
-    OtherRunsErrors,  // exit 13
+    OtherRuntimeErrors,  // exit 13
     OutOfMemory, // exit 99 (chyba alokace pameti)
 } ExceptionType;
 
@@ -101,7 +102,7 @@ typedef struct
 typedef int UndefinedVariableException;
 typedef int UndefinedFunctionException;
 typedef int NegativeNumericException;	// int je zdroj {CONSTANT, VARIABLE}
-typedef bool OtherRunsErrorsException;
+typedef bool OtherRuntimeErrorsException;
 typedef bool DividingByZeroException;
 typedef Value VariableIsNotFunctionException;
 typedef Value FunctionIsNotVariableException;
@@ -113,7 +114,8 @@ typedef const char* OutOfMemoryException;
 typedef RCString MultipleFunctionDefinitionsException;
 typedef RCString VariableOverridesFunctionException; // nazev funkce/promenne
 typedef int InvalidAssignmentException; // index promenne, do ktere se prirazuje
-typedef int InvalidExpressionException; // nevim, co ten int znamena
+typedef int InvalidExpressionException; // ten int asi nic neznamena
+typedef RCString RedefinedParameterException; // nazev parametru
 
 #define EXCEPTION( name ) name##Exception name##ExceptionValue
 
@@ -128,7 +130,7 @@ typedef struct
         EXCEPTION( UndefinedFunction );
         EXCEPTION( UnexpectedValueType );
         EXCEPTION( NegativeNumeric );
-        EXCEPTION( OtherRunsErrors );
+        EXCEPTION( OtherRuntimeErrors );
         EXCEPTION( DividingByZero );
         EXCEPTION( VariableIsNotFunction );
         EXCEPTION( FunctionIsNotVariable );
@@ -144,6 +146,7 @@ typedef struct
         EXCEPTION( VariableOverridesFunction );
         EXCEPTION( InvalidAssignment );
         EXCEPTION( InvalidExpression );
+        EXCEPTION( RedefinedParameter );
     } value;
 } Exception;
 

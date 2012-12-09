@@ -166,8 +166,24 @@ void parseFunctionParameters( Scanner* s, Function* func, SyntaxContext* ctx )
     {
         case tokId:
         {
-            Variable param;
-            parseIdentifier( s, &param, ctx ); // tady to chce asi delat neco vic
+            testTok( s, tokId );
+            
+            RCString name = getTok( s ).data.id;
+            bool exists;
+            searchSymbol( &ctx->localSymbols->root, name, &exists );
+
+            if( exists )
+            {
+                throw( RedefinedParameter, copyRCString( &name ) );
+            }
+            
+            Variable param = getSymbol( name, ctx->globalSymbols, ctx->localSymbols );
+            if( param  < 0 )
+            {
+                throw( VariableOverridesFunction, name );
+            }
+            consumeTok( s );
+            
             func->paramCount++;
 
             testTok( s, tokComma | tokRParen );
@@ -207,36 +223,46 @@ void parseFunction( Scanner* s, SyntaxContext* ctx )
     };
 
     SymbolTable localSymbols = newSymbolTable();
-
     SymbolTable* oldLocalSymbols = ctx->localSymbols;
-    ctx->localSymbols = &localSymbols;
+    RCString funcName;
+    
+    try{
+        ctx->localSymbols = &localSymbols;
 
-    expectKeyw( s, kFunction );
+        expectKeyw( s, kFunction );
 
-    testTok( s, tokId );
-    RCString funcName = getTok( s ).data.id;
-    funcName = copyRCString(&funcName);
-    consumeTok( s );
+        testTok( s, tokId );
+        funcName = getTok( s ).data.id;
+        funcName = copyRCString(&funcName);
+        consumeTok( s );
 
-    expectTok( s, tokLParen );
-    parseFunctionParameters( s, func, ctx );
-    expectTok( s, tokRParen );
-    expectTok( s, tokEndOfLine );
-    while( ! ( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd ) )
-    {
-        parseStatement( s, &func->value.userDefined.statements, ctx );
+        expectTok( s, tokLParen );
+        parseFunctionParameters( s, func, ctx );
+        expectTok( s, tokRParen );
+        expectTok( s, tokEndOfLine );
+        while( ! ( getTok( s ).type == tokKeyW && getTok( s ).data.keyw == kEnd ) )
+        {
+            parseStatement( s, &func->value.userDefined.statements, ctx );
+        }
+        consumeTok( s );
+        expectTok( s, tokEndOfLine );
+
+        func->value.userDefined.variableCount = ctx->localSymbols->count;
+
+        //pro kontrolu shodnosti promenych a funkci
+        func->value.userDefined.variableNames = newArray( RCString, ctx->localSymbols->count );
+        fillNameListFromSymbolTree( func->value.userDefined.variableNames, ctx->localSymbols->root );
     }
-    consumeTok( s );
-    expectTok( s, tokEndOfLine );
-
-    func->value.userDefined.variableCount = ctx->localSymbols->count;
-
-    //pro kontrolu shodnosti promenych a funkci
-    func->value.userDefined.variableNames = newArray( RCString, ctx->localSymbols->count );
-    fillNameListFromSymbolTree( func->value.userDefined.variableNames, ctx->localSymbols->root );
-
+    catch{
+        onAll{
+            freeSymbolTable( &localSymbols );
+            ctx->localSymbols = oldLocalSymbols;
+            free( func );
+            rethrow();
+        }
+    }
+    
     freeSymbolTable( &localSymbols );
-
     ctx->localSymbols = oldLocalSymbols;
 
     addFunctionToContext( ctx, &funcName, func );
