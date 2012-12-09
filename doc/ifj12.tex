@@ -57,15 +57,18 @@ Popisuje, nejen způsob implementace interpretu, ale i~jeho testování a~také 
 Úkolem je vytvořit již zmíněný interpret imperativního jazyka IFJ12. Interpret 
 musí navíc nabízet několik vestavěných funkcí a musí být napsán v jazyce C. Součástí 
 zadání jsou i dílčí úkoly do předmětu IAL. Z varianty a/4/I vyplývá, že vyhledávácí 
-algoritmus bude \textbf{Knuth-Moris-Prattův}, řadící algoritmus bude \textbf{Merge sort} 
+algoritmus bude \textbf{Knuth-Moris-Prattův}, řadící algoritmus bude \textbf{merge sort} 
 a~tabulka symbolů bude implementována pomocí \textbf{binárního vyhledávacího stromu}. 
 %=============================================================================
 \subsection{Princip řešení}
-Tady bude jen nějaký obecný pricnip, že LA načte token, da to Syn.A ten z toho vyrobí 
-nevím co, pak to probehne Sem.A, a pak se to interpretuje. Kde a jak se používají tabulky
-symbolů atd. Zkrátka nějaký hodně obecný pohled na celou strukturu interpretu. 
+Jádrem interpretu bude \textbf{syntaktický analyzátor}, který bude zpracovávat tokeny 
+dodané \mbox{\textbf{lexikálním analyzátorem}}, který bude zpracovávat lexémy ze zdrojového souboru.
+Syntaktický analyzátor bude z tokenů sestavovat abstraktní syntaktický strom (AST), který poté
+prověří \textbf{sémantický analyzátor}. Pokud nastane při práci v některém z analyzátorů chyba, 
+tak bude vyvolána výjimka s příslušnou chybou. Když vše proběhne v pořádku, tak se provede 
+interpretace AST. 
 %=============================================================================
-
+                                              
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementace} \label{implementace}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,49 +83,43 @@ zdrojového souboru, operátor nebo klíčové slovo. Lexikální analyzátor na
 analyzátoru až 4 tokeny naráz pomocí struktury \texttt{Scanner} a přidružených funkcí
 \texttt{getTok}, \texttt{getTokN}, \texttt{consumeTok} a \texttt{consumeTokN}.
 %=============================================================================
-\subsection{Syntaktický analyzátor}
-bla
-%=============================================================================
 \subsection{Syntaktický analyzátor - precedenční analýza výrazů}
-V případě že metoda rekurzivního sestupu narazí na neterminál E, zavolá funkci
+V případě, že metoda rekurzivního sestupu narazí na neterminál E, zavolá funkci
 pro interpretaci výrazu, \texttt{parseExpression}, která dále vstupní posloupnost
 tokenů vyhodnocuje podle algoritmu precedenční analýzy.
 
-Precedenční analýza funguje jako rozšířený zásobníkový automat, jehož vstupní
-i zásobníkovou abecedou jsou tokeny. Terminál na vstupu a terminál na zásobníku
+Precedenční analýza funguje jako rozšířený zásobníkový automat, jehož vstupní 
+i~zá\-so\-bní\-ko\-vou abecedou jsou tokeny. Terminál na vstupu a~terminál na zásobníku
 nejbližší vrcholu určují souřadnice do tabulky precedenční analýzy.
 Obsah takto vybrané buňky tabulky precedenční analýzy pak určuje akci, kterou
-by měl automat provést. (Zda přesunout vstupní terminál na vrchol zásobníku a
-načíst nový vstupní terminál, zda za terminál na zásobníku nejbližší vrcholu přidat
+by měl automat provést. (Zda přesunout vstupní terminál na vrchol zásobníku a~načíst 
+nový vstupní terminál, zda za terminál na zásobníku nejbližší vrcholu přidat
 levou závorku \texttt{<} nebo zda redukovat obsah zásobníku použitím pravidel)
 
 Precedenční tabulku jsme se rozhodli implementovat jako fyzickou strukturu v paměti,
-jako dvourozměné pole \texttt{precTable[][]}. Použití pravidel na obsah zásobníku je
+jako dvourozměrné pole \texttt{precTable[][]}. Použití pravidel na obsah zásobníku je
 pak implementováno voláním funkce \texttt{tryUseRules()}. Jejím výsledkem by mělo být
 vždy nahrazení několika terminálů a neterminálů na vrcholu zásobníku za jediný
 neterminál. (např. \texttt{<E+E} bude nahrazeno za \texttt{E}) Jestliže vyhodnocování
-výrazu skončí jinak než terminálem ukončujícím výraz (např. koncem řádku) na vstupu a
-značkou konce zásobníku na vrcholu zásobníku, výraz není platný a vyhodnocování
+výrazu skončí jinak než terminálem ukončujícím výraz (např. koncem řádku) na vstupu 
+a~značkou konce zásobníku na vrcholu zásobníku, výraz není platný a vyhodnocování
 končí chybou.
-
 %=============================================================================
 \subsection{Sémantický analyzátor}
-Po vygenerování abstraktního syntaktického stromu (AST) pomocí syntaktického
-analyzátoru je AST procházen sémantickým analyzátorem, který slouží k 
-nalezení sémanticky neplatných operací, jako je například dělení
-řetězce číslem či sčítání dvou nilů.
+Po vygenerování abstraktního syntaktického stromu (AST) pomocí syntaktického analyzátoru 
+je AST procházen sémantickým analyzátorem, který slouží k~nalezení sémanticky 
+neplatných operací, jako je například dělení řetězce číslem či sčítání dvou nilů.
 
 Pro tuto činnost využívá sémantický analyzátor několik tabulek, které 
-popisují datové typy výstupních hodnot pro všechny možné kombinace
+popisují datové typy výstupních hodnot pro všechny možné kombinace 
 datových typů operandů všech podporovaných operátorů. 
 
 Během své činnosti se tento analyzátor snaží udržovat si informace 
-i~o~datových typech proměnných. To umožňuje nalezení některých sémantických
+i~o~datových typech proměnných. To umožňuje nalezení některých sémantických 
 chyb ještě před provedením samotného programu, což může být výhodné 
-v~případě, že se takové chyby nachází v části programu, která je prováděna
-pouze v malém množství případů.
-
-%=============================================================================
+v~případě, že se takové chyby nachází v části programu, která je prováděna 
+pouze v~malém množství případů.
+ %=============================================================================
 \subsection{Interpretace}
 Interpretace je prováděna rekurzivním čtením abstraktního syntaktického stromu 
 a~prováděním činností popisovaných jednotlivými uzly stromu. 
@@ -145,18 +142,32 @@ Funkce \texttt{evalCondition} a~\texttt{evalLoop} taktéž využívají funkce
 %=============================================================================
 \subsection{Modul ial}
 \subsubsection{Vyhledávací algoritmus - Knuth-Moris-Pratt}
-bla
+Klasické vyhledávání podřetězce (vzorku) v řetězci hledající znak po znaku se 
+v případě neshody s některým znakem vrací na první znak a posunou se o jednu 
+pozici v řetězci doprava. Poté začínají hledat znova od prvního znaku vzorku. 
+Tohoto využívá algoritmus Knuth-Moris-Pratt (KMP), který bere v úvahu informaci, 
+ze znaků, které již byly zkontrolovány. V případě neshody vzorku s řetězcem se 
+snaží posunout doprava tak, aby se již nemusel vracet v řetězci. 
+
+Aby algoritmus věděl, o kolik se může posunout ve vyhledávání v případě neshody, 
+pro každý vzorek se vygeneruje nové pole s opravou. A to tak, že bere v úvahu 
+nejdelší unikátní prefix vzorku, ve kterém se neopakují žádné znaky (v prefixu). 
+Poté tento prefix porovnává se zbytkem vzorku a určuje opravu, pokud nalezne alespoň část. 
+Pak následuje už samotné vyhledávání. Pokud se nějaký znak neshoduje se vzorkem, 
+vyhledávání se posune doprava podle opravy, která byla spočítána. 
+
 \subsubsection{Řadící algoritmus - Merge sort}
 Merge sort se skládá ze dvou funkcí. Funkce \texttt{mergesort} rekurzivně dělí 
-řetězec na dvě poloviny, dokud jí nezbydou jen dva znaky. Tyto poloviny  předává funkci
-\texttt{merge}, která oba subřetězce seřadí a~vrátí. Funkce \texttt{mergesort} skončí 
-a~o~úroveň výš se seřadí dva již seřazené subřetězce do jednoho. To se opakuje dokud 
+řetězec na dvě poloviny, dokud jí nezbydou jen dva znaky. Tyto poloviny předává funkci
+\texttt{merge}, která oba podřetězce seřadí a~vrátí. Funkce \texttt{mergesort} skončí 
+a~o~úroveň výš se seřadí dva již seřazené podřetězce do jednoho. To se opakuje, dokud 
 není celý řetězec seřazený.
 
-Protože merge sort kromě prvního řazení seřazuje vždy dva už seřazené subřetězce, 
-tak se ve funkci \texttt{merge} subřetězce seřazují do nového jen do doby než, 
-je jeden ze subřetězců zařazen, poté se už zbytek druhého jen přilepí na konec nově 
+Protože merge sort kromě prvního řazení seřazuje vždy dva už seřazené podřetězce, 
+tak se ve funkci \texttt{merge} podřetězce seřazují do nového jen do doby než, 
+je jeden ze podřetězců zařazen, poté se už zbytek druhého jen přilepí na konec nově 
 seřazeného řetězce.  
+
 \subsubsection{Tabulka symbolů - Binární vyhledávací strom}
 Jeden uzel stromu (prvek tabulky) je reprezentován strukturou \texttt{Symbol}.
 Ta obsahuje název symbolu, který je zároveň klíčem, podle kterého se ve stromu vyhledává. 
@@ -182,6 +193,7 @@ symbolů v~tabulce.\newline\newline Pro operace nad stromem jsou implementovány
 \subsection{Rozšíření}
 \subsubsection{FUNEXP}
 bla
+
 \subsubsection{LOGOP}
 Implementovány stejně, jako veškeré ostatní operátory. % co víc k tomu psat?
 
@@ -192,7 +204,7 @@ bla
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Testování} \label{testovani}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Testování je nedílnou součástí vývoje software. Už od začátku jsme proto začali
+Testování je nedílnou součástí vývoje software. Už od začátku jsme proto začali 
 psát krátké testy pro každý modul, který jsme vytvořili. Tyto testy ověřovali,
 zdali námi implementované funkce v modulech vrací očekávané výstupy. Ověřovali 
 jsme kromě běžných případů i~různé okrajové případy. Smyslem těchto krátkých testů 
@@ -208,7 +220,7 @@ texty ze zadání, tak i~některé vlastní.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 K~úspěšnému dokončení interpretu nebyly potřeba jen dobré programátorské 
 znalosti~a nadšení, ale bylo potřeba zvládnout i~spolupráci v~pětičlenném týmu. 
-Bylo potřeba najít efektivní způsob komunikace a~rozdělení práce abychom interpret
+Bylo potřeba najít efektivní způsob komunikace a~rozdělení práce abychom interpret 
 dokončili včas.
 %=============================================================================
 \subsection{Komunikace}
@@ -226,7 +238,7 @@ Výsledné rozdělení práce dopadlo přibližně takto: \medskip
 
 \begin{tabular}{llp{12.4cm}}
 Zdeněk Biberle & - & AST, syntaktický analyzátor, sémantický analyzátor\\
-Jan Doležal    & - & lexikální analyzátor, ještě něco, nevim co :P\\
+Jan Doležal    & - & lexikální analyzátor, testování\\
 Martin Fryč    & - & Knuth-Moris-Prattův algoritmus, sémantický analyzátor\\
 Jan Kalina     & - & syntaktický analyzátor, generický datový typ, tabulka symbolů\\
 Zdeněk Tretter & - & vestavěné funkce, merge sort, dokumentace\\
@@ -240,7 +252,7 @@ Vytvořený interpret funguje tak, jak je požadováno v~zadání. Správně int
 všechny zdrojové texty ze zadání a~splňuje požadavky na formát výstupů. Dále zvládl 
 správně interpretovat i~naše vlastní testy. Naše implementace interpretu také zvládá 
 velmi rychlé kopírování řetězců mezi proměnnými. Také jsme implementovali navíc tři 
-rozšíření, které rozšiřují funkcionalitu interpretu o~možnost použítí unárního mínus, 
+rozšíření, které rozšiřují funkcionalitu interpretu o~možnost použití unárního mínus, 
 úplných logických výrazů a~výrazů v~parametrech funkcí nebo použití funkcí ve výrazech.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -248,8 +260,8 @@ rozšíření, které rozšiřují funkcionalitu interpretu o~možnost použít�
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{tabular}{ll}
   Počet souborů: & 24 \\
-  Počet řádků: & 9001 \\
-  Velikost spustitelného souboru: & 42 kB \\
+  Počet řádků: & 5577 \\
+  Velikost spustitelného souboru: & 74\,659\,B \\
 \end{tabular}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
