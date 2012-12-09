@@ -12,7 +12,7 @@
 
 SOURCES=ifj12 value ast exceptions rcstring bif scanner syntax ial alloc parsexp semantics
 
-CFLAGS=-std=c99 -Wall -Wno-unused-variable -pedantic -DNDEBUG -lm
+CFLAGS=-std=c99 -Wall -Wno-unused-variable -pedantic -lm
 
 ifj12: $(addsuffix .c,$(SOURCES))
 	gcc -o $@ $^ $(CFLAGS)
