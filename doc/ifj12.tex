@@ -290,7 +290,7 @@ P = \{ \\
 \begin{math}
 G = (N,T,R,P) \\
 N = \{ P, S, P', S', L, E', E \} \\
-T = \{ =, [, ], \text{ i }, \text{ if }, \text{ else }, \text{ while }, \text{ end }, \text{ function }, (, ), \text{ , }, \text{ EOL } \} \\
+T = \{ \underline{=}, \underline{[}, \underline{]}, \text{ \underline{i} }, \text{ \underline{-} }, \text{ \underline{not} }, \text{ \underline{if} }, \text{ \underline{else} }, \text{ \underline{while} }, \text{ \underline{end} }, \text{ \underline{function} }, \text{ \underline{(} }, \text{ \underline{)} }, \text{ \underline{,} }, \text{ \underline{EOL} } \} \\
 \end{math}
 
 \begin{minipage}{0.2\linewidth}
@@ -300,17 +300,17 @@ T = \{ =, [, ], \text{ i }, \text{ if }, \text{ else }, \text{ while }, \text{ e
 3.  S  \rightarrow S' \\
 4.  P' \rightarrow \varepsilon \\
 5.  P' \rightarrow S'P' \\
-6.  S' \rightarrow id = A \text{ EOL } \\
+6.  S' \rightarrow i = A \text{ EOL } \\
 \end{math}
 \end{minipage}
 \begin{minipage}{0.42\linewidth}
 \begin{math}
 7.  A \rightarrow E \\
-8.  A \rightarrow id[E':E'] \\
-9.  S' \rightarrow \text{ if } E \text{ EOL } P' \text{ end } \text{ EOL } \\
+8.  A \rightarrow i[E':E'] \\
+9.  S' \rightarrow \text{ if } E \text{ EOL } P' \text{ else } \text{ EOL } P' \text{ end } \text{ EOL } \\
 10. S' \rightarrow \text{ while } E \text{ EOL } P' \text{ end } \text{ EOL } \\
 11. S' \rightarrow \text{ return } E \text{ EOL } \\
-12. S  \rightarrow \text{ function } id ( E' L ) \text{ EOL } P' \text{ end } \text{ EOL } \\
+12. S  \rightarrow \text{ function } i ( E' L ) \text{ EOL } P' \text{ end } \text{ EOL } \\
 \end{math}
 \end{minipage}
 \begin{minipage}{0.4\linewidth}
@@ -319,6 +319,8 @@ T = \{ =, [, ], \text{ i }, \text{ if }, \text{ else }, \text{ while }, \text{ e
 14. L  \rightarrow E L \\
 15. E' \rightarrow E \\
 16. E' \rightarrow \varepsilon \\
+17. S' \rightarrow \varepsilon \\
+18. S \rightarrow \varepsilon \\
 \\ \\
 \end{math}
 \end{minipage}

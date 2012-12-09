@@ -17,6 +17,7 @@ prectab.tex: prectab.csv
 rectab.tex: rectab.csv
 	type csv2latex >/dev/null	# Aby se nevytvořil prázdný soubor prectab.tex, když není nainstalovaný balík csv2latex
 	csv2latex --nohead --position c rectab.csv > rectab.tex
+	sed -i 's/&\\\\/\\\\/g' rectab.tex
 
 open: clean $(NAME).pdf
 	xdg-open $(NAME).pdf 2>/dev/null
