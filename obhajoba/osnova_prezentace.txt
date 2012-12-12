@@ -1,0 +1,8 @@
+- standardní rozložení interpretu
+- funkce scanneru
+- funkce syna
+- funkce sema
+- ast
+- řešení chyb (výjimky)
+- algoritmy
+- díky za pozornost
