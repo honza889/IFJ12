@@ -19,7 +19,7 @@
         <stop stop-opacity="1" stop-color="rgb(232,238,247)" offset="0%"/>
         <stop stop-opacity="1" stop-color="rgb(183,201,227)" offset="100%"/>
       </linearGradient>
-      <linearGradient x1="132.9182" gradientUnits="userSpaceOnUse" x2="212.9182" y1="120" y2="136" id="linearGradient5" spreadMethod="pad">
+      <linearGradient x1="157.9182" gradientUnits="userSpaceOnUse" x2="237.9182" y1="120" y2="136" id="linearGradient5" spreadMethod="pad">
         <stop stop-opacity="1" stop-color="rgb(232,238,247)" offset="0%"/>
         <stop stop-opacity="1" stop-color="rgb(183,201,227)" offset="100%"/>
       </linearGradient>
@@ -68,7 +68,7 @@
     <g fill="url(#linearGradient1)" stroke-miterlimit="1.45" transform="matrix(1,0,0,1,-67,-33)" stroke-linecap="butt" stroke="url(#linearGradient1)">
       <path d="M171 48 L319 48 L319 88 L171 88 Z" clip-path="url(#clipPath2)" stroke="none"/>
       <path fill="none" d="M171 48 L319 48 L319 88 L171 88 Z" clip-path="url(#clipPath2)" stroke="black"/>
-      <text x="193.3525" y="72.1543" clip-path="url(#clipPath2)" fill="black" font-family="sans-serif" stroke="none" xml:space="preserve">Lexikální analýza</text>
+      <text x="184.8623" y="72.1543" clip-path="url(#clipPath2)" fill="black" font-family="sans-serif" stroke="none" xml:space="preserve">Lexikální analyzátor</text>
     </g>
     <g transform="matrix(1,0,0,1,96,127)" image-rendering="optimizeQuality">
       <image x="0" y="0" clip-path="url(#clipPath4)" width="169" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKkAAAA9CAYAAADWIkl6AAABnUlEQVR42u3dXU+D&#10;MBiA0TJRp///v+r42ISkTSpxsy0zUXNO8gZCGBfmEbYbGgIAAADwt3WV53WVn4Ot&#10;y5XtrkjXcw5xumxgT6DnzfaqvjDQ9byHbERKa6QpzHmZKR6/GWpfEOga5eMyz3Hb&#10;x+PQEmkKdFjmtIm3+U66nvO0zMsyx7jf+3vTIAU6LvO2ibbpcZ/fSVOkrzHU3iOf&#10;BukRf4qBjnG6e30nTY/8Y9wXKS2RjnF/zL467op0e0dNsYqUFum3zBR7OpR0VPPd&#10;svtiIDQ2VF02/PrbL4gURIpIQaQgUkQKIkWkIFIQKSIFkYJIESmIFJGCSEGkiBRE&#10;CiJFpCBSRAoiBZEiUhApiBSRwt2VvkQ3X9okvYjfS3Spdc7m5oojtZGmOKc4Yzwm&#10;UloiHWNHcyhYaKwk0jzQ9eKn7HMipSXStPrIUBpqXxFoWndn3bcqHq2RphVI3uN2&#10;DjuXbbzEi6Q76BSsiEe77Y1v2BtpumD+XzCEwmVN4Juu5mxuRlq6SnMXPq/SDHtD&#10;vZT+yq8JTpz8RKwAAADAv/cBFp5zI4PwQjEAAAAASUVORK5CYII=" height="61" preserveAspectRatio="none"/>
@@ -76,7 +76,7 @@
     <g fill="url(#linearGradient2)" stroke-miterlimit="1.45" transform="matrix(1,0,0,1,-67,-33)" stroke-linecap="butt" stroke="url(#linearGradient2)">
       <path d="M171 168 L319 168 L319 208 L171 208 Z" clip-path="url(#clipPath2)" stroke="none"/>
       <path fill="none" d="M171 168 L319 168 L319 208 L171 208 Z" clip-path="url(#clipPath2)" stroke="black"/>
-      <text x="184.7568" y="192.1543" clip-path="url(#clipPath2)" fill="black" font-family="sans-serif" stroke="none" xml:space="preserve">Syntaktická analýza</text>
+      <text x="176.3926" y="192.1543" clip-path="url(#clipPath2)" fill="black" font-family="sans-serif" stroke="none" xml:space="preserve">Syntaktický analyzátor</text>
     </g>
     <g transform="matrix(1,0,0,1,7,247)" image-rendering="optimizeQuality">
       <image x="0" y="0" clip-path="url(#clipPath5)" width="169" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKkAAAA9CAYAAADWIkl6AAABnUlEQVR42u3dXU+D&#10;MBiA0TJRp///v+r42ISkTSpxsy0zUXNO8gZCGBfmEbYbGgIAAADwt3WV53WVn4Ot&#10;y5XtrkjXcw5xumxgT6DnzfaqvjDQ9byHbERKa6QpzHmZKR6/GWpfEOga5eMyz3Hb&#10;x+PQEmkKdFjmtIm3+U66nvO0zMsyx7jf+3vTIAU6LvO2ibbpcZ/fSVOkrzHU3iOf&#10;BukRf4qBjnG6e30nTY/8Y9wXKS2RjnF/zL467op0e0dNsYqUFum3zBR7OpR0VPPd&#10;svtiIDQ2VF02/PrbL4gURIpIQaQgUkQKIkWkIFIQKSIFkYJIESmIFJGCSEGkiBRE&#10;CiJFpCBSRAoiBZEiUhApiBSRwt2VvkQ3X9okvYjfS3Spdc7m5oojtZGmOKc4Yzwm&#10;UloiHWNHcyhYaKwk0jzQ9eKn7HMipSXStPrIUBpqXxFoWndn3bcqHq2RphVI3uN2&#10;DjuXbbzEi6Q76BSsiEe77Y1v2BtpumD+XzCEwmVN4Juu5mxuRlq6SnMXPq/SDHtD&#10;vZT+yq8JTpz8RKwAAADAv/cBFp5zI4PwQjEAAAAASUVORK5CYII=" height="61" preserveAspectRatio="none"/>
@@ -84,7 +84,7 @@
     <g fill="url(#linearGradient3)" stroke-miterlimit="1.45" transform="matrix(1,0,0,1,-67,-33)" stroke-linecap="butt" stroke="url(#linearGradient3)">
       <path d="M82 288 L230 288 L230 328 L82 328 Z" clip-path="url(#clipPath2)" stroke="none"/>
       <path fill="none" d="M82 288 L230 288 L230 328 L82 328 Z" clip-path="url(#clipPath2)" stroke="black"/>
-      <text x="95.5986" y="312.1543" clip-path="url(#clipPath2)" fill="black" font-family="sans-serif" stroke="none" xml:space="preserve">Sémantická analýza</text>
+      <text x="87.2344" y="312.1543" clip-path="url(#clipPath2)" fill="black" font-family="sans-serif" stroke="none" xml:space="preserve">Sémantický analyzátor</text>
     </g>
     <g transform="matrix(1,0,0,1,185,247)" image-rendering="optimizeQuality">
       <image x="0" y="0" clip-path="url(#clipPath6)" width="169" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKkAAAA9CAYAAADWIkl6AAABnUlEQVR42u3dXU+D&#10;MBiA0TJRp///v+r42ISkTSpxsy0zUXNO8gZCGBfmEbYbGgIAAADwt3WV53WVn4Ot&#10;y5XtrkjXcw5xumxgT6DnzfaqvjDQ9byHbERKa6QpzHmZKR6/GWpfEOga5eMyz3Hb&#10;x+PQEmkKdFjmtIm3+U66nvO0zMsyx7jf+3vTIAU6LvO2ibbpcZ/fSVOkrzHU3iOf&#10;BukRf4qBjnG6e30nTY/8Y9wXKS2RjnF/zL467op0e0dNsYqUFum3zBR7OpR0VPPd&#10;svtiIDQ2VF02/PrbL4gURIpIQaQgUkQKIkWkIFIQKSIFkYJIESmIFJGCSEGkiBRE&#10;CiJFpCBSRAoiBZEiUhApiBSRwt2VvkQ3X9okvYjfS3Spdc7m5oojtZGmOKc4Yzwm&#10;UloiHWNHcyhYaKwk0jzQ9eKn7HMipSXStPrIUBpqXxFoWndn3bcqHq2RphVI3uN2&#10;DjuXbbzEi6Q76BSsiEe77Y1v2BtpumD+XzCEwmVN4Juu5mxuRlq6SnMXPq/SDHtD&#10;vZT+yq8JTpz8RKwAAADAv/cBFp5zI4PwQjEAAAAASUVORK5CYII=" height="61" preserveAspectRatio="none"/>
@@ -95,9 +95,9 @@
       <text x="305.1309" y="312.1543" clip-path="url(#clipPath2)" fill="black" font-family="sans-serif" stroke="none" xml:space="preserve">Interpretr</text>
     </g>
     <g fill="url(#linearGradient5)" stroke-miterlimit="1.45" transform="matrix(1,0,0,1,-67,-33)" stroke-linecap="butt" stroke="url(#linearGradient5)">
-      <rect x="132.9182" y="120" clip-path="url(#clipPath2)" width="80" rx="8" ry="8" height="16" stroke="none"/>
-      <rect x="132.9182" y="120" clip-path="url(#clipPath2)" fill="none" width="80" rx="8" ry="8" height="16" stroke="black"/>
-      <text x="154.6135" y="132.1543" clip-path="url(#clipPath2)" fill="black" font-family="sans-serif" stroke="none" xml:space="preserve">Token</text>
+      <rect x="157.9182" y="120" clip-path="url(#clipPath2)" width="80" rx="8" ry="8" height="16" stroke="none"/>
+      <rect x="157.9182" y="120" clip-path="url(#clipPath2)" fill="none" width="80" rx="8" ry="8" height="16" stroke="black"/>
+      <text x="179.6135" y="132.1543" clip-path="url(#clipPath2)" fill="black" font-family="sans-serif" stroke="none" xml:space="preserve">Token</text>
     </g>
     <g fill="url(#linearGradient6)" stroke-miterlimit="1.45" transform="matrix(1,0,0,1,-67,-33)" stroke-linecap="butt" stroke="url(#linearGradient6)">
       <circle r="4.0923" clip-path="url(#clipPath2)" cx="264.3334" cy="217.3623" stroke="none"/>
@@ -121,12 +121,8 @@
       <circle fill="none" r="4.0923" clip-path="url(#clipPath2)" cx="286.0275" cy="245.0015" stroke="black"/>
     </g>
     <g stroke-linecap="butt" transform="matrix(1,0,0,1,-67,-33)" stroke-miterlimit="1.45">
-      <path fill="none" d="M219.4497 87.9753 L219.4497 157.0377" clip-path="url(#clipPath2)"/>
-      <path d="M219.4497 168.0377 L225.4497 156.0377 L213.4497 156.0377 Z" clip-path="url(#clipPath2)" stroke="none"/>
-    </g>
-    <g stroke-linecap="butt" transform="matrix(1,0,0,1,-67,-33)" stroke-miterlimit="1.45">
-      <path fill="none" d="M268.2338 168.0064 L268.2338 99.03" clip-path="url(#clipPath2)"/>
-      <path d="M268.2338 88.03 L262.2338 100.03 L274.2338 100.03 Z" clip-path="url(#clipPath2)" stroke="none"/>
+      <path fill="none" d="M245 88.0098 L245 157.0312" clip-path="url(#clipPath2)"/>
+      <path d="M245 168.0312 L251 156.0312 L239 156.0312 Z" clip-path="url(#clipPath2)" stroke="none"/>
     </g>
     <g stroke-linecap="butt" transform="matrix(1,0,0,1,-67,-33)" stroke-miterlimit="1.45">
       <path fill="none" d="M245 207.9888 L245 245 L244.375 249.375 L242.5 252.5 L239.375 254.375 L235 255 L166 255 L161.625 255.625 L158.5 257.5 L156.625 260.625 L156 265 L156 276.9956" clip-path="url(#clipPath2)"/>
