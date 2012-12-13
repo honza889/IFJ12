@@ -173,9 +173,6 @@
         <path d="M-8 -205 L-8 200.8854 L643 200.8854 L643 -205 Z"/>
       </clipPath>
     </defs>
-    <g fill="white" transform="translate(8,205)" stroke="white">
-      <rect x="-8" width="651" height="447" y="-205" clip-path="url(#clipPath2)" stroke="none"/>
-    </g>
     <g transform="matrix(1,0,0,1,281,151.25)" image-rendering="optimizeQuality">
       <image x="0" y="0" clip-path="url(#clipPath3)" width="99" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAABTCAYAAACLQbk4AAACA0lEQVR42u2dYW+C&#10;MBBASylDs///VxcRkEFyjbeulhNxMfO95IJz2A/3vKt8uToHAAAAANupNn6menCN&#10;/8qUvJ6eJWO51ydXZORlLNdLct1FRqUE1Cp8pkqQcRUwqrhIFAlGGbXc28zxIa8D&#10;MrIyoohhjvMcvYRbExIMIrzc185xlGsr73lkZGX0IuIkMYmc4j6yJiO2pqUiDnN8&#10;KiGN/J994+d+Eauik9w51arGrZVRqRYVZRxFSEubKlbGkIjo5b2xJMTaphoRcFBt&#10;qkbEzQ1ci+gkz6v5slSGVxt4UAt7cl/8dapzVVu6iDdWRhpUhP25TId7RMatp254&#10;woM1reaFQAYyABnIAGQgA5CBDEAGMgAZyABkADKQAchABiADGYAMZAAykAHIQAYg&#10;A5CBDEAGMgAZyABkIAOQgQxABjIAGYAMZAAykAHIQAYgAxmADGTAC8mYMgE27sqb&#10;Ny4WB+ReVCBlPWdpvoo5C8ZFB4k4LDeOV2WIZD5vQxLxi+y2ynCJjGW2d6c+E5CR&#10;JearkzjL36snBQSDiDg++uSuk4yXxRvHiNXSl3cR8SV56yWP06OVMYrdSonQI6Ud&#10;QrJtXZ8SsJuMuHgswbNUhT7QBH53E31+xmDZM6yJTE+WMY+UftM9I3YUfbLMtJcM&#10;p/aHNGD9uWy3M5ee8dl3EAIAAAAAf8o3H7KjUZULorUAAAAASUVORK5CYII=" height="83" preserveAspectRatio="none"/>
       <rect x="281" y="-45.75" transform="matrix(1,0,0,1,-273,53.75)" clip-path="url(#clipPath4)" fill="url(#linearGradient1)" width="78" image-rendering="auto" rx="4" ry="4" height="62" stroke="none"/>

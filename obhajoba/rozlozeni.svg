@@ -62,9 +62,6 @@
         <path d="M-185 -247 L171 -247 L171 63 L-185 63 L-185 -247 Z"/>
       </clipPath>
     </defs>
-    <g fill="white" transform="translate(-67,-33)" stroke="white">
-      <rect x="67" width="356" height="310" y="33" clip-path="url(#clipPath2)" stroke="none"/>
-    </g>
     <g transform="matrix(1,0,0,1,96,7)" image-rendering="optimizeQuality">
       <image x="0" y="0" clip-path="url(#clipPath3)" width="169" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKkAAAA9CAYAAADWIkl6AAABnUlEQVR42u3dXU+D&#10;MBiA0TJRp///v+r42ISkTSpxsy0zUXNO8gZCGBfmEbYbGgIAAADwt3WV53WVn4Ot&#10;y5XtrkjXcw5xumxgT6DnzfaqvjDQ9byHbERKa6QpzHmZKR6/GWpfEOga5eMyz3Hb&#10;x+PQEmkKdFjmtIm3+U66nvO0zMsyx7jf+3vTIAU6LvO2ibbpcZ/fSVOkrzHU3iOf&#10;BukRf4qBjnG6e30nTY/8Y9wXKS2RjnF/zL467op0e0dNsYqUFum3zBR7OpR0VPPd&#10;svtiIDQ2VF02/PrbL4gURIpIQaQgUkQKIkWkIFIQKSIFkYJIESmIFJGCSEGkiBRE&#10;CiJFpCBSRAoiBZEiUhApiBSRwt2VvkQ3X9okvYjfS3Spdc7m5oojtZGmOKc4Yzwm&#10;UloiHWNHcyhYaKwk0jzQ9eKn7HMipSXStPrIUBpqXxFoWndn3bcqHq2RphVI3uN2&#10;DjuXbbzEi6Q76BSsiEe77Y1v2BtpumD+XzCEwmVN4Juu5mxuRlq6SnMXPq/SDHtD&#10;vZT+yq8JTpz8RKwAAADAv/cBFp5zI4PwQjEAAAAASUVORK5CYII=" height="61" preserveAspectRatio="none"/>
     </g>

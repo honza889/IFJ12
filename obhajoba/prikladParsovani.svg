@@ -135,9 +135,6 @@
         <path d="M-204.1003 -303.6783 L139.8997 -303.6783 L139.8997 135.3217 L-204.1003 135.3217 L-204.1003 -303.6783 Z"/>
       </clipPath>
     </defs>
-    <g fill="white" transform="translate(-337,62)" stroke="white">
-      <rect x="337" width="344" height="439" y="-62" clip-path="url(#clipPath2)" stroke="none"/>
-    </g>
     <g transform="matrix(1,0,0,1,146.9946,116.1783)" image-rendering="optimizeQuality">
       <image x="0" y="0" clip-path="url(#clipPath3)" width="96" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABGCAYAAAAzbZETAAAB+klEQVR42u2caW/C&#10;MAxAkx4DtP//Wyn0WqrZm3ssJKXTpPGeZPWkSH6JUz5g5wAAAABeEb/zM/7JZ/w3&#10;xsX++BsCpnuLxRYBcwGD7A+pInzGiJ+SXpooNmbDKwvQxPeLiEqoEgWUcm8d4k32&#10;KwTMBGjy2xB32bpHEqrEsjPddwpxke1JzhUI+Co9U3QhbiGaEFczM/q9ArTsTCP/&#10;HOLdSKjl+quvA7b8tFIhSnNuMGtClgBvyo8KuIiEEyVoswS1JvmtRBcrQ6klqJak&#10;n00JKkn+ahZoRejMWhkt0ykzoDCLsEZpvgw+8zRG8uRjNT5lBiyDkf940Cblqsh8&#10;MBwMZQQBCAAEIAAQgABAAAIAAQgABCAAEIAAyMNHjj0CmAGAAAQAAhAACEAAIOB4&#10;xj3XEPA3QhBACQIEIAAQgAAEAAIQAAhAACAAAT+S1QMHjhMwunkvhGjfA8jPVZXw&#10;QNsDR/seDHKd/w6vE9+ZfD1s3FQlPFQTf5eoJfEVAla50gYd2i8o2qgjVYB2Abm5&#10;7xY1gxGBhPlAbSRucjy4Jxo2afmZjGp3FBVCw6a1AB2oV9m2LtKsKXUN6CXJjalx&#10;jaNf0NZaaUv1PWUG5DTt01Ys5WL0I2C+Xmop6sybkHtGgH1lta1YSP72LBhzXtdp&#10;3HpM4pf7/E4CAAAAiPIBXDqlYHIJ5DsAAAAASUVORK5CYII=" height="70" preserveAspectRatio="none"/>
       <rect x="491.9946" y="62.1783" transform="matrix(1,0,0,1,-483.9946,-54.1783)" clip-path="url(#clipPath4)" fill="url(#linearGradient1)" width="75.8333" image-rendering="auto" rx="4" ry="4" height="49.375" stroke="none"/>
