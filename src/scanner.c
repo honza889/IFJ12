@@ -288,10 +288,15 @@ bool FSM(FILE *f, Token *token, char *last_letter, unsigned *line_num, RCString 
         while (*last_letter != EOF) {
           *last_letter = getc(f);
           if (*last_letter == '\n') (*line_num)++;
-          else if (*last_letter == '*' && (*last_letter = getc(f)) == '/') {
-            *last_letter = getc(f);
-            return false;	// narazilo se na konec blokového komentáře, token však naplněn nebyl
-          }
+          else
+	  {
+	    while (*last_letter == '*') {
+	      if ( (*last_letter = getc(f)) == '/' ) {
+		*last_letter = getc(f);
+		return false;	// narazilo se na konec blokového komentáře, token však naplněn nebyl
+	      }
+	    }
+	  }
         }
         // Narazilo se na EOF -> error: unterminated comment
         deleteRCString(lexeme);
